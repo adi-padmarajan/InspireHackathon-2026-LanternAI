@@ -1,96 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Lantern Design System - Nature-Themed with Warm Lantern Glow */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Nature-inspired light theme */
+    --background: 80 20% 96%;
+    --foreground: 150 30% 12%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 75 25% 98%;
+    --card-foreground: 150 30% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 75 25% 98%;
+    --popover-foreground: 150 30% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Deep forest green with golden undertones */
+    --primary: 152 45% 28%;
+    --primary-foreground: 45 100% 97%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Warm amber/lantern glow */
+    --secondary: 38 92% 50%;
+    --secondary-foreground: 38 100% 10%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Soft sage muted */
+    --muted: 120 12% 75%;
+    --muted-foreground: 150 20% 35%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Forest accent */
+    --accent: 158 40% 88%;
+    --accent-foreground: 152 45% 22%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 85% 97%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 120 15% 85%;
+    --input: 120 15% 90%;
+    --ring: 152 45% 28%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Lantern glow color */
+    --lantern-glow: 38 95% 55%;
+    --lantern-glow-soft: 38 90% 75%;
+    
+    /* Forest greens palette */
+    --forest-deep: 152 45% 18%;
+    --forest-medium: 152 40% 35%;
+    --forest-light: 152 35% 55%;
+    --moss: 95 30% 45%;
+    
+    /* Nature gradients */
+    --gradient-forest: linear-gradient(135deg, hsl(152 45% 28%) 0%, hsl(95 30% 45%) 100%);
+    --gradient-sunrise: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(22 90% 55%) 100%);
+    --gradient-mist: linear-gradient(180deg, hsl(80 20% 96%) 0%, hsl(158 40% 88%) 100%);
+    
+    /* Shadows with lantern warmth */
+    --shadow-glow: 0 0 40px hsl(38 95% 55% / 0.3);
+    --shadow-forest: 0 10px 40px hsl(152 45% 18% / 0.15);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-background: 75 25% 98%;
+    --sidebar-foreground: 150 30% 12%;
+    --sidebar-primary: 152 45% 28%;
+    --sidebar-primary-foreground: 45 100% 97%;
+    --sidebar-accent: 158 40% 88%;
+    --sidebar-accent-foreground: 152 45% 22%;
+    --sidebar-border: 120 15% 85%;
+    --sidebar-ring: 152 45% 28%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --chart-1: 152 45% 40%;
+    --chart-2: 38 92% 50%;
+    --chart-3: 95 30% 45%;
+    --chart-4: 22 90% 55%;
+    --chart-5: 180 35% 45%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --font-sans: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Lora', ui-serif, Georgia, serif;
+    --font-mono: 'Inconsolata', ui-monospace, monospace;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Deep forest night theme */
+    --background: 150 25% 8%;
+    --foreground: 80 15% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 150 20% 12%;
+    --card-foreground: 80 15% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 150 20% 15%;
+    --popover-foreground: 80 15% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Vibrant forest green */
+    --primary: 152 55% 45%;
+    --primary-foreground: 150 25% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Warm lantern amber */
+    --secondary: 38 95% 55%;
+    --secondary-foreground: 38 100% 10%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 150 15% 25%;
+    --muted-foreground: 80 10% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 152 35% 20%;
+    --accent-foreground: 152 55% 60%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 85% 97%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 150 20% 20%;
+    --input: 150 20% 18%;
+    --ring: 152 55% 45%;
+
+    --lantern-glow: 38 95% 55%;
+    --lantern-glow-soft: 38 85% 40%;
+    
+    --forest-deep: 152 40% 10%;
+    --forest-medium: 152 45% 25%;
+    --forest-light: 152 50% 40%;
+    --moss: 95 25% 30%;
+
+    --sidebar-background: 150 20% 12%;
+    --sidebar-foreground: 80 15% 95%;
+    --sidebar-primary: 152 55% 45%;
+    --sidebar-primary-foreground: 150 25% 8%;
+    --sidebar-accent: 152 35% 20%;
+    --sidebar-accent-foreground: 152 55% 60%;
+    --sidebar-border: 150 20% 20%;
+    --sidebar-ring: 152 55% 45%;
+
+    --chart-1: 152 55% 55%;
+    --chart-2: 38 95% 60%;
+    --chart-3: 95 35% 50%;
+    --chart-4: 22 85% 60%;
+    --chart-5: 180 40% 50%;
   }
 }
 
@@ -100,6 +146,89 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .lantern-glow {
+    box-shadow: 0 0 60px hsl(var(--lantern-glow) / 0.4), 
+                0 0 120px hsl(var(--lantern-glow) / 0.2);
+  }
+
+  .lantern-glow-sm {
+    box-shadow: 0 0 20px hsl(var(--lantern-glow) / 0.3);
+  }
+
+  .forest-card {
+    @apply bg-card rounded-lg border border-border;
+    box-shadow: 0 4px 20px hsl(var(--forest-deep) / 0.1);
+  }
+
+  .nature-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--moss)) 100%);
+  }
+
+  .sunrise-gradient {
+    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(22 90% 55%) 100%);
+  }
+
+  .glass-forest {
+    @apply backdrop-blur-md;
+    background: hsl(var(--card) / 0.8);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--lantern-glow) / 0.5);
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 40px hsl(var(--lantern-glow) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 80px hsl(var(--lantern-glow) / 0.5);
+    }
+  }
+
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+  }
+
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
 }
