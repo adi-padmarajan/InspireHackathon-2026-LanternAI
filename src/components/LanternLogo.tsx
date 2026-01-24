@@ -22,25 +22,23 @@ export const LanternLogo = ({ className = "", size = "md", showText = true }: La
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <div className="relative">
-        {/* Outer glow - large diffuse light */}
-        <div className="absolute inset-0 -m-2 blur-xl opacity-60 animate-pulse">
-          <div className={`${sizeClasses[size]} bg-amber-400 rounded-full`} />
-        </div>
-        {/* Middle glow - warm light emission */}
-        <div className="absolute inset-0 -m-1 blur-md opacity-70">
-          <Lamp className={`${sizeClasses[size]} text-amber-300`} />
-        </div>
-        {/* Inner glow - bright core */}
-        <div className="absolute inset-0 blur-sm opacity-80">
-          <Lamp className={`${sizeClasses[size]} text-yellow-400`} />
-        </div>
+        {/* Ambient outer glow */}
+        <div className="absolute inset-0 -m-3 rounded-full bg-gradient-to-r from-amber-300/40 via-yellow-300/50 to-amber-400/40 blur-2xl opacity-70 animate-[pulse_4s_ease-in-out_infinite]" />
+
+        {/* Soft halo */}
+        <div className="absolute inset-0 -m-1 rounded-full bg-yellow-300/40 blur-lg" />
+
+        {/* Lamp glow */}
+        <Lamp className={`${sizeClasses[size]} absolute inset-0 text-yellow-300 blur-sm opacity-80`} />
+
         {/* Main lamp icon */}
-        <Lamp className={`${sizeClasses[size]} text-amber-500 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] relative z-10`} />
+        <Lamp
+          className={`${sizeClasses[size]} relative z-10 text-amber-500 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]`}
+        />
       </div>
+
       {showText && (
-        <span className={`${textSizeClasses[size]} font-serif font-bold text-foreground`}>
-          Lantern
-        </span>
+        <span className={`${textSizeClasses[size]} font-serif font-bold text-foreground tracking-wide`}>Lantern</span>
       )}
     </div>
   );
