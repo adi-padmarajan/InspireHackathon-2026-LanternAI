@@ -40,7 +40,7 @@ export const FloatingModeSelector = ({
   const currentMode = modes.find((m) => m.id === mode) || modes[0];
 
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3 bg-card/80 backdrop-blur-sm border-b border-border/50">
+    <div className="relative z-50 flex items-center justify-between gap-3 px-4 py-3 bg-card backdrop-blur-sm border-b border-border/50">
       {/* Mode Selector */}
       <div className="relative">
         <button
