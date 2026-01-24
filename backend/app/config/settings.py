@@ -14,10 +14,8 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_anon_key: str = ""
 
-    # AI Provider (for future integration)
-    ai_provider: str = "openai"
-    openai_api_key: str = ""
-    anthropic_api_key: str = ""
+    # AI Provider
+    gemini_api_key: str = ""
 
     class Config:
         env_file = ".env"
