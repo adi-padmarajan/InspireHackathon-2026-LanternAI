@@ -4,7 +4,7 @@
  * social anxiety, seasonal depression, and more.
  */
 
-import type { ChatMode } from "@/components/chat/FloatingModeSelector";
+import type { ChatMode } from "@/lib/chatModes";
 
 export interface SupportCategory {
   keywords: string[];
