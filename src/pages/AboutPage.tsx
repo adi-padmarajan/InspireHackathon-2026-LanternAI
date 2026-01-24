@@ -48,7 +48,7 @@ const AboutPage = () => {
           {/* Hero */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="flex justify-center mb-6">
-              <LanternLogo size="lg" showText={false} />
+              <LanternLogo size="lg" />
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6">
               About <span className="text-primary">Lantern</span>
