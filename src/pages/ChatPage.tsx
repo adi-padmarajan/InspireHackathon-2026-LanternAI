@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Loader2 } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
-import { ChatMessage } from "@/components/chat/ChatMessage";
-import { ChatInput } from "@/components/chat/ChatInput";
-import { ModeToggle, QuickTopics, type ChatMode } from "@/components/chat/ModeToggle";
-import { SuggestedPrompts } from "@/components/chat/SuggestedPrompts";
+import { WelcomeHero } from "@/components/chat/WelcomeHero";
+import { ChatBubble } from "@/components/chat/ChatBubble";
+import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import { QuickActionCards } from "@/components/chat/QuickActionCards";
+import { FloatingModeSelector, type ChatMode } from "@/components/chat/FloatingModeSelector";
+import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
 import { generateLanternResponse, getMoodBasedGreeting } from "@/lib/lanternAI";
 
 interface Message {
@@ -15,36 +15,14 @@ interface Message {
   timestamp: Date;
 }
 
-const getInitialGreeting = (): string => {
-  const hour = new Date().getHours();
-  const timeGreeting = getMoodBasedGreeting(hour);
-  
-  return `Hello! I'm Lantern, your UVic wellness companion. 🌿✨
-
-${timeGreeting}
-
-I'm here to help you with:
-• **Mental health** - Stress, anxiety, seasonal depression
-• **Social support** - Making friends, joining clubs, social anxiety
-• **Accessibility** - Campus navigation, accessible routes
-• **International students** - Cultural adjustment, academic norms
-
-What's on your mind?`;
-};
-
 const ChatPage = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: getInitialGreeting(),
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<ChatMode>("default");
+  const [hasStartedChat, setHasStartedChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,13 +32,45 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const startChat = (initialMessage?: string) => {
+    setHasStartedChat(true);
+
+    // Add initial greeting from Lantern
+    const hour = new Date().getHours();
+    const timeGreeting = getMoodBasedGreeting(hour);
+
+    const greetingMessage: Message = {
+      id: "greeting",
+      role: "assistant",
+      content: `${timeGreeting}\n\nI'm Lantern, your UVic wellness companion. I'm here to listen and help with whatever you're going through - whether it's stress, making connections, navigating campus, or adjusting to life here.\n\nWhat would you like to talk about?`,
+      timestamp: new Date(),
+    };
+
+    setMessages([greetingMessage]);
+
+    // If there's an initial message (from quick action), send it
+    if (initialMessage) {
+      setTimeout(() => {
+        handleSendMessage(initialMessage);
+      }, 500);
+    }
+  };
+
+  const handleSendMessage = async (messageText?: string) => {
+    const text = messageText || input;
+    if (!text.trim() || isLoading) return;
+
+    // Start chat if not started
+    if (!hasStartedChat) {
+      startChat(text);
+      setInput("");
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input.trim(),
+      content: text.trim(),
       timestamp: new Date(),
     };
 
@@ -68,7 +78,7 @@ const ChatPage = () => {
     setInput("");
     setIsLoading(true);
 
-    // Generate AI response using the unified Lantern AI system
+    // Generate AI response
     setTimeout(() => {
       const response = generateLanternResponse(userMessage.content, mode);
       const assistantMessage: Message = {
@@ -79,26 +89,36 @@ const ChatPage = () => {
       };
       setMessages((prev) => [...prev, assistantMessage]);
       setIsLoading(false);
-    }, 800);
+    }, 800 + Math.random() * 400);
   };
 
-  const handlePromptClick = (prompt: string) => {
-    setInput(prompt);
+  const handleSend = () => {
+    handleSendMessage();
+  };
+
+  const handleQuickAction = (prompt: string) => {
+    if (!hasStartedChat) {
+      startChat(prompt);
+    } else {
+      setInput(prompt);
+    }
   };
 
   const handleModeChange = (newMode: ChatMode) => {
     setMode(newMode);
-    
-    // Add a system message about mode change
-    if (newMode !== "default") {
-      const modeMessage = newMode === "accessibility" 
-        ? "🦽 Accessibility mode enabled. I'll prioritize accessible routes, elevator locations, and mobility support in my responses."
-        : "🌍 International student mode enabled. I'll provide extra context about Canadian culture, academic norms, and international resources.";
-      
+
+    if (hasStartedChat && newMode !== "default") {
+      const modeMessages: Record<string, string> = {
+        accessibility:
+          "I've switched to accessibility mode. I'll prioritize accessible routes, elevator locations, and mobility support in my responses. How can I help you navigate campus?",
+        international:
+          "I've switched to international student mode. I'll provide extra context about Canadian culture, academic norms, and international resources. What questions do you have?",
+      };
+
       const systemMessage: Message = {
         id: Date.now().toString(),
         role: "assistant",
-        content: modeMessage,
+        content: modeMessages[newMode] || "",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, systemMessage]);
@@ -106,75 +126,72 @@ const ChatPage = () => {
   };
 
   const handleNewChat = () => {
-    setMessages([
-      {
-        id: "1",
-        role: "assistant",
-        content: getInitialGreeting(),
-        timestamp: new Date(),
-      },
-    ]);
+    setMessages([]);
+    setHasStartedChat(false);
     setMode("default");
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col chat-ambient-bg">
       <Navigation />
-      
-      <main className="flex-1 pt-20 pb-8">
-        <div className="container mx-auto px-4 h-full flex flex-col max-w-4xl">
-          {/* Mode Toggles */}
-          <ModeToggle 
-            mode={mode} 
-            onModeChange={handleModeChange} 
-            onNewChat={handleNewChat} 
-          />
 
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto forest-card p-4 md:p-6 mb-4 min-h-[400px] max-h-[60vh]">
-            <div className="space-y-6">
-              {messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
-              ))}
-              
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-accent text-accent-foreground rounded-2xl rounded-bl-md px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm">Lantern is thinking...</span>
-                    </div>
-                  </div>
+      {/* Main Chat Container */}
+      <main className="flex-1 pt-16 flex flex-col">
+        <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+          {/* Mode Selector Header - Only show when chat has started */}
+          {hasStartedChat && (
+            <FloatingModeSelector
+              mode={mode}
+              onModeChange={handleModeChange}
+              onNewChat={handleNewChat}
+            />
+          )}
+
+          {/* Chat Content Area */}
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto chat-scroll px-4 md:px-6"
+          >
+            {!hasStartedChat ? (
+              /* Welcome State */
+              <div className="h-full flex flex-col">
+                <WelcomeHero />
+                <div className="flex-1 pb-4">
+                  <QuickActionCards onSelect={handleQuickAction} />
                 </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+              </div>
+            ) : (
+              /* Chat Messages */
+              <div className="py-6 space-y-6">
+                {messages.map((message, index) => (
+                  <ChatBubble
+                    key={message.id}
+                    message={message}
+                    isLatest={
+                      index === messages.length - 1 &&
+                      message.role === "assistant"
+                    }
+                  />
+                ))}
+
+                {isLoading && <TypingIndicator />}
+
+                <div ref={messagesEndRef} />
+              </div>
+            )}
           </div>
 
-          {/* Quick Topics - Show only on first message */}
-          {messages.length <= 1 && (
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground mb-3">Quick topics:</p>
-              <QuickTopics onSelect={handlePromptClick} />
-            </div>
-          )}
-
-          {/* Suggested Prompts - Show when few messages */}
-          {messages.length > 1 && messages.length < 4 && (
-            <SuggestedPrompts onPromptClick={handlePromptClick} />
-          )}
-
-          {/* Input Area */}
-          <ChatInput
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            isLoading={isLoading}
-          />
+          {/* Input Area - Fixed at bottom */}
+          <div className="sticky bottom-0 p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent pt-8">
+            <EnhancedChatInput
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };
