@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Navigation } from "@/components/Navigation";
 import { WelcomeHero } from "@/components/chat/WelcomeHero";
 import { ChatBubble } from "@/components/chat/ChatBubble";
@@ -32,7 +32,32 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const startChat = (initialMessage?: string) => {
+  const sendMessageToAI = useCallback((text: string, currentMode: ChatMode) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: text.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+
+    // Generate AI response
+    setTimeout(() => {
+      const response = generateLanternResponse(text.trim(), currentMode);
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: response,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      setIsLoading(false);
+    }, 800 + Math.random() * 400);
+  }, []);
+
+  const startChat = useCallback((initialMessage?: string) => {
     setHasStartedChat(true);
 
     // Add initial greeting from Lantern
@@ -48,17 +73,17 @@ const ChatPage = () => {
 
     setMessages([greetingMessage]);
 
-    // If there's an initial message (from quick action), send it
+    // If there's an initial message (from quick action), send it after greeting
     if (initialMessage) {
       setTimeout(() => {
-        handleSendMessage(initialMessage);
+        sendMessageToAI(initialMessage, mode);
       }, 500);
     }
-  };
+  }, [mode, sendMessageToAI]);
 
-  const handleSendMessage = async (messageText?: string) => {
-    const text = messageText || input;
-    if (!text.trim() || isLoading) return;
+  const handleSend = useCallback(() => {
+    const text = input.trim();
+    if (!text || isLoading) return;
 
     // Start chat if not started
     if (!hasStartedChat) {
@@ -67,42 +92,17 @@ const ChatPage = () => {
       return;
     }
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: text.trim(),
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    sendMessageToAI(text, mode);
     setInput("");
-    setIsLoading(true);
+  }, [input, isLoading, hasStartedChat, mode, startChat, sendMessageToAI]);
 
-    // Generate AI response
-    setTimeout(() => {
-      const response = generateLanternResponse(userMessage.content, mode);
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: response,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 800 + Math.random() * 400);
-  };
-
-  const handleSend = () => {
-    handleSendMessage();
-  };
-
-  const handleQuickAction = (prompt: string) => {
+  const handleQuickAction = useCallback((prompt: string) => {
     if (!hasStartedChat) {
       startChat(prompt);
     } else {
       setInput(prompt);
     }
-  };
+  }, [hasStartedChat, startChat]);
 
   const handleModeChange = (newMode: ChatMode) => {
     setMode(newMode);

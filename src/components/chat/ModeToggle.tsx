@@ -1,7 +1,6 @@
 import { Accessibility, Globe, RefreshCw, Heart, Brain, Users, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export type ChatMode = "default" | "accessibility" | "international";
+import type { ChatMode } from "@/components/chat/FloatingModeSelector";
 
 interface ModeToggleProps {
   mode: ChatMode;

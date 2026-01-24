@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Lamp, User, Check, CheckCheck } from "lucide-react";
+import { Lamp, User, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -52,11 +52,11 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
       {/* Avatar */}
       <div className={cn(
         "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300",
-        isAssistant && "bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 shadow-sm",
-        isUser && "bg-gradient-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20"
+        isAssistant && "bg-gradient-to-br from-lantern-glow/20 to-lantern-glow-soft/30 shadow-sm",
+        isUser && "bg-gradient-to-br from-primary/20 to-primary/10"
       )}>
         {isAssistant ? (
-          <Lamp className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <Lamp className="h-4 w-4 text-lantern-glow" />
         ) : (
           <User className="h-4 w-4 text-primary" />
         )}
@@ -70,7 +70,7 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
         {/* Name Label */}
         <span className={cn(
           "text-xs font-medium mb-1.5 px-1",
-          isAssistant ? "text-amber-700 dark:text-amber-400" : "text-primary"
+          isAssistant ? "text-lantern-glow" : "text-primary"
         )}>
           {isAssistant ? "Lantern" : "You"}
         </span>
@@ -104,7 +104,7 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
 
           {/* Subtle glow for assistant messages */}
           {isAssistant && isLatest && (
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-400/5 to-orange-400/5 rounded-2xl blur-xl" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-lantern-glow/5 to-lantern-glow-soft/5 rounded-2xl blur-xl" />
           )}
         </div>
 
