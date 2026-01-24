@@ -6,7 +6,9 @@ import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { QuickActionCards } from "@/components/chat/QuickActionCards";
 import { FloatingModeSelector, type ChatMode } from "@/components/chat/FloatingModeSelector";
 import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
-import { generateLanternResponse, getMoodBasedGreeting } from "@/lib/lanternAI";
+import { getMoodBasedGreeting } from "@/lib/lanternAI";
+
+const API_BASE_URL = "http://localhost:8000";
 
 interface Message {
   id: string;
@@ -32,7 +34,7 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessageToAI = useCallback((text: string, currentMode: ChatMode) => {
+  const sendMessageToAI = useCallback(async (text: string, currentMode: ChatMode) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -43,18 +45,39 @@ const ChatPage = () => {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Generate AI response
-    setTimeout(() => {
-      const response = generateLanternResponse(text.trim(), currentMode);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: text.trim(),
+          mode: currentMode,
+        }),
+      });
+
+      const data = await response.json();
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response,
+        content: data.data?.message || "I'm here to help! Could you try rephrasing that?",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Error calling chat API:", error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "I'm having trouble connecting right now. Please make sure the backend server is running on localhost:8000.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 800 + Math.random() * 400);
+    }
   }, []);
 
   const startChat = useCallback((initialMessage?: string) => {
