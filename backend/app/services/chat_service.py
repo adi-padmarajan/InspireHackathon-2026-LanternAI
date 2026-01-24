@@ -1,10 +1,13 @@
 from datetime import datetime
-import google.generativeai as genai
+from openai import OpenAI
 from ..config import settings
 from ..models.schemas import ChatMode, ChatResponse
 
-# Configure Gemini
-genai.configure(api_key=settings.gemini_api_key)
+# Configure OpenRouter client
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=settings.openrouter_api_key,
+)
 
 SYSTEM_PROMPT = """You are Lantern, a warm and supportive AI companion for University of Victoria (UVic) students. You help students navigate mental health challenges, campus life, accessibility needs, and the unique experiences of international students.
 
@@ -52,34 +55,27 @@ Remember: You're a supportive first step, not a replacement for professional hel
 
 
 class ChatService:
-    _model = None
-
-    @classmethod
-    def _get_model(cls):
-        if cls._model is None:
-            cls._model = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                system_instruction=SYSTEM_PROMPT,
-            )
-        return cls._model
-
     @staticmethod
     def get_contextual_response(message: str, mode: ChatMode) -> ChatResponse:
-        """Generate a response using Gemini API."""
-        model = ChatService._get_model()
+        """Generate a response using OpenRouter API."""
 
         # Add mode context to the prompt
         mode_context = ""
         if mode == ChatMode.ACCESSIBILITY:
-            mode_context = "[Accessibility Mode Active - prioritize accessible routes and mobility support] "
+            mode_context = "[Accessibility Mode Active - prioritize accessible routes and mobility support]\n\n"
         elif mode == ChatMode.INTERNATIONAL:
-            mode_context = "[International Student Mode Active - focus on cultural adjustment and international student resources] "
-
-        full_prompt = f"{mode_context}Student message: {message}"
+            mode_context = "[International Student Mode Active - focus on cultural adjustment and international student resources]\n\n"
 
         try:
-            response = model.generate_content(full_prompt)
-            response_text = response.text
+            response = client.chat.completions.create(
+                model="mistralai/devstral-2512:free",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": f"{mode_context}{message}"},
+                ],
+                max_tokens=500,
+            )
+            response_text = response.choices[0].message.content
         except Exception as e:
             # Fallback response if API fails
             response_text = (
