@@ -8,14 +8,19 @@ T = TypeVar("T")
 
 # Chat models
 class ChatMode(str, Enum):
-    DEFAULT = "default"
-    ACCESSIBILITY = "accessibility"
+    WELLNESS = "wellness"
+    NAVIGATOR = "navigator"
+    SOCIAL = "social"
+    MENTAL_HEALTH = "mental_health"
     INTERNATIONAL = "international"
+    ACCESSIBILITY = "accessibility"
+    SEASONAL = "seasonal"
+    RESOURCES = "resources"
 
 
 class ChatMessageInput(BaseModel):
     message: str = Field(..., min_length=1)
-    mode: ChatMode = ChatMode.DEFAULT
+    mode: ChatMode = ChatMode.WELLNESS
 
 
 class ChatResponse(BaseModel):

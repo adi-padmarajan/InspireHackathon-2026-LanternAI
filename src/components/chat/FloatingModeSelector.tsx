@@ -1,8 +1,10 @@
-import { Accessibility, Globe, RefreshCw, ChevronDown, Check } from "lucide-react";
+import { RefreshCw, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { type ChatMode, allModes, getModeConfig } from "@/lib/chatModes";
 
-export type ChatMode = "default" | "accessibility" | "international";
+// Re-export ChatMode for backward compatibility
+export type { ChatMode } from "@/lib/chatModes";
 
 interface FloatingModeSelectorProps {
   mode: ChatMode;
@@ -10,34 +12,13 @@ interface FloatingModeSelectorProps {
   onNewChat: () => void;
 }
 
-const modes = [
-  {
-    id: "default" as const,
-    label: "Standard",
-    description: "General wellness support",
-    icon: null,
-  },
-  {
-    id: "accessibility" as const,
-    label: "Accessibility",
-    description: "Accessible routes & mobility",
-    icon: Accessibility,
-  },
-  {
-    id: "international" as const,
-    label: "International",
-    description: "Cultural & visa support",
-    icon: Globe,
-  },
-];
-
 export const FloatingModeSelector = ({
   mode,
   onModeChange,
   onNewChat,
 }: FloatingModeSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const currentMode = modes.find((m) => m.id === mode) || modes[0];
+  const currentMode = getModeConfig(mode);
 
   return (
     <div className="relative z-50 flex items-center justify-between gap-3 px-4 py-3 bg-card backdrop-blur-sm border-b border-border/50">
@@ -52,10 +33,8 @@ export const FloatingModeSelector = ({
             "focus:outline-none focus:ring-2 focus:ring-primary/30"
           )}
         >
-          {currentMode.icon && (
-            <currentMode.icon className="h-4 w-4 text-primary" />
-          )}
-          <span>{currentMode.label}</span>
+          <currentMode.icon className={cn("h-4 w-4", currentMode.iconColor)} />
+          <span>{currentMode.shortLabel}</span>
           <ChevronDown
             className={cn(
               "h-4 w-4 text-muted-foreground transition-transform duration-200",
@@ -74,9 +53,12 @@ export const FloatingModeSelector = ({
             />
 
             {/* Menu */}
-            <div className="absolute top-full left-0 mt-2 w-64 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden animate-scale-in">
+            <div className="absolute top-full left-0 mt-2 w-72 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden animate-scale-in max-h-[70vh] overflow-y-auto">
               <div className="p-2">
-                {modes.map((modeOption) => (
+                <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Support Modes
+                </div>
+                {allModes.map((modeOption) => (
                   <button
                     key={modeOption.id}
                     onClick={() => {
@@ -90,7 +72,7 @@ export const FloatingModeSelector = ({
                       mode === modeOption.id && "bg-accent"
                     )}
                   >
-                    {/* Icon or Placeholder */}
+                    {/* Icon */}
                     <div
                       className={cn(
                         "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center",
@@ -99,24 +81,20 @@ export const FloatingModeSelector = ({
                           : "bg-muted text-muted-foreground"
                       )}
                     >
-                      {modeOption.icon ? (
-                        <modeOption.icon className="h-4 w-4" />
-                      ) : (
-                        <div className="w-2 h-2 rounded-full bg-current" />
-                      )}
+                      <modeOption.icon className="h-4 w-4" />
                     </div>
 
                     {/* Text */}
-                    <div className="flex-1 text-left">
+                    <div className="flex-1 text-left min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-sm truncate">
                           {modeOption.label}
                         </span>
                         {mode === modeOption.id && (
-                          <Check className="h-3 w-3 text-primary" />
+                          <Check className="h-3 w-3 text-primary flex-shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                         {modeOption.description}
                       </p>
                     </div>
