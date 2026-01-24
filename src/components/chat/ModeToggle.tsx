@@ -27,14 +27,9 @@ export const ModeToggle = ({ mode, onModeChange, onNewChat }: ModeToggleProps) =
         className="gap-2"
       >
         <Globe className="h-4 w-4" />
-        International
+        International Students
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onNewChat}
-        className="gap-2"
-      >
+      <Button variant="ghost" size="sm" onClick={onNewChat} className="gap-2">
         <RefreshCw className="h-4 w-4" />
         New Chat
       </Button>
@@ -54,7 +49,11 @@ export const QuickTopics = ({ onSelect }: QuickTopicsProps) => {
     { icon: Users, label: "Making Friends", prompt: "I'm having trouble making friends at university" },
     { icon: Heart, label: "Social Anxiety", prompt: "I want to join clubs but I feel too anxious" },
     { icon: Accessibility, label: "Campus Access", prompt: "I need help finding accessible routes on campus" },
-    { icon: Globe, label: "International Help", prompt: "As an international student, I'm confused about Canadian academic culture" },
+    {
+      icon: Globe,
+      label: "International Help",
+      prompt: "As an international student, I'm confused about Canadian academic culture",
+    },
   ];
 
   return (
