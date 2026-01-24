@@ -6,9 +6,9 @@ interface LanternLogoProps {
 }
 
 const sizeClasses = {
-  sm: "h-5 w-5",
-  md: "h-7 w-7",
-  lg: "h-10 w-10",
+  sm: "h-6 w-6",
+  md: "h-10 w-10",
+  lg: "h-14 w-14",
 };
 
 const titleSizeClasses = {
