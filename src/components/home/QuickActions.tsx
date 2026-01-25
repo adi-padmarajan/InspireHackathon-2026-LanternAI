@@ -20,7 +20,7 @@ const quickActions: QuickAction[] = [
   {
     icon: MessageCircle,
     title: "Talk to me",
-    description: "I'm here to listen and help with whatever's on your mind",
+    description: "Choose from 8 specialized support modes",
     to: "/chat",
     gradient: "from-chart-1/20 to-chart-1/5",
   },
