@@ -1,0 +1,2082 @@
+{
+  "source": {
+    "title": "Student Resources - University of Victoria",
+    "url": "https://www.uvic.ca/students/campus-services/student-resources/index.php",
+    "retrieved_date": "2026-01-24"
+  },
+  "categories": [
+    "Academics",
+    "Arts & culture, recreation",
+    "Campus services",
+    "Departments, faculties & units",
+    "Indigenous",
+    "International",
+    "Online tools",
+    "Research"
+  ],
+  "resources": [
+    {
+      "name": "A. Wilfrid Johns Gallery",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "The A. Wilfrid Johns Gallery is located in the MacLaurin building (MAC) A wing.",
+      "location": "MacLaurin Building",
+      "url": "/search/maps-buildings/buildings/maclaurin.php"
+    },
+    {
+      "name": "About UVic",
+      "categories": ["Academics", "Indigenous", "International", "Research"],
+      "description": "Learn about the University of Victoria, our programs and research strengths.",
+      "url": "/about-uvic/about-the-university/"
+    },
+    {
+      "name": "Academic accommodations",
+      "categories": ["Academics", "Campus services"],
+      "description": "Academic accommodations reduce barriers and provide different ways of meeting essential course or program requirements.",
+      "url": "https://www.uvic.ca/accessible-learning/index.php"
+    },
+    {
+      "name": "Academic advising, undergraduate",
+      "categories": ["Academics", "Campus services"],
+      "description": "Get advice and guidance on your academic requirements and learn what supports there are to help you complete your degree.",
+      "location": "Jamie Cassels Centre, A203",
+      "url": "/students/undergraduate/academic-advising/"
+    },
+    {
+      "name": "Academic calendar",
+      "categories": ["Academics", "Online tools"],
+      "description": "The official guide to all courses, programs, services, dates and regulations of the university.",
+      "url": "/calendar/"
+    },
+    {
+      "name": "Academic concessions and deferrals",
+      "categories": ["Academics"],
+      "description": "If your academic courses are affected by illness, accident or family affliction, you may wish to request an academic concession.",
+      "url": "https://www.uvic.ca/students/academics/academic-concessions-accommodations/"
+    },
+    {
+      "name": "Academic integrity",
+      "categories": ["Academics"],
+      "description": "Learn about UVic's expectations for students, faculty members and staff around academic integrity.",
+      "url": "/students/academics/academic-integrity/"
+    },
+    {
+      "name": "Academic Skills Centre (ASC)",
+      "categories": ["Academics", "Campus services"],
+      "description": "The Academic Skills Centre (ASC) offers in-person or Zoom coaching sessions for managing your time, setting goals and sustaining focus during busy periods. The CAC can also help you improve your academic writing, deliver better presentations and learn how to retain information for your exams and assessments.",
+      "url": "https://www.uvic.ca/learningandteaching/cac"
+    },
+    {
+      "name": "Academic Writing Requirement (AWR)",
+      "categories": ["Academics"],
+      "description": "All undergraduate students enrolled in a degree program at UVic must complete an Academic Writing Requirement (AWR) course.",
+      "url": "https://www.uvic.ca/students/undergraduate/program-planning/academic-writing-requirement/index.php"
+    },
+    {
+      "name": "Accessible Learning, Centre for (CAL)",
+      "categories": ["Academics", "Campus services"],
+      "description": "CAL works with students and faculty to create equity and accessibility for students with disabilities.",
+      "location": "Campus Services, 150",
+      "url": "https://www.uvic.ca/accessible-learning/index.php"
+    },
+    {
+      "name": "Admissions, graduate",
+      "categories": ["Academics"],
+      "description": "Everything you need to know about becoming a graduate student at UVic.",
+      "location": "Jamie Cassels Centre, A206",
+      "url": "/graduate/index.php"
+    },
+    {
+      "name": "Admissions, undergraduate",
+      "categories": ["Academics"],
+      "description": "Everything you need to know about becoming an undergrad at UVic. Get information on everything from undergraduate admissions to housing.",
+      "location": "Jamie Cassels Centre, A203",
+      "url": "/undergraduate/"
+    },
+    {
+      "name": "Advanced Materials and Related Technology, Centre for (CAMTEC)",
+      "categories": ["Research"],
+      "description": "CAMTEC is a research centre committed to interdisciplinary work on advanced materials and technology.",
+      "location": "Elliott, 207",
+      "url": "https://www.uvic.ca/research/centres/camtec/"
+    },
+    {
+      "name": "Advanced Microscopy Facility",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "Learn about our Advanced Microscopy Facility, one of the core labs of the Centre for Advanced Materials and Related Technology (CAMTEC).",
+      "location": "Bob Wright, A015",
+      "url": "https://www.uvic.ca/research/advancedmicroscopy/"
+    },
+    {
+      "name": "Aging and Lifelong Health, Institute on (IALH)",
+      "categories": ["Research"],
+      "description": "The Institute on Aging and Lifelong Health (IALH) is committed to promoting and conducting rigorous basic and applied research to improve the health and quality of life of individuals.",
+      "location": "Hut R",
+      "url": "https://www.uvic.ca/research/centres/aging/"
+    },
+    {
+      "name": "Alumni Card",
+      "categories": ["Campus services"],
+      "description": "The UVic Alumni Card is a unique ONECard that gives alumni access to exclusive discounts and privileges at a variety of on- and off-campus businesses for a one-time fee of $20.",
+      "location": "ONECard Office - Jamie Cassels Centre",
+      "url": "https://www.uvic.ca/alumni/benefits-and-services/alumni-card/index.php"
+    },
+    {
+      "name": "Alumni Relations",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Connect, learn and remember by staying in touch with the UVic Alumni Association.",
+      "location": "Alumni House - Ian Stewart Complex",
+      "url": "https://www.uvic.ca/alumni/"
+    },
+    {
+      "name": "Animal Care Services",
+      "categories": ["Campus services", "Research"],
+      "description": "All research with animals at UVic must be conducted in accordance with the highest ethical and humane standards. Animal research must receive approval from the Animal Care Committee (ACC).",
+      "url": "https://www.uvic.ca/research-services/home/regapproval/animalethics/index.php"
+    },
+    {
+      "name": "Anthropology",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Anthropology at UVic explores human evolution and past and present human cultures.",
+      "location": "Cornett, B228",
+      "url": "https://www.uvic.ca/socialsciences/anthropology/"
+    },
+    {
+      "name": "Anti-Violence Project (AVP)",
+      "categories": ["Campus services"],
+      "description": "The Anti-Violence Project (AVP) is committed to addressing and ending gender-based and sexualized violence on campus and beyond.",
+      "url": "https://antiviolenceproject.org/"
+    },
+    {
+      "name": "Apply to UVic",
+      "categories": ["Academics", "Online tools"],
+      "description": "UVic's online application is the gateway to admissions for both undergraduate and graduate studies at UVic.",
+      "url": "https://www.uvic.ca/BAN2P/bzsklogn.p_display_login"
+    },
+    {
+      "name": "Art History and Visual Studies",
+      "categories": ["Academics", "Arts & culture, recreation", "Departments, faculties & units"],
+      "description": "The Department of Art History and Visual Studies immerses students in the visual traditions of cultures worldwide.",
+      "location": "Fine Arts, 151",
+      "url": "https://www.uvic.ca/finearts/ahvs/"
+    },
+    {
+      "name": "Asia-Pacific Initiatives, Centre for (CAPI)",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "CAPI conducts research on policy issues and builds relationships with universities and civil society organizations in the Pacific.",
+      "location": "Sedgewick, C128",
+      "url": "https://www.uvic.ca/research/centres/capi/"
+    },
+    {
+      "name": "Astronomy Research Centre (ARC)",
+      "categories": ["Research"],
+      "description": "The Astronomy Research Centre (ARC) explores astrophysics, engineering, computation, and instrumentation.",
+      "location": "Elliot, 101",
+      "url": "https://www.uvic.ca/research/centres/arc/"
+    },
+    {
+      "name": "Athletics, Recreation and Special Abilities, Centre for (CARSA)",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "CARSA is home to Vikes varsity programs, athletics and recreation and CanAssist. It features a two-floor weight room and climbing tower.",
+      "location": "CARSA",
+      "url": "https://vikesrec.ca/facilities"
+    },
+    {
+      "name": "Audio Visual and Media Services",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Learn what audiovisual and media services are available on campus such as video conferencing, webcasting and video production.",
+      "location": "Clearihue, A067",
+      "url": "https://www.uvic.ca/systems/services/avmultimedia/index.php"
+    },
+    {
+      "name": "Banner",
+      "categories": ["Online tools"],
+      "description": "The Banner system provides University of Victoria's faculty and staff with access to financial, HR and student information.",
+      "url": "https://www.uvic.ca/systems/support/businessapps/banner/index.php"
+    },
+    {
+      "name": "Bargaining information",
+      "categories": ["Campus services"],
+      "description": "Learn about collective bargaining for UVic's six unionized employee groups.",
+      "url": "https://www.uvic.ca/bargaining/index.php"
+    },
+    {
+      "name": "Better Data Project",
+      "categories": ["Campus services"],
+      "description": "Collecting, managing, and using identity data across campus to inform inclusive action.",
+      "url": "https://www.uvic.ca/equity-action-plan/better-data/about-project/index.php"
+    },
+    {
+      "name": "Biochemistry and Microbiology",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Biochemistry and Microbiology engages in research and teaching in the disciplines central to molecular biology and biotechnology.",
+      "location": "Petch, 207",
+      "url": "https://www.uvic.ca/science/biochem/index.php"
+    },
+    {
+      "name": "Biology",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Biology studies life at all levels—from the gene to the ecosystem.",
+      "location": "Cunningham, 202",
+      "url": "https://www.uvic.ca/science/biology/index.php"
+    },
+    {
+      "name": "Board of Governors",
+      "categories": [],
+      "description": "The Board of Governors is one of the two elected bodies that governs the university.",
+      "url": "https://www.uvic.ca/universitysecretary/governors/"
+    },
+    {
+      "name": "Booking space",
+      "categories": ["Campus services"],
+      "description": "Book on-campus classrooms, lecture halls and meeting space.",
+      "url": "https://www.uvic.ca/registrar/bookings/index.php"
+    },
+    {
+      "name": "Bookstore",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The UVic Bookstore is the on-campus stop for textbooks, merchandise, giftware, stationery, computers and all your school essentials.",
+      "location": "Campus Services",
+      "url": "https://www.uvicbookstore.ca/"
+    },
+    {
+      "name": "Brightspace",
+      "categories": ["Academics", "Online tools"],
+      "description": "Brightspace learning management system is the primary online hub to access course content, collaborate, track progress and get feedback.",
+      "url": "https://bright.uvic.ca"
+    },
+    {
+      "name": "Budget and Capital Planning",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Budget Office forecasts, develops and manages the university's operating budget.",
+      "location": "Michael Williams, A212",
+      "url": "https://www.uvic.ca/budget/index.php"
+    },
+    {
+      "name": "Business, Peter B. Gustavson School of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Learn about the academic programs and opportunities in the Peter B. Gustavson School of Business.",
+      "location": "Business and Economics, 254",
+      "url": "https://www.uvic.ca/gustavson/"
+    },
+    {
+      "name": "Campus Alone",
+      "categories": ["Campus services"],
+      "description": "Campus Alone is available to all members of the campus community who work or study on campus during the quiet hours of evenings, weekends, holidays, etc.",
+      "url": "https://www.uvic.ca/security/home/safewalk/index.php"
+    },
+    {
+      "name": "Campus Bike Centre",
+      "categories": ["Campus services"],
+      "description": "The Centre provides covered bike parking for 234 bikes, equipment lockers, benches and an expanded, renovated space for the BikeHub bicycle program.",
+      "location": "Jamie Cassels Centre",
+      "url": "https://www.uvic.ca/security/parking/bicycle/index.php"
+    },
+    {
+      "name": "Campus Community Garden",
+      "categories": ["Campus services"],
+      "description": "The Campus Community Garden is a space for UVic students, faculty, and staff to grow food and share in the beauty of tending to plants.",
+      "url": "https://www.ccgardenuvic.ca/"
+    },
+    {
+      "name": "Campus Dental Centre",
+      "categories": ["Campus services"],
+      "description": "The Campus Dental Centre is a full-service dental practice in the Student Union Building.",
+      "location": "Student Union (SUB), B142",
+      "url": "https://campusdentalcentre.com/"
+    },
+    {
+      "name": "Campus hours of operation",
+      "categories": ["Online tools"],
+      "description": "View the hours of operation and holiday hours for the UVic campus and various services.",
+      "url": "/about-uvic/contact-us/campus-hours/"
+    },
+    {
+      "name": "Campus Planning",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Physical changes at UVic are guided by the university's Campus Plan.",
+      "location": "Michael Williams, A279",
+      "url": "https://www.uvic.ca/campusplanning/"
+    },
+    {
+      "name": "Campus Security Services",
+      "categories": ["Campus services"],
+      "description": "Campus Security Services is available 24 hours a day, seven days a week. We are UVic's first responders for emergencies and oversee parking services.",
+      "location": "Campus Security",
+      "url": "https://www.uvic.ca/security/"
+    },
+    {
+      "name": "Campus Services",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Campus Services, in the Division of Student Affairs, oversees the Bookstore, Child Care Services, ONECard, Printing, Food Services and more.",
+      "location": "Jamie Cassels Centre, B202",
+      "url": "https://www.uvic.ca/studentaffairs/departments/campus-services/index.php"
+    },
+    {
+      "name": "Campus tours and visits",
+      "categories": ["Campus services"],
+      "description": "UVic campus tours are available Monday to Saturday.",
+      "location": "Jamie Cassels Centre, Welcome Centre",
+      "url": "/campus/tours-and-visits/"
+    },
+    {
+      "name": "Canadian Institute for Substance Use Research (CISUR)",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "CISUR is a network dedicated to the study of substance use and addiction. Learn about our efforts to promote health and reduce harm.",
+      "url": "https://www.uvic.ca/research/centres/cisur/"
+    },
+    {
+      "name": "Career Services",
+      "categories": ["Academics", "Campus services"],
+      "description": "Career Services is here to help you succeed at work during your time at UVic and beyond. We run workshops and programs, offer in-person support and provide many online resources to help you navigate your career.",
+      "location": "Campus Services Building 110",
+      "url": "https://www.uvic.ca/career-services/"
+    },
+    {
+      "name": "Ceremonies and Events",
+      "categories": ["Arts & culture, recreation", "Departments, faculties & units"],
+      "description": "Ceremonies and Events is an experienced, professional team that creates and implements all major university events.",
+      "location": "Cornett, B142",
+      "url": "https://www.uvic.ca/ceremonies/"
+    },
+    {
+      "name": "CFUV Campus Radio (101.9 FM)",
+      "categories": ["Arts & culture, recreation"],
+      "description": "UVic's campus radio station.",
+      "location": "Student Union (SUB), B006",
+      "url": "http://cfuv.uvic.ca/"
+    },
+    {
+      "name": "Chemistry",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Chemistry fosters world-class research and outstanding chemical education.",
+      "location": "Elliott, 301",
+      "url": "https://www.uvic.ca/science/chemistry/"
+    },
+    {
+      "name": "Child and Youth Care",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Child and Youth Care is dedicated to practice and research that supports the well-being of children, youth, families and communities.",
+      "location": "Human and Social Development, 102A",
+      "url": "https://www.uvic.ca/education/cyc/"
+    },
+    {
+      "name": "Child Care Services",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Child Care Services provides full-time and part-time child care to the UVic community for children ages five and younger.",
+      "location": "Child Care Complex",
+      "url": "https://www.uvic.ca/services/childcare/"
+    },
+    {
+      "name": "CIFAL Victoria",
+      "categories": ["Academics", "International", "Research"],
+      "description": "CIFAL Victoria, based at UVic, is part of a global network of 24 United Nations Institute of Training and Research (UNITAR) training centres.",
+      "contact": "cifal.victoria@uvic.ca",
+      "url": "https://www.uvic.ca/about-uvic/cifal/"
+    },
+    {
+      "name": "Cinecenta",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "Cinecenta is UVic's on-campus movie theatre and is open to everyone.",
+      "location": "Student Union (SUB)",
+      "url": "https://www.cinecenta.com/"
+    },
+    {
+      "name": "Civil Engineering",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "As the greenest civil engineering department in Canada, UVic's Department of Civil Engineering responds to global environmental challenges with practical design solutions.",
+      "location": "Engineering and Computer Science, 304",
+      "url": "https://www.uvic.ca/ecs/civil/index.php"
+    },
+    {
+      "name": "Class schedule search",
+      "categories": ["Online tools"],
+      "description": "Search for classes by term, subject, course number or other criteria.",
+      "url": "https://www.uvic.ca/students/academics/course-timetable/"
+    },
+    {
+      "name": "Climate science, BSc",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Learn the foundations of climate science to translate climate information into actionable practice.",
+      "url": "https://www.uvic.ca/undergraduate/programs/undergraduate-programs/pages/climate-science.php"
+    },
+    {
+      "name": "Clubs",
+      "categories": ["Arts & culture, recreation"],
+      "description": "There are more than 200 student clubs open to students and community members.",
+      "url": "https://uvss.ca/clubs-course-unions/"
+    },
+    {
+      "name": "Co-operative Education",
+      "categories": ["Academics", "Campus services"],
+      "description": "Co-op helps students get on the fast track for their dream job and provides opportunities to learn outside the classroom and gain valuable work experience.",
+      "location": "Jamie Cassels Centre, B271",
+      "url": "https://www.uvic.ca/coop/"
+    },
+    {
+      "name": "Coast Capital Savings Innovation Centre",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "UVic's on-campus venture accelerator provides support and mentorship for business concepts to go from idea to investor ready.",
+      "location": "Sedgewick, A142",
+      "url": "https://www.uvic.ca/innovation/index.php"
+    },
+    {
+      "name": "Communications and Marketing (UCAM)",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "UCAM provides strategic communications and marketing support to the university.",
+      "location": "Sedgewick, C149",
+      "url": "https://www.uvic.ca/communicationsmarketing/"
+    },
+    {
+      "name": "Community and Government Relations",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The Office of Community and Government Relations provides strategic support and expertise to units on engaging with all levels of government.",
+      "location": "Michael Williams, A120",
+      "url": "https://www.uvic.ca/external/community/"
+    },
+    {
+      "name": "Community-Engaged Learning (CEL)",
+      "categories": ["Academics", "Campus services"],
+      "description": "CEL helps students apply academic knowledge to real world issues, a process that can benefit both students and the community.",
+      "url": "https://www.uvic.ca/cue/involved/index.php"
+    },
+    {
+      "name": "Computer Help Desk",
+      "categories": ["Campus services", "Online tools"],
+      "description": "The Computer Help Desk provides information and advice to members of the university for most campus computing resources.",
+      "location": "Clearihue, A037",
+      "url": "https://www.uvic.ca/systems/services/helpsupport/computerhelpdesk/"
+    },
+    {
+      "name": "Computer labs (hours & operation)",
+      "categories": ["Campus services"],
+      "description": "UVic offers computing facilities across campus.",
+      "url": "https://www.uvic.ca/systems/services/computerssoftware/computingfacilities/index.php"
+    },
+    {
+      "name": "Computer Science",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Computer Science offers undergraduate and graduate degrees in data and computing.",
+      "location": "Engineering and Computer Science, 504",
+      "url": "https://www.uvic.ca/ecs/computerscience/index.php"
+    },
+    {
+      "name": "Computer Store",
+      "categories": ["Campus services"],
+      "description": "Find solutions for all your technology needs including computers, cameras, speakers and more at the Computer Store.",
+      "location": "UVic Bookstore",
+      "url": "https://www.uvicbookstore.ca/tech/"
+    },
+    {
+      "name": "Contacts",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Contact information for the University of Victoria.",
+      "url": "/about-uvic/contact-us/"
+    },
+    {
+      "name": "Continuing Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Continuing Studies provides adult and continuing education programming in co-operation with UVic faculties and community partners. Full-time, part-time, distance and on-campus options are available.",
+      "location": "Continuing Studies, 2nd Floor",
+      "url": "https://continuingstudies.uvic.ca/"
+    },
+    {
+      "name": "Copyright",
+      "categories": ["Academics", "Research"],
+      "description": "The Copyright Office provides information on copyright issues, including fair dealing, university policies and guidelines.",
+      "url": "https://www.uvic.ca/library/research-teaching/copyright/index.php"
+    },
+    {
+      "name": "Course registration, graduate",
+      "categories": ["Academics", "Online tools"],
+      "description": "Learn how to register for graduate courses.",
+      "url": "/students/graduate/registration/index.php#ipn-register-for-courses"
+    },
+    {
+      "name": "Course registration, undergraduate",
+      "categories": ["Academics", "Online tools"],
+      "description": "Learn the basics of course registration at UVic.",
+      "url": "/students/undergraduate/course-registration/"
+    },
+    {
+      "name": "COVID-19 info",
+      "categories": ["Academics", "Campus services"],
+      "description": "Stay up-to-date about UVic's response to COVID-19.",
+      "url": "/covid19/"
+    },
+    {
+      "name": "Cultural, Social and Political Thought Program",
+      "categories": ["Research"],
+      "description": "The Cultural, Social and Political Thought (CSPT) program is built on the principles of inclusiveness and democratic participation.",
+      "url": "https://www.uvic.ca/interdisciplinary/cspt/index.php"
+    },
+    {
+      "name": "Curriculum and Instruction",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Curriculum and Instruction offers new research-based approaches to teaching. Learn how and why we teach what we teach.",
+      "location": "MacLaurin, A541",
+      "url": "https://www.uvic.ca/education/curriculum/"
+    },
+    {
+      "name": "Curriculum and Teaching Support",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Curriculum and Teaching Support assists the UVic community with technology enabled learning, blended and online learning, and more.",
+      "location": "McPherson Library, Mearns Centre for Learning",
+      "url": "https://www.uvic.ca/learningandteaching/index.php"
+    },
+    {
+      "name": "Curriculum, Advising and Program Planning report (CAPP)",
+      "categories": ["Academics", "Online tools"],
+      "description": "The curriculum, advising and program planning report, also known as the degree evaluation report, is a tool to support program completion and help track your academic requirements.",
+      "url": "/students/undergraduate/academic-advising/index.php#ipn-degree-evaluation-report"
+    },
+    {
+      "name": "David Lam Auditorium",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "The David Lam Auditorium is located in the MacLaurin building (MAC) A144.",
+      "location": "MacLaurin Building, A144",
+      "url": "/search/maps-buildings/buildings/maclaurin.php"
+    },
+    {
+      "name": "Degree evaluation report",
+      "categories": ["Academics", "Online tools"],
+      "description": "The degree evaluation report is a tool to support program completion and help track your academic requirements.",
+      "url": "/students/undergraduate/academic-advising/index.php#ipn-degree-evaluation-report"
+    },
+    {
+      "name": "Degrees Catering",
+      "categories": ["Campus services"],
+      "description": "Degrees Catering is UVic's full-service catering department for all events on campus.",
+      "url": "https://www.uvic.ca/services/food/catering/index.php"
+    },
+    {
+      "name": "Directory of records",
+      "categories": ["Online tools"],
+      "description": "The directory of records is UVic's main tool to manage university records. Search by section or specific field.",
+      "url": "https://www.uvic.ca/recordsmanagement/directory/index.php"
+    },
+    {
+      "name": "Discrimination and harassment",
+      "categories": ["Campus services"],
+      "description": "UVic strives to prevent discrimination and harassment from taking place, and to act upon complaints of such behaviour promptly, fairly, judiciously and with due regard to confidentiality for all parties concerned.",
+      "url": "https://www.uvic.ca/equity/discrimination-harassment/index.php"
+    },
+    {
+      "name": "Earth and Ocean Sciences",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Earth and Ocean Sciences studies the processes that shape the Earth, global climate change, marine pollution and more.",
+      "location": "Bob Wright Centre, A405",
+      "url": "https://www.uvic.ca/science/seos/"
+    },
+    {
+      "name": "Economics",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Economics provides students with powerful quantitative and analytical tools to help them understand the world.",
+      "location": "Business and Economics, 360",
+      "url": "https://www.uvic.ca/socialsciences/economics/"
+    },
+    {
+      "name": "Education, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units", "Indigenous"],
+      "description": "Whether you want to be a teacher, a community leader, a counsellor, enter the health industry or work in sports and recreation, there's no better place to start than Education.",
+      "location": "MacLaurin, A225",
+      "url": "https://www.uvic.ca/education/"
+    },
+    {
+      "name": "Educational Psychology and Leadership Studies (EPLS)",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "EPLS teaches students how to make an impact in the lives of people and communities. Learn how to be a leader, counsellor or educational psychologist in our programs.",
+      "location": "MacLaurin, A439",
+      "url": "https://www.uvic.ca/education/psychology/"
+    },
+    {
+      "name": "Electrical and Computer Engineering",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Electrical and Computer Engineering provides research and teaching in electrical and computer design.",
+      "location": "Engineering Office Wing, 448",
+      "url": "https://www.uvic.ca/ecs/ece/"
+    },
+    {
+      "name": "Email, faculty and staff",
+      "categories": ["Online tools"],
+      "description": "UVic email for faculty and staff. Our Outlook web app can be accessed on a public or private computer.",
+      "url": "https://mail.uvic.ca"
+    },
+    {
+      "name": "Email, student webmail",
+      "categories": ["Online tools"],
+      "description": "Access your UVic email through Online tools or Webmail.",
+      "url": "https://webmail.uvic.ca/"
+    },
+    {
+      "name": "Emergency Alerts",
+      "categories": ["Campus services", "Online tools"],
+      "description": "Get real time alerts from UVic during an emergency.",
+      "url": "https://www.uvic.ca/services/emergency/alerts/"
+    },
+    {
+      "name": "Emergency Planning",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Learn how to prepare for an emergency in your classroom, office or home.",
+      "location": "Campus Security",
+      "url": "https://www.uvic.ca/services/emergency/"
+    },
+    {
+      "name": "Employee benefits",
+      "categories": ["Campus services"],
+      "description": "Learn about your pay and benefits as an employee of UVic.",
+      "url": "https://www.uvic.ca/hr/pay-benefits/index.php"
+    },
+    {
+      "name": "Employment",
+      "categories": ["Campus services"],
+      "description": "View employment and career opportunities for staff, faculty, casual and leadership positions at UVic.",
+      "url": "/faculty-staff/careers/why-apply-to-uvic/index.php"
+    },
+    {
+      "name": "Engineering and Computer Science, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "UVic Engineering and Computer Science is pushing the edges of engineering and applied science, while creating tangible solutions to real world problems.",
+      "location": "Engineering Office Wing, 248",
+      "url": "https://www.uvic.ca/ecs/"
+    },
+    {
+      "name": "English",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of English offers a wide range of courses tackling literature from a variety of perspectives. Challenge your intellect and feed your imagination.",
+      "location": "Clearihue, C343",
+      "url": "https://www.uvic.ca/humanities/english/"
+    },
+    {
+      "name": "English Language Centre (ELC)",
+      "categories": ["Academics", "International"],
+      "description": "The ELC offers intensive English language programs at UVic and is one of the largest on-campus English schools in Canada.",
+      "location": "Continuing Studies, 2nd Floor",
+      "url": "https://continuingstudies.uvic.ca/elc"
+    },
+    {
+      "name": "Entrance scholarships and awards",
+      "categories": ["Academics", "Campus services"],
+      "description": "Entrance scholarships are financial awards offered to newly admitted undergraduate students who have demonstrated academic excellence.",
+      "url": "https://www.uvic.ca/safa/scholarships/entrance-scholarships/index.php"
+    },
+    {
+      "name": "Environmental Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Environmental Studies examines fundamental ecological processes and the interface between humans and the environment.",
+      "location": "David Turpin, B243",
+      "url": "https://www.uvic.ca/socialsciences/environmental/"
+    },
+    {
+      "name": "Equity Action Plan",
+      "categories": ["Campus services", "Departments, faculties & units", "Indigenous"],
+      "description": "The Equity Action Plan's goals provide UVic with strategic direction to advance equity, diversity and inclusion, and to create the conditions in which everyone feels a sense of belonging.",
+      "url": "https://www.uvic.ca/equity-action-plan"
+    },
+    {
+      "name": "Equity and Human Rights (EQHR)",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "EQHR is devoted to building an equitable and inclusive campus. Get support for sexualized violence, discrimination, harassment or workplace bullying.",
+      "location": "Sedgewick, C128",
+      "url": "https://www.uvic.ca/equity/"
+    },
+    {
+      "name": "Exams",
+      "categories": ["Academics"],
+      "description": "Get exam schedules and policies.",
+      "url": "/students/academics/final-exams/index.php"
+    },
+    {
+      "name": "Exchange students",
+      "categories": ["Academics", "International"],
+      "description": "Information for international students who want to study at UVic through an exchange program.",
+      "url": "https://www.uvic.ca/international-experiences/info-for/visiting-uvic/exchange-program-apply/index.php"
+    },
+    {
+      "name": "Exercise Science, Physical and Health Education (EPHE)",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Exercise Science, Physical & Health Education is all about movement. We explore the role movement plays in our lives and in a healthy, active society.",
+      "location": "McKinnon, 120",
+      "url": "https://www.uvic.ca/health/exercise/"
+    },
+    {
+      "name": "Expert, Find a UVic",
+      "categories": ["Online tools", "Research"],
+      "description": "Get access to the wealth of expertise that UVic has to offer. Learn about UVic researchers and their areas of research.",
+      "url": "https://www.uvic.ca/research-innovation/our-researchers/find-a-uvic-expert/index.php"
+    },
+    {
+      "name": "Facilities Management",
+      "categories": ["Campus services"],
+      "description": "Facilities Management supports the university through building services, capital development, grounds, interior modification and more.",
+      "location": "Saunders, 112",
+      "url": "https://www.uvic.ca/facilities/"
+    },
+    {
+      "name": "Facilities Management Information System (FMIS)",
+      "categories": ["Online tools"],
+      "description": "FMIS is an electronic self-service tool that is used to request services from Facilities Management.",
+      "url": "https://www.uvic.ca/facilities/service/administration/fmis/"
+    },
+    {
+      "name": "Family Centre",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The Family Centre is an inclusive family resource centre that supports a diverse student family community living both on and off campus.",
+      "location": "Child Care Services",
+      "url": "https://www.uvic.ca/familycentre/"
+    },
+    {
+      "name": "Farquhar Auditorium",
+      "categories": ["Arts & culture, recreation"],
+      "description": "Discover upcoming events coming to the Farquhar Auditorium as well as booking opportunities and contact information.",
+      "location": "Jamie Cassels Centre, B272e",
+      "url": "https://www.uvic.ca/farquhar/"
+    },
+    {
+      "name": "Film Studies",
+      "categories": ["Academics", "Arts & culture, recreation", "Departments, faculties & units"],
+      "description": "Our Film Studies program offers a solid combination of lectures, screenings, writing and hands-on production work in film.",
+      "location": "Fine Arts",
+      "url": "https://www.uvic.ca/finearts/film/"
+    },
+    {
+      "name": "Financial Planning and Operations",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The office of the AVP Financial Planning and Operations is responsible for the overall planning and coordination of the university's budget and budget planning process.",
+      "location": "Michael Williams, A212",
+      "url": "https://www.uvic.ca/financialplanning/"
+    },
+    {
+      "name": "Fine Arts, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Faculty of Fine Arts offers a dynamic community where curiosity, experimentation and exploration are the cornerstones of the learning environment.",
+      "location": "Fine Arts, 110",
+      "url": "https://www.uvic.ca/finearts/"
+    },
+    {
+      "name": "Finnerty Gardens",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "A beautiful oasis on the edge of campus known for its collection of over 200 rhododendron species and azaleas.",
+      "url": "https://www.uvic.ca/finnerty/"
+    },
+    {
+      "name": "First Peoples House",
+      "categories": ["Campus services", "Indigenous"],
+      "description": "The First Peoples House is a social, cultural and academic centre for Indigenous students at UVic.",
+      "location": "First Peoples House",
+      "url": "https://www.uvic.ca/iace/first-peoples-house/index.php"
+    },
+    {
+      "name": "Food Services",
+      "categories": ["Campus services"],
+      "description": "UVic has 12 unique food outlets around campus for you to enjoy.",
+      "url": "https://www.uvic.ca/services/food/"
+    },
+    {
+      "name": "Forest Biology, Centre for",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "The Centre for Forest Biology (CFB) conducts fundamental and applied research in forest biology.",
+      "location": "Cunningham, 153",
+      "url": "https://www.uvic.ca/research/centres/forestbiology/"
+    },
+    {
+      "name": "Gender Empowerment Centre (GEM)",
+      "categories": ["Campus services"],
+      "description": "The Gender Empowerment Centre (GEM) is a student-run collective that provides resources through an intersectional feminist framework.",
+      "url": "https://genderempowermentcentre.ca/"
+    },
+    {
+      "name": "Gender Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Gender Studies explores how gender shapes people's lives, experiences, knowledge and possibilities in relation to Indigenous and racialized identities, and more.",
+      "location": "Clearihue, B111",
+      "url": "https://www.uvic.ca/humanities/gender/"
+    },
+    {
+      "name": "Geography",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Geography asks how we impact the natural world and how it impacts us.",
+      "location": "David Turpin, B203",
+      "url": "https://www.uvic.ca/socialsciences/geography/"
+    },
+    {
+      "name": "Giving to UVic",
+      "categories": ["Campus services"],
+      "description": "Every gift made to UVic has an impact. Find out the ways to give and the impact gifts to UVic have.",
+      "location": "Ian Stewart Complex",
+      "url": "https://www.uvic.ca/givingtouvic/"
+    },
+    {
+      "name": "Global Development Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Global Development Studies (GDS) program explores issues such as socioeconomic inequalities, environment and sustainability, governance and human rights, and community resilience from a global and historical perspective.",
+      "url": "https://www.uvic.ca/socialsciences/global-development/index.php"
+    },
+    {
+      "name": "Global Engagement, Office of",
+      "categories": ["Campus services", "International"],
+      "description": "The Office of Global Engagement develops and promotes global partnerships that advance UVic's strategic goals for internationalization.",
+      "location": "Jamie Cassels Centre, B202",
+      "url": "https://www.uvic.ca/info-for/international/global-engagement/index.php"
+    },
+    {
+      "name": "Global Studies, Centre for",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "The Centre for Global Studies (CFGS) promotes collaborative, multidisciplinary research across multiple regions.",
+      "location": "Sedgewick, C173",
+      "url": "https://www.uvic.ca/research/centres/globalstudies/"
+    },
+    {
+      "name": "Governance and administration",
+      "categories": [],
+      "description": "The University of Victoria operates under the authority of the University Act and is governed by a Board of Governors and a Senate.",
+      "url": "/about-uvic/governance-and-administration/"
+    },
+    {
+      "name": "Grad House Restaurant",
+      "categories": ["Campus services"],
+      "description": "Located within the Halpern Centre, the Grad House Restaurant is open to the public for food and drinks in a relaxed, lounge-style atmosphere.",
+      "url": "https://gss.uvic.ca/grad-house-restaurant/"
+    },
+    {
+      "name": "Grade point average (GPA) calculations",
+      "categories": ["Academics"],
+      "description": "Information on grade point average (GPA) calculations.",
+      "url": "https://www.uvic.ca/registrar/students/policies/calc/index.php"
+    },
+    {
+      "name": "Graduate program advising",
+      "categories": ["Academics", "Campus services"],
+      "description": "Get advice and guidance on your graduate programs and learn what supports there are to help you complete your degree.",
+      "location": "Jamie Cassels Centre, A203",
+      "url": "/students/graduate/program-advising/index.php"
+    },
+    {
+      "name": "Graduate programs",
+      "categories": ["Academics"],
+      "description": "A comprehensive list of the graduate programs available at the University of Victoria.",
+      "url": "/graduate/programs/graduate-programs/"
+    },
+    {
+      "name": "Graduate programs by special arrangement (SPARR)",
+      "categories": ["Academics"],
+      "description": "Get instructions for individual graduate programs by special arrangement.",
+      "url": "/graduate/programs/specialized-programs/index.php"
+    },
+    {
+      "name": "Graduate scholarships and financial aid",
+      "categories": ["Academics", "Campus services"],
+      "description": "Information on awards, scholarships, fellowships and bursaries for graduate students.",
+      "url": "/graduatestudies/finances/index.php"
+    },
+    {
+      "name": "Graduate secretaries and advisers",
+      "categories": ["Academics"],
+      "description": "Your graduate adviser and graduate secretary know the details of your program and degree.",
+      "url": "/students/graduate/program-advising/"
+    },
+    {
+      "name": "Graduate Students Society",
+      "categories": ["Campus services"],
+      "description": "The Graduate Students' Society (GSS) is an autonomous, not-for-profit society that strives to promote the interests and represent the views of graduate students at UVic.",
+      "location": "Halpern Centre for Graduate Studies",
+      "url": "https://gss.uvic.ca/"
+    },
+    {
+      "name": "Graduate Studies, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Faculty of Graduate Studies oversees the 150+ graduate programs at UVic.",
+      "location": "Jamie Cassels Centre, A207",
+      "url": "https://www.uvic.ca/graduatestudies/"
+    },
+    {
+      "name": "Graduation & convocation, graduate",
+      "categories": ["Academics"],
+      "description": "Convocation marks the end of an academic journey and is the official ceremony of graduation.",
+      "url": "https://www.uvic.ca/students/graduate/graduation/index.php"
+    },
+    {
+      "name": "Graduation & convocation, undergraduate",
+      "categories": ["Academics"],
+      "description": "Convocation marks the end of an academic journey and is the official ceremony of graduation.",
+      "url": "https://www.uvic.ca/students/undergraduate/graduation/index.php"
+    },
+    {
+      "name": "Greek and Roman Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Greek and Roman Studies explores language, history, literature and archeology.",
+      "location": "Clearihue, B409",
+      "url": "https://www.uvic.ca/humanities/greekroman/"
+    },
+    {
+      "name": "Harm Reduction Centre",
+      "categories": ["Campus services"],
+      "description": "The Harm Reduction Centre (HRC) helps you make informed and safer choices around sex and substance use.",
+      "url": "https://www.uvic.ca/student-wellness/wellness-resources/harm-reduction/index.php#ipn-harm-reduction-centre"
+    },
+    {
+      "name": "Health and dental plan, graduate students",
+      "categories": ["Campus services"],
+      "description": "Information on the health and dental plan for graduate students.",
+      "url": "https://gss.uvic.ca/health-dental/"
+    },
+    {
+      "name": "Health and dental plan, undergraduate students",
+      "categories": ["Campus services"],
+      "description": "Get health and dental plan details for undergraduate students through the UVSS.",
+      "url": "https://uvss.ca/health/"
+    },
+    {
+      "name": "Health Information Science",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Health Information Science is a pioneer and leader in transforming the world of health care and health information management.",
+      "location": "Human and Social Development, A202",
+      "url": "https://www.uvic.ca/health/hinf/"
+    },
+    {
+      "name": "Health services",
+      "categories": ["Campus services"],
+      "description": "UVic Health is a full-service primary health clinic for UVic students that also coordinates healthy student and campus initiatives.",
+      "location": "Health and Wellness Building",
+      "url": "https://www.uvic.ca/student-wellness/"
+    },
+    {
+      "name": "Health, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units", "Indigenous"],
+      "description": "From practice to practitioner, the Faculty of Health combines hands-on practicums, community-engaged learning, cutting-edge primary care partnerships and human health programs.",
+      "location": "HSD Building, room A102",
+      "url": "https://www.uvic.ca/health/"
+    },
+    {
+      "name": "History",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of History seeks to understand the paths that brought societies to where they are today.",
+      "location": "Clearihue, A203",
+      "url": "https://www.uvic.ca/humanities/history/"
+    },
+    {
+      "name": "Human Dimensions of Climate Change (HDCC)",
+      "categories": ["Research"],
+      "description": "We focus on climate change from the perspectives of all the major disciplines that emphasize the human elements of climate change.",
+      "url": "https://www.uvic.ca/socialsciences/intd/hdcc/index.php"
+    },
+    {
+      "name": "Human research ethics",
+      "categories": ["Research"],
+      "description": "The Human Research Ethics Board (HREB) ensures that UVic research and research in academic courses involving human participants or human biological materials follows the ethical standards.",
+      "url": "https://www.uvic.ca/research-services/home/regapproval/humanethics/index.php"
+    },
+    {
+      "name": "Human Resources",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Human Resources is here to assist you with a variety of services dedicated to supporting your personal and professional needs.",
+      "location": "Sedgewick, B130",
+      "url": "https://www.uvic.ca/hr/"
+    },
+    {
+      "name": "Humanities, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Faculty of Humanities explores language, culture, technology and the environment, recognizing the richness offered by diversity, difference, distance and place.",
+      "location": "Clearihue, A305",
+      "url": "https://www.uvic.ca/humanities/"
+    },
+    {
+      "name": "Important academic dates",
+      "categories": ["Academics"],
+      "description": "View all the important academic dates for the school year such as holidays, exam times, convocation and reading break.",
+      "url": "https://events.uvic.ca/dates/"
+    },
+    {
+      "name": "Indigenous Academic and Community Engagement",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Office of Indigenous Academic and Community Engagement (IACE) is here to support the success of Indigenous students at UVic.",
+      "location": "First Peoples House, 140",
+      "url": "https://www.uvic.ca/iace/"
+    },
+    {
+      "name": "Indigenous Education",
+      "categories": ["Departments, faculties & units"],
+      "description": "The department of Indigenous Education is committed to honouring Indigenous ways of learning and teaching.",
+      "location": "MacLaurin Building, A260",
+      "url": "https://www.uvic.ca/education/indigenous/index.php"
+    },
+    {
+      "name": "Indigenous Governance, School of",
+      "categories": ["Academics", "Departments, faculties & units", "Indigenous"],
+      "description": "The School of Indigenous Governance supports the development of future Indigenous leaders by focusing on Indigenous resurgence, good governance and excellent scholarship.",
+      "location": "Human and Social Development, A260",
+      "url": "/socialsciences/igov/index.php"
+    },
+    {
+      "name": "Indigenous Nationhood certificate",
+      "categories": ["Research"],
+      "description": "The certificate in Indigenous Nationhood (IN) is a graduate level program that enables students to examine the intersections of law, politics and governance.",
+      "url": "https://www.uvic.ca/socialsciences/igov/programs/in/"
+    },
+    {
+      "name": "Indigenous Research and Community-Led Engagement, Centre for (CIRCLE)",
+      "categories": ["Departments, faculties & units", "Indigenous", "Research"],
+      "description": "CIRCLE is dedicated to expanding wellbeing by building on strengths of Indigenous peoples.",
+      "location": "Saunders Annex, 130",
+      "url": "https://www.uvic.ca/research/centres/circle/"
+    },
+    {
+      "name": "Indigenous Student Services",
+      "categories": ["Campus services", "Indigenous"],
+      "description": "Learn about the services and supports available to Indigenous students.",
+      "location": "First Peoples House, 140",
+      "url": "https://www.uvic.ca/iace/index.php"
+    },
+    {
+      "name": "Indigenous Studies",
+      "categories": ["Departments, faculties & units"],
+      "description": "Indigenous studies is an exciting area of study that emphasizes Indigenous ways of knowing and learning.",
+      "url": "https://www.uvic.ca/humanities/indigenous/index.php"
+    },
+    {
+      "name": "Institutional Planning and Analysis",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Institutional Planning and Analysis' primary role is to provide information, research/statistical support and other analytical services for decision making and policy planning at UVic.",
+      "location": "Michael Williams, A263",
+      "url": "https://www.uvic.ca/institutionalplanning/"
+    },
+    {
+      "name": "Integrated Energy Systems, Institute for (IIES)",
+      "categories": ["Research"],
+      "description": "The mission of the IIES is to develop sustainable energy systems that are reliable, cost-effective and socially acceptable.",
+      "location": "Engineering Office Wing, 108",
+      "url": "https://www.uvic.ca/research/centres/iesvic/"
+    },
+    {
+      "name": "International Centre for Students (ICS)",
+      "categories": ["Campus services", "International"],
+      "description": "International Centre for Students (ICS) provides support for international students studying at UVic, and coordinates programs for all UVic students interested in studying abroad.",
+      "location": "Jamie Cassels Centre, B202d",
+      "url": "https://www.uvic.ca/international-experiences/index.php"
+    },
+    {
+      "name": "International Commons",
+      "categories": ["Campus services", "International"],
+      "description": "The International Commons is a welcoming space in the McPherson Library's Learning Commons where students can study, connect and access a variety of programs and resources.",
+      "location": "McPherson Library",
+      "url": "https://www.uvic.ca/international-experiences/programs/academic-supports/index.php"
+    },
+    {
+      "name": "Island Medical Program",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Island Medical Program (IMP) educates doctors on Vancouver Island as part of an innovative plan to increase the number of physicians in BC.",
+      "location": "Medical Sciences",
+      "url": "https://imp.med.ubc.ca/"
+    },
+    {
+      "name": "Jamie Cassels Centre (JCC)",
+      "categories": ["Academics", "Campus services"],
+      "description": "Jamie Cassels Centre contains academic and administrative offices.",
+      "url": "/search/maps-buildings/buildings/jamie-cassels-centre.php"
+    },
+    {
+      "name": "Jamie Cassels Undergraduate Research Awards (JCURA)",
+      "categories": ["Academics", "Research"],
+      "description": "These awards provide support for exceptional undergraduate students to help them conduct independent research.",
+      "url": "https://onlineacademiccommunity.uvic.ca/LearnAnywhere/jcura/"
+    },
+    {
+      "name": "KnowlEDGE",
+      "categories": ["Research"],
+      "description": "KnowlEDGE is a monthly research publication produced by University Communications + Marketing. Learn about research and discovery at UVic.",
+      "url": "https://www.uvic.ca/knowledge/index.php"
+    },
+    {
+      "name": "Latin American Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Latin American Studies lets you explore a rich history and culture while you build on language and cultural skills or prepare to live abroad.",
+      "location": "Clearihue, B447",
+      "url": "https://www.uvic.ca/humanities/latinamerican/"
+    },
+    {
+      "name": "Law Library, Diana M. Priestly",
+      "categories": ["Academics", "Research"],
+      "description": "The Diana M. Priestly Law Library is your source for legal knowledge at the University of Victoria.",
+      "url": "https://www.uvic.ca/library/locations/home/law/index.php"
+    },
+    {
+      "name": "Law, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units", "Indigenous"],
+      "description": "UVic Law is one of Canada's leading law schools known for the strength of its academic program, approach to experiential learning and commitment to social justice.",
+      "location": "Fraser, 102",
+      "url": "https://www.uvic.ca/law/"
+    },
+    {
+      "name": "LE,NOṈET",
+      "categories": ["Campus services", "Indigenous"],
+      "description": "LE, NONET is a series of programs designed to welcome and support Indigenous students.",
+      "url": "https://www.uvic.ca/iace/students/le-nonet/index.php"
+    },
+    {
+      "name": "Learning and Teaching Support and Innovation (LTSI)",
+      "categories": ["Academics", "Campus services", "Departments, faculties & units", "Research"],
+      "description": "LTI supports UVic's extraordinary academic environment by helping faculty, instructors and students develop their skills in the classroom.",
+      "location": "Harry Hickman, 120",
+      "url": "https://www.uvic.ca/learningandteaching/"
+    },
+    {
+      "name": "Learning Assistance Program (LAP)",
+      "categories": ["Academics", "Campus services"],
+      "description": "If you're a student with a disability, LAP has variety of programs to help you meet your academic goals.",
+      "url": "https://www.uvic.ca/accessible-learning/services/learning-assistance-program/index.php"
+    },
+    {
+      "name": "Legacy Art Galleries",
+      "categories": ["Academics", "Arts & culture, recreation"],
+      "description": "The University of Victoria Legacy Art Galleries provide lively and engaging centres for art.",
+      "url": "https://www.uvic.ca/legacygalleries/"
+    },
+    {
+      "name": "Library, McPherson",
+      "categories": ["Academics", "Research"],
+      "description": "Articles, books, databases, specialized collections, course reserves, news, research help, journal titles and more.",
+      "location": "McPherson Library",
+      "url": "https://www.uvic.ca/library/index.php"
+    },
+    {
+      "name": "Malahat Review",
+      "categories": ["Arts & culture, recreation"],
+      "description": "The Malahat Review features contemporary works of poetry, fiction, and creative non-fiction.",
+      "url": "https://www.malahatreview.ca/"
+    },
+    {
+      "name": "Maps and buildings",
+      "categories": ["Campus services"],
+      "description": "Maps and buildings at UVic.",
+      "url": "/search/maps-buildings/"
+    },
+    {
+      "name": "Martlet, The",
+      "categories": ["Arts & culture, recreation"],
+      "description": "The Martlet is the University of Victoria's independent student newspaper.",
+      "url": "https://martlet.ca/"
+    },
+    {
+      "name": "Math and Stats Assistance, Centre (MSAC)",
+      "categories": ["Academics", "Campus services"],
+      "description": "Math and Stats Assistance Centre (MSAC) offers help in 100 and 200 level Math and Stats courses online.",
+      "url": "https://www.uvic.ca/science/math-statistics/current-students/undergraduate/msac/index.php"
+    },
+    {
+      "name": "Mathematics and Statistics",
+      "categories": ["Academics", "Campus services"],
+      "description": "Department of Mathematics and Statistics.",
+      "location": "David Turpin Building A425",
+      "url": "https://www.uvic.ca/science/math-statistics/index.php"
+    },
+    {
+      "name": "Mearns Centre for Learning",
+      "categories": ["Academics", "Research"],
+      "description": "Come and explore the Mearns Centre - McPherson Library to pursue your scholarly research, work on your media projects, or simply to relax.",
+      "location": "McPherson Library",
+      "url": "https://www.uvic.ca/library/locations/home/mearns/index.php"
+    },
+    {
+      "name": "Mechanical Engineering",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Mechanical Engineering teaches students the design and study of physical and mechanical systems.",
+      "location": "Engineering Office Wing, 548",
+      "url": "https://www.uvic.ca/ecs/mechanical/"
+    },
+    {
+      "name": "Media relations",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The public affairs team in University Communications and Marketing (UCAM) connects our university with local, regional and national media.",
+      "location": "Sedgewick, C149",
+      "url": "https://www.uvic.ca/communicationsmarketing/media/index.php"
+    },
+    {
+      "name": "Media Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Media Studies is an interdisciplinary certificate program in media literacy. Our courses focus on experiential learning and the people skills of media, communication and culture.",
+      "url": "https://www.uvic.ca/humanities/media-studies/index.php"
+    },
+    {
+      "name": "Medical Physics",
+      "categories": ["Academics", "Research"],
+      "description": "The Medical Physics Program at UVic is jointly offered through our Department of Physics and Astronomy and the British Columbia Cancer Agency - Vancouver Island Centre.",
+      "location": "Elliott, 109",
+      "url": "https://www.uvic.ca/science/physics/medicalphysics/index.php"
+    },
+    {
+      "name": "Medical Sciences",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Medical Sciences addresses some of society's most pressing health care needs.",
+      "location": "Medical Sciences, 104",
+      "url": "https://www.uvic.ca/health/medsci/"
+    },
+    {
+      "name": "Medieval Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "In the Department of Medieval Studies, students gain an understanding of the middle ages and study artistic, intellectual and social achievements.",
+      "location": "Clearihue, D264",
+      "url": "https://www.uvic.ca/humanities/medieval/"
+    },
+    {
+      "name": "Mental health",
+      "categories": ["Campus services"],
+      "description": "UVic offers a variety of supports, services and opportunities to promote student mental health.",
+      "url": "https://www.uvic.ca/student-wellness/wellness-resources/mental-health/"
+    },
+    {
+      "name": "Michelle Pujol Room",
+      "categories": ["Campus services"],
+      "description": "The Michelle Pujol room is located in the Student Union building (SUB) and is bookable.",
+      "location": "Student Union (SUB), A121",
+      "url": "https://uvsscatering.com/rooms/"
+    },
+    {
+      "name": "Multifaith",
+      "categories": ["Campus services"],
+      "description": "We're a culturally diverse and multifaith community. Our spiritual care providers are appointed by local faith communities.",
+      "location": "Multifaith Centre",
+      "url": "https://www.uvic.ca/student-wellness/"
+    },
+    {
+      "name": "Multifaith Centre",
+      "categories": ["Arts & culture, recreation"],
+      "description": "The Multifaith Centre is located next to the beautiful Finnerty Gardens. It's a peaceful place to mark important life events, connect with peers and spiritual leaders.",
+      "location": "Multifaith Centre",
+      "url": "https://www.uvic.ca/campus/multifaith-centre/index.php"
+    },
+    {
+      "name": "Music",
+      "categories": ["Academics", "Arts & culture, recreation", "Departments, faculties & units"],
+      "description": "The School of Music invites students to collaborate with fellow musicians and grow as artists and performers.",
+      "location": "MacLaurin, B102",
+      "url": "https://www.uvic.ca/finearts/music"
+    },
+    {
+      "name": "MyUVic Life",
+      "categories": ["Academics", "Arts & culture, recreation"],
+      "description": "MyUVic Life follows over 20 undergrad students at UVic to give you a window on what it's like to be a UVic student.",
+      "url": "https://onlineacademiccommunity.uvic.ca/myuviclife/"
+    },
+    {
+      "name": "National Consortium for Indigenous Economic Development (NCIED)",
+      "categories": ["Indigenous", "Research"],
+      "description": "NCIED focuses on independent, collaborative research and economic development for Indigenous nations and their communities.",
+      "location": "Business & Economics, 254",
+      "url": "https://www.uvic.ca/ncied/"
+    },
+    {
+      "name": "Native Students Union",
+      "categories": ["Indigenous"],
+      "description": "The Native Students Union is a student-run collective dedicated to supporting the Indigenous student community at UVic.",
+      "location": "Student Union (SUB), B203",
+      "url": "https://www.uvicnsu.ca/"
+    },
+    {
+      "name": "NetLink ID",
+      "categories": ["Online tools"],
+      "description": "Use your NetLink ID to access UVic services and systems.",
+      "url": "/systems/netlink/"
+    },
+    {
+      "name": "Network Services",
+      "categories": ["Campus services"],
+      "description": "Network Services is responsible for the design, development and operation of the university's voice and data networks, including the internet.",
+      "url": "https://www.uvic.ca/systems/services/index.php"
+    },
+    {
+      "name": "New Student Handbook",
+      "categories": ["Campus services"],
+      "description": "The New Student Handbook provides an overview of UVic's services and programs.",
+      "url": "https://www.uvic.ca/orientation/new-student-handbook/index.php"
+    },
+    {
+      "name": "Nursing",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The UVic School of Nursing is committed to student success. Benefit from research-inspired teaching, practice placements and collaborative partnerships.",
+      "location": "Human and Social Development, A402A",
+      "url": "https://www.uvic.ca/health/nursing/"
+    },
+    {
+      "name": "Occupational Health, Safety and Environment (OHSE)",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "OHSE provides health and safety support to UVic.",
+      "location": "Sedgewick, B130",
+      "url": "https://www.uvic.ca/ohse"
+    },
+    {
+      "name": "Off-campus housing",
+      "categories": ["Campus services"],
+      "description": "Look up off-campus housing opportunities for students, faculty and staff.",
+      "url": "https://www.uvic.ca/residence/home/home/off-campus/"
+    },
+    {
+      "name": "Ombudsperson",
+      "categories": ["Academics", "Campus services"],
+      "description": "The Office of the Ombudsperson is an independent, impartial and confidential resource to help resolve student problems and disputes.",
+      "location": "Student Union (SUB), 205",
+      "url": "https://uvicombudsperson.ca/"
+    },
+    {
+      "name": "ONECard",
+      "categories": ["Campus services"],
+      "description": "The ONECard is UVic's official photo ID.",
+      "location": "Jamie Cassels Centre, lobby",
+      "url": "https://www.uvic.ca/onecard/"
+    },
+    {
+      "name": "Online tools",
+      "categories": ["Online tools"],
+      "description": "Log in to My page, where you can access all of your personal information, register for classes and more.",
+      "url": "https://www.uvic.ca/tools/"
+    },
+    {
+      "name": "Orange Shirt Day",
+      "categories": ["Indigenous"],
+      "description": "Each year UVic faculty, staff and students wear an orange shirt as a visual symbol of our awareness of the need for ongoing reconciliation.",
+      "url": "https://www.uvic.ca/event/orange-shirt-day/"
+    },
+    {
+      "name": "Organizational chart",
+      "categories": ["Academics", "Campus services"],
+      "description": "The organization chart for the University of Victoria.",
+      "url": "/about-uvic/governance-and-administration/index.php#ipn-administrative-organization-chart"
+    },
+    {
+      "name": "Orientation",
+      "categories": ["Campus services"],
+      "description": "Orientation offers events, guidance, information and more to welcome new students to UVic.",
+      "url": "https://www.uvic.ca/orientation/"
+    },
+    {
+      "name": "Pacific and Asian Studies",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Increase your global cultural knowledge of our world with the Department of Pacific and Asian Studies.",
+      "location": "Clearihue, C205",
+      "url": "https://www.uvic.ca/humanities/pacificasia/"
+    },
+    {
+      "name": "Pacific Institute for Climate Solutions (PICS)",
+      "categories": ["Research"],
+      "description": "The Pacific Institute for Climate Solutions studies the impacts of climate change and works to mitigate it.",
+      "location": "University House 1",
+      "url": "https://pics.uvic.ca/"
+    },
+    {
+      "name": "Pacific Institute for the Mathematical Sciences (PIMS)",
+      "categories": ["Research"],
+      "description": "PIMS has a mandate to promote excellent research and applications of mathematical sciences.",
+      "location": "David Turpin, A425",
+      "url": "https://www.pims.math.ca/"
+    },
+    {
+      "name": "Parking and transportation services",
+      "categories": ["Campus services"],
+      "description": "Learn about parking permits at UVic, update your permit or purchase a new one.",
+      "location": "Campus Security",
+      "url": "https://www.uvic.ca/security/parking/index.php"
+    },
+    {
+      "name": "Payroll",
+      "categories": ["Campus services"],
+      "description": "Find information and forms to manage your payroll account with UVic.",
+      "location": "Michael Williams, B115",
+      "url": "https://www.uvic.ca/vpfo/financial-services/services/payroll/index.php"
+    },
+    {
+      "name": "Pension Services",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Learn about the pension plans offered by the University of Victoria.",
+      "location": "Michael Williams, B278",
+      "url": "https://www.uvic.ca/pensions/"
+    },
+    {
+      "name": "Phillip T. Young recital hall",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "The Phillip T. Young recital hall is located in the MacLaurin building (MAC) B125.",
+      "location": "MacLaurin Building, B125",
+      "url": "/search/maps-buildings/buildings/maclaurin.php"
+    },
+    {
+      "name": "Philosophy",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Philosophy explores thought-provoking questions in a critical and rational way.",
+      "location": "Clearihue, B334",
+      "url": "https://www.uvic.ca/humanities/philosophy/"
+    },
+    {
+      "name": "Phoenix Theatre",
+      "categories": ["Academics", "Arts & culture, recreation"],
+      "description": "When you attend the Phoenix Theatre you experience some of this city's most exciting and eclectic theatre.",
+      "location": "Phoenix Theatre box office",
+      "url": "https://finearts.uvic.ca/theatre/mainstage/"
+    },
+    {
+      "name": "Photo Services",
+      "categories": ["Campus services"],
+      "description": "Photo Services offers a range of professional photo and video service.",
+      "url": "https://www.uvic.ca/communicationsmarketing/photos/"
+    },
+    {
+      "name": "Physics and Astronomy",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Physics and Astronomy seeks to understand the world, from the invisible particles that make up matter, to the vast reaches of the universe.",
+      "location": "Elliott, 101",
+      "url": "https://www.uvic.ca/science/physics/"
+    },
+    {
+      "name": "POLIS Project on Ecological Governance",
+      "categories": ["Research"],
+      "description": "The POLIS Project on Ecological Governance is a centre for transdisciplinary research that investigates and promotes sustainability.",
+      "url": "https://polisproject.org/"
+    },
+    {
+      "name": "Political Science",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Political Science studies power, authority and governance in human affairs.",
+      "location": "David Turpin, A316",
+      "url": "https://www.uvic.ca/socialsciences/politicalscience/"
+    },
+    {
+      "name": "Poster guidelines",
+      "categories": ["Campus services"],
+      "description": "Information and guidelines on displaying posters, banners and notices on campus.",
+      "url": "https://www.uvic.ca/onecard/contact-us/poster-notice-guidelines/index.php"
+    },
+    {
+      "name": "President, Office of the",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Office of the President of the University of Victoria.",
+      "location": "Michael Williams, A220",
+      "url": "https://www.uvic.ca/about-uvic/governance-and-administration/about-our-president/"
+    },
+    {
+      "name": "Pride Collective",
+      "categories": ["Campus services"],
+      "description": "The Pride Collective is a student-led collective that works to provide queer and trans+ centred programs, events and spaces.",
+      "url": "https://pridecollective.ca/"
+    },
+    {
+      "name": "Printing Services",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Visit us for all of your printing needs on UVic campus.",
+      "location": "Saunders Annex, 120",
+      "url": "https://www.uvic.ca/print/"
+    },
+    {
+      "name": "Privacy and Access to Information Office",
+      "categories": ["Campus services"],
+      "description": "Learn about privacy and access to information at UVic.",
+      "location": "Michael Williams, A212",
+      "url": "https://www.uvic.ca/general-counsel/privacy-access/index.php"
+    },
+    {
+      "name": "Professional Communication",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Our Professional Communication minor lets our students gain highly-employable skills while they complete their undergraduate degree.",
+      "location": "Clearihue, C352",
+      "url": "https://www.uvic.ca/humanities/english/professionalcommunication/"
+    },
+    {
+      "name": "Program planning, undergraduate",
+      "categories": ["Academics"],
+      "description": "Figure out what courses you need to complete your program and meet your academic goals.",
+      "url": "/students/undergraduate/program-planning/"
+    },
+    {
+      "name": "Psychology",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Psychology studies mental behaviour and processes in order to understand the human experience.",
+      "location": "Cornett, A236",
+      "url": "https://www.uvic.ca/socialsciences/psychology/"
+    },
+    {
+      "name": "Public Administration",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Public Administration develops professionals who will have a positive impact on government affairs, non-profits and communities in British Columbia.",
+      "location": "Human & Social Development, A302",
+      "url": "https://www.uvic.ca/socialsciences/publicadmin/"
+    },
+    {
+      "name": "Public Health and Social Policy",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Public Health and Social Policy examines public health, health promotion and the social, environmental and structural determinants of health.",
+      "location": "Human and Social Development, B202",
+      "url": "https://www.uvic.ca/health/publichealthsocialpolicy/"
+    },
+    {
+      "name": "Purchasing Services",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Purchasing Services delivers high quality procurements to all of our clients at the University of Victoria.",
+      "location": "Saunders Annex, 110",
+      "url": "https://www.uvic.ca/purchasing/"
+    },
+    {
+      "name": "Records Management",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Records Management helps staff understand the rules around managing university documents.",
+      "location": "McPherson Library",
+      "url": "https://www.uvic.ca/recordsmanagement/"
+    },
+    {
+      "name": "Registrar and Enrolment Management, Office",
+      "categories": ["Academics", "Campus services"],
+      "description": "The Office of the Registrar and Enrolment Management provides support services to undergraduate and graduate students.",
+      "location": "Jamie Cassels Centre, Ground Floor A-wing",
+      "url": "https://www.uvic.ca/registrar/"
+    },
+    {
+      "name": "Religion, Culture and Society",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Religion, Culture and Society explores the traditional and spiritual dimensions of religion, as well as the role that religion plays in human societies.",
+      "location": "Clearihue, D264",
+      "url": "https://www.uvic.ca/humanities/religious/"
+    },
+    {
+      "name": "Research",
+      "categories": ["Research"],
+      "description": "Learn about our research and its impact on the social, cultural and economic well-being of Canada and the world.",
+      "location": "Michael Williams, A110",
+      "url": "/research-innovation/research-at-uvic/"
+    },
+    {
+      "name": "Research Administration Information System (UVic-RAIS)",
+      "categories": ["Online tools", "Research"],
+      "description": "Research Administration Information System (UVic-RAIS) is a one-stop integrated online system for managing information, processes, and workflows tailored for the UVic research community.",
+      "location": "Michael Williams, B202",
+      "url": "https://www.uvic.ca/userais/index.php"
+    },
+    {
+      "name": "Research centres and organizations",
+      "categories": ["Research"],
+      "description": "UVic research centres and organizations promote research partnerships and connections and provide training opportunities for students.",
+      "url": "https://www.uvic.ca/research-innovation/research-centres/index.php"
+    },
+    {
+      "name": "Residence Services",
+      "categories": ["Campus services"],
+      "description": "Explore your on-campus housing options, including buildings, amenities and layouts.",
+      "location": "Craigdarroch Office",
+      "url": "https://www.uvic.ca/residence/"
+    },
+    {
+      "name": "Retirees Association (UVRA)",
+      "categories": ["Campus services"],
+      "description": "UVRA keeps our retirees connected with UVic and the campus community. They offer a wide range of benefits and services.",
+      "location": "Hut-R",
+      "url": "https://www.uvic.ca/retirees/"
+    },
+    {
+      "name": "SafetyApp, UVic",
+      "categories": ["Campus services", "Online tools"],
+      "description": "The UVic SafetyApp is a new way to receive emergency notifications from the university on your mobile phone.",
+      "url": "https://www.uvic.ca/security/home/safetyapp/index.php"
+    },
+    {
+      "name": "SafeWalk program",
+      "categories": ["Campus services"],
+      "description": "Campus Security Services provides a safe walk service, which is available to members of the university community 24 hours a day, 7 days a week.",
+      "url": "https://www.uvic.ca/security/home/safewalk/index.php"
+    },
+    {
+      "name": "Salary schedules",
+      "categories": [],
+      "description": "View the salary ranges for UVic employees.",
+      "url": "https://www.uvic.ca/hr/pay-benefits/salary-schedule/index.php"
+    },
+    {
+      "name": "Science Stores",
+      "categories": ["Campus services"],
+      "description": "Science Stores sells stationery and scientific material and equipment to university account holders.",
+      "location": "Petch, 168",
+      "url": "https://www.uvic.ca/science/stores/"
+    },
+    {
+      "name": "Science Venture",
+      "categories": ["Campus services"],
+      "description": "Science Venture is an outreach program that teaches science, technology, engineering and mathematics to children and youth across Canada.",
+      "url": "https://www.facebook.com/scienceventure"
+    },
+    {
+      "name": "Science, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Faculty of Science explores the reaches of modern science and mathematics.",
+      "location": "Bob Wright Centre, A201",
+      "url": "https://www.uvic.ca/science/"
+    },
+    {
+      "name": "Senate",
+      "categories": ["Campus services"],
+      "description": "Under the University Act, the Senate is responsible for the academic governance of the university.",
+      "url": "https://www.uvic.ca/universitysecretary/senate/index.php"
+    },
+    {
+      "name": "Sexual health clinics & services",
+      "categories": ["Campus services"],
+      "description": "UVic Health, part of the Student Wellness Centre, offers routine sexual health information and exams.",
+      "url": "https://www.uvic.ca/student-wellness/book-an-appointment/"
+    },
+    {
+      "name": "Sexualized violence support",
+      "categories": ["Campus services"],
+      "description": "Preventing sexualized violence begins with conversations about how to practice respect and consent in our daily lives.",
+      "location": "Sedgewick, C128",
+      "url": "https://www.uvic.ca/sexualizedviolence/"
+    },
+    {
+      "name": "Social and Sustainable Innovation, Centre for (CSSI)",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "The CRF helps those who study or work at the Gustavson School of Business promote sustainability, host events, and share what they do with the world.",
+      "location": "Business & Economics",
+      "url": "https://www.uvic.ca/gustavson/faculty-and-research/centres-and-collaborations/crf/index.php"
+    },
+    {
+      "name": "Social Dimensions of Health",
+      "categories": ["Academics", "Research"],
+      "description": "The Social Dimensions of Health program centres on a unique training and research collaboration among the faculties of Social Sciences, Humanities, Education, and Human and Social Development.",
+      "url": "https://www.uvic.ca/health/socialdimensionshealth/index.php"
+    },
+    {
+      "name": "Social Justice Studies (SJS)",
+      "categories": ["Research"],
+      "description": "SJS seeks to explore complex questions from an interdisciplinary angle, dissecting issues of social justice and inequalities from different academic and ideological approaches.",
+      "url": "https://www.uvic.ca/socialsciences/intd/socialjustice/index.php"
+    },
+    {
+      "name": "Social Sciences, Faculty of",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Faculty of Social Sciences examines our interconnected world through seven different social science disciplines.",
+      "location": "Business & Economics, 456",
+      "url": "https://www.uvic.ca/socialsciences/"
+    },
+    {
+      "name": "Social Work",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The School of Social Work nurtures accountable and critically engaged social work education, research and practice in the advancement of decolonization, anti-racism, Indigenous resurgence, feminism, 2SLGBTQ+ liberation struggles, disability justice and other social justice struggles.",
+      "location": "Human & Social Development, 302",
+      "url": "https://www.uvic.ca/health/socialwork/"
+    },
+    {
+      "name": "Society for Students with a Disability (SSD)",
+      "categories": ["Campus services"],
+      "description": "SSD represents the interest of a wide range of students on the UVic campus who self-identify as having one or more disabilities.",
+      "location": "Student Union (SUB), B111",
+      "url": "https://uvicssd.ca/"
+    },
+    {
+      "name": "Sociology",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Sociology looks at social aspects of life, how societies are organized and how they shape human behaviour.",
+      "location": "Cornett, A333",
+      "url": "https://www.uvic.ca/socialsciences/sociology/"
+    },
+    {
+      "name": "Software Engineering",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Department of Software Engineering applies engineering principles and practices to create the software-centric systems modern societies rely on.",
+      "location": "Engineering Lab Wing, 206",
+      "url": "https://www.uvic.ca/ecs/software/"
+    },
+    {
+      "name": "Special Collections",
+      "categories": ["Academics", "Research"],
+      "description": "Special Collections houses rare books and archival materials. These items are held in the Special Collections department of the McPherson Library.",
+      "location": "McPherson Library, basement",
+      "url": "https://www.uvic.ca/library/locations/home/spcoll/"
+    },
+    {
+      "name": "Specialized Tutor Program",
+      "categories": ["Academics", "Campus services"],
+      "description": "Connect with trained tutors from departments across campus.",
+      "url": "https://onlineacademiccommunity.uvic.ca/lap/tutor-program/"
+    },
+    {
+      "name": "STEPS Forward (BC-IPSE)",
+      "categories": ["Academics"],
+      "description": "STEPS Forward's BC Initiative for Inclusive Post-Secondary Education (BC-IPSE) provides inclusion support for students with developmental disabilities to access post-secondary education.",
+      "url": "https://www.bc-ipse.org/"
+    },
+    {
+      "name": "Strategic Research Plan",
+      "categories": ["Research"],
+      "description": "The UVic Strategic Research Plan 2016-2021 prepares the university for future research excellence.",
+      "url": "https://www.uvic.ca/research-innovation/strategic-initiatives/aspiration-2030/index.php"
+    },
+    {
+      "name": "Student Advocacy Groups",
+      "categories": ["Campus services", "Indigenous", "International"],
+      "description": "There are several advocacy groups for minority students, including Indigenous students, women, students of colour and students with a disability.",
+      "url": "https://uvss.ca/student-groups/advocacy-groups/"
+    },
+    {
+      "name": "Student Affairs",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The Division of Student Affairs is committed to our vibrant and engaging learning community that supports student success.",
+      "location": "Michael Williams, A244",
+      "url": "https://www.uvic.ca/studentaffairs/"
+    },
+    {
+      "name": "Student Awards and Financial Aid",
+      "categories": ["Academics", "Campus services"],
+      "description": "Student Awards and Financial Aid (SAFA) works with students to help them budget and fund their education.",
+      "location": "Jamie Cassels Centre, ground floor A-wing",
+      "url": "https://www.uvic.ca/safa/index.php"
+    },
+    {
+      "name": "Student conduct",
+      "categories": ["Academics", "Campus services"],
+      "description": "A guide to reporting and resolving non-academic student conduct concerns.",
+      "location": "Jamie Cassels Centre, B202",
+      "url": "https://www.uvic.ca/students/student-life/student-conduct-and-policies/index.php"
+    },
+    {
+      "name": "Student Life Leadership Program",
+      "categories": ["Academics", "Campus services"],
+      "description": "The student leadership program provides opportunities to take leadership on student mental health, consent and healthy relationships, or LGBTQIA2+ communities on campus.",
+      "url": "https://www.uvic.ca/students/student-life/leadership-and-volunteering/index.php#ipn-student-leadership-programs"
+    },
+    {
+      "name": "Student Life, Office of",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "The Office of Student Life investigates and responds to student non-academic conduct matters and offers programming support the well-being and development of UVic students.",
+      "location": "Jamie Cassels Centre, B202",
+      "url": "https://www.uvic.ca/services/studentlife/"
+    },
+    {
+      "name": "Student loans, BC",
+      "categories": [],
+      "description": "StudentAid BC website.",
+      "url": "https://studentaidbc.ca/"
+    },
+    {
+      "name": "Student loans, Canada",
+      "categories": [],
+      "description": "Canada Student Loans website.",
+      "url": "https://www.canada.ca/en/employment-social-development/services/student-financial-aid.html"
+    },
+    {
+      "name": "Student Wellness Centre",
+      "categories": ["Campus services"],
+      "description": "The Student Wellness Centre offers free professional, confidential, inclusive support to registered UVic students.",
+      "location": "Health and Wellness Building",
+      "url": "/student-wellness/"
+    },
+    {
+      "name": "Students of Colour Collective (SOCC)",
+      "categories": ["Campus services"],
+      "description": "The UVSS Students of Colour Collective is a group of self-identified Black, Indigenous and/or Persons of colour committed to cultural awareness, mental health, anti-racism and social justice.",
+      "url": "https://soccollective.com/"
+    },
+    {
+      "name": "Studies in Religion and Society, Centre for (CSRS)",
+      "categories": ["Departments, faculties & units", "Research"],
+      "description": "CSRS is a community of academics dedicated to the scholarly study of religion as it relates to human society.",
+      "location": "Sedgewick, B102",
+      "url": "https://www.uvic.ca/research/centres/csrs/"
+    },
+    {
+      "name": "Style guide",
+      "categories": ["Campus services"],
+      "description": "UVic Style, the style guide for the university, was created to help writers and editors preparing print and web communications.",
+      "url": "https://www.uvic.ca/brand/story/style/"
+    },
+    {
+      "name": "SupportConnect",
+      "categories": ["Campus services"],
+      "description": "SupportConnect is a free and confidential 24/7 mental health service for UVic students. Connect with counsellors, consultants and life coaches by phone or online.",
+      "url": "https://www.uvic.ca/student-wellness/contacts/emergency-contacts/index.php#ipn-supportconnect-24-7-help"
+    },
+    {
+      "name": "Sustainability at UVic",
+      "categories": ["Campus services"],
+      "description": "Learn about sustainability initiatives at the University of Victoria.",
+      "location": "Michael Williams, A279",
+      "url": "https://www.uvic.ca/sustainability/"
+    },
+    {
+      "name": "Teacher Education",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "Study to become a teacher in our education programs. We offer instruction in elementary and secondary curriculums.",
+      "location": "MacLaurin, A225",
+      "url": "https://www.uvic.ca/education/programs/teacher-education/index.php"
+    },
+    {
+      "name": "Technology and Society",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "The Technology and Society minor program studies how technology impacts and advances knowledge across all disciplines.",
+      "location": "Cornett, B138",
+      "url": "https://www.uvic.ca/undergraduate/programs/undergraduate-programs/pages/technology-and-society.php"
+    },
+    {
+      "name": "Technology Solutions Centre (TSC)",
+      "categories": ["Campus services"],
+      "description": "The Technology Solutions Centre (TSC) provides assistance with institutional technology acquisitions for faculty and staff.",
+      "location": "Clearihue, A037",
+      "url": "https://www.uvic.ca/systems/support/computerssoftware/technologysolutions/"
+    },
+    {
+      "name": "Theatre",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Department of Theatre offers innovative teaching methods that engages our students with performance and active learning.",
+      "location": "Phoenix Theatre, 154",
+      "url": "https://www.uvic.ca/finearts/theatre"
+    },
+    {
+      "name": "Ticket Centre",
+      "categories": ["Arts & culture, recreation", "Online tools"],
+      "description": "Purchase tickets online for upcoming events at the Jamie Cassels Centre Farquhar Auditorium.",
+      "location": "Jamie Cassels Centre, B272e",
+      "url": "https://tickets.uvic.ca/TheatreManager/1/login&event=0"
+    },
+    {
+      "name": "Timetable and course listing",
+      "categories": ["Academics", "Online tools"],
+      "description": "UVic timetable and course listing.",
+      "url": "https://www.uvic.ca/students/academics/course-timetable/"
+    },
+    {
+      "name": "Torch, The",
+      "categories": ["Campus services"],
+      "description": "The Torch is UVic's alumni magazine. Published by the university and its Alumni Association, the Torch is largely written and produced by UVic alumni.",
+      "url": "https://www.uvic.ca/alumni/read-and-explore/the-torch-magazine/index.php"
+    },
+    {
+      "name": "Transcripts",
+      "categories": ["Academics", "Campus services", "Online tools"],
+      "description": "Details for current and former students on requesting official transcripts.",
+      "url": "/students/academics/grades-transcripts-parchments/index.php#ipn-transcripts"
+    },
+    {
+      "name": "Tuition and fees, graduate",
+      "categories": ["Academics", "Campus services"],
+      "description": "Tuition and fees for graduate studies.",
+      "url": "/graduate/finances/tuition-costs/"
+    },
+    {
+      "name": "Tuition and fees, undergraduate",
+      "categories": ["Academics", "Campus services"],
+      "description": "Tuition and fees for undergraduate studies.",
+      "url": "/undergraduate/finances/tuition-costs/"
+    },
+    {
+      "name": "Undergraduate programs",
+      "categories": ["Academics"],
+      "description": "A comprehensive list of the undergraduate programs available at the University of Victoria.",
+      "url": "/undergraduate/programs/undergraduate-programs/"
+    },
+    {
+      "name": "University Club of Victoria",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "The University Club serves lunch and dinner. They also host teas, luncheons, banquets, weddings, dances and meetings.",
+      "location": "University Club",
+      "url": "https://club.uvic.ca/"
+    },
+    {
+      "name": "University of Victoria Students' Society (UVSS)",
+      "categories": ["Academics", "Arts & culture, recreation", "Indigenous", "International"],
+      "description": "The UVSS is run by students for students. We're an independent student organization made up of every undergraduate student at UVic.",
+      "location": "Student Union (SUB)",
+      "url": "https://uvss.ca/"
+    },
+    {
+      "name": "University of Victoria Sustainability Project (UVSP)",
+      "categories": [],
+      "description": "The UVSP's mission is to reconceptualize sustainability through united environmental initiatives.",
+      "url": "https://www.uvsp.ca/"
+    },
+    {
+      "name": "University plans",
+      "categories": [],
+      "description": "Read about the University of Victoria's plans for the future.",
+      "url": "/about-uvic/university-plans/"
+    },
+    {
+      "name": "University policies and procedures",
+      "categories": ["Online tools"],
+      "description": "Search or browse policies and procedures at UVic.",
+      "url": "https://www.uvic.ca/universitysecretary/policies/"
+    },
+    {
+      "name": "University Secretary",
+      "categories": ["Departments, faculties & units"],
+      "description": "The University Secretary is the corporate secretariat for the university's governing bodies: the Board of Governors and the Senate.",
+      "location": "Michael Williams, A138",
+      "url": "https://www.uvic.ca/universitysecretary/"
+    },
+    {
+      "name": "University Systems",
+      "categories": ["Campus services", "Online tools"],
+      "description": "University Systems provides all of the campus's digital and electronic needs.",
+      "location": "Clearihue, A037",
+      "url": "https://www.uvic.ca/systems/"
+    },
+    {
+      "name": "UVic archives",
+      "categories": ["Academics", "Campus services", "Research"],
+      "description": "The UVic Archives preserve and provide public access to UVic historical records.",
+      "location": "McPherson Library, Mearns Centre for Learning, A005",
+      "url": "https://www.uvic.ca/library/locations/home/archives/index.php"
+    },
+    {
+      "name": "UVic Counselling",
+      "categories": ["Campus services"],
+      "description": "Counselling at the Student Wellness Centre offers free professional, confidential, inclusive support to registered UVic students.",
+      "location": "Health and Wellness Building",
+      "url": "https://www.uvic.ca/student-wellness/contacts/student-wellness-team/index.php#ipn-counsellors"
+    },
+    {
+      "name": "UVic Edge, The",
+      "categories": [],
+      "description": "Dynamic learning, vital impact and an extraordinary academic environment are the foundation of The UVic Edge.",
+      "url": "/about-uvic/about-the-university/index.php#ipn-the-uvic-edge"
+    },
+    {
+      "name": "UVic Global Community",
+      "categories": ["Arts & culture, recreation", "International"],
+      "description": "The UVic Global Community provides opportunities for students, faculty and staff to celebrate diversity, advance inter-cultural competency and cultivate an inclusive and globally minded campus.",
+      "location": "Jamie Cassels Centre, B272",
+      "url": "https://www.uvic.ca/international-experiences/get-involved/uvic-global-community/index.php"
+    },
+    {
+      "name": "UVic LEARN",
+      "categories": ["Academics", "Campus services"],
+      "description": "Provides articles, tip sheets, and video tutorials to develop the learning skills you need for academic success at all stages of your journey at the University of Victoria.",
+      "url": "https://onlineacademiccommunity.uvic.ca/uviclearn/"
+    },
+    {
+      "name": "UVic Research Anywhere",
+      "categories": ["Academics", "Research"],
+      "description": "Find the guides, tools and services that support research from home and relevant research resources available at UVic Libraries and beyond.",
+      "url": "https://www.uvic.ca/library/research-teaching/index.php"
+    },
+    {
+      "name": "UVic social media",
+      "categories": ["Campus services", "Departments, faculties & units"],
+      "description": "Get guidance on UVic's social media channels.",
+      "url": "https://www.uvic.ca/communicationsmarketing/social/index.php"
+    },
+    {
+      "name": "UVic Teach Anywhere",
+      "categories": ["Academics"],
+      "description": "Provides practical strategies for teaching online and relevant educational technology tools.",
+      "url": "https://onlineacademiccommunity.uvic.ca/TeachAnywhere/"
+    },
+    {
+      "name": "UVic-Genome BC Proteomics Centre",
+      "categories": ["Research"],
+      "description": "The UVic-Genome BC Proteomics Centre is a central hub of the Pan-Canadian Proteomics Centre.",
+      "url": "https://www.proteincentre.com/"
+    },
+    {
+      "name": "UVSS Catering and Conferences",
+      "categories": ["Campus services"],
+      "description": "The Student Union Building provides catering and booking services for events and meetings through UVSS Catering.",
+      "location": "Student Union (SUB)",
+      "url": "https://uvsscatering.com/"
+    },
+    {
+      "name": "UVSS Info Booth",
+      "categories": ["Campus services"],
+      "description": "The Info Booth can provide all the information you need about the UVSS Extended Health and Dental Plan information, bookings, lost and found, posters approval and stamping, U-Pass validation, International Student Identity Card (ISIC) and more.",
+      "location": "Student Union (SUB)",
+      "url": "https://uvss.ca/contact-us/"
+    },
+    {
+      "name": "Vice-President Academic & Provost (VPAC)",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Office of the Vice-President Academic and Provost is committed to fostering an environment of academic excellence and innovation.",
+      "location": "Michael Williams, A244",
+      "url": "https://www.uvic.ca/vpacademic/"
+    },
+    {
+      "name": "Vice-President External Relations (VPER)",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Office of the VP, External Relations connects UVic to the rest of the world and provides strategic leadership in communication, partnerships, philanthropy and more.",
+      "location": "Michael Williams, A120",
+      "url": "https://www.uvic.ca/external/"
+    },
+    {
+      "name": "Vice-President Finance & Operations (VPFO)",
+      "categories": ["Departments, faculties & units"],
+      "description": "The Vice-President Finance and Operations (VPFO) is the chief financial officer and a member of the executive at the University of Victoria.",
+      "location": "Michael Williams, A212",
+      "url": "https://www.uvic.ca/vpfo/home/vice-president/index.php"
+    },
+    {
+      "name": "Vice-President Indigenous",
+      "categories": ["Departments, faculties & units", "Indigenous"],
+      "description": "The Vice-President Indigenous (VPI) provides leadership and direction that furthers UVic's commitment to truth, respect and reconciliation.",
+      "location": "Michael Williams, A220",
+      "url": "https://www.uvic.ca/ovpi/index.php"
+    },
+    {
+      "name": "Vice-President Research & Innovation (VPRI)",
+      "categories": ["Departments, faculties & units"],
+      "description": "The role of the Vice-President Research and Innovation (VPRI) is to promote and facilitate research and creative activities at the University of Victoria.",
+      "location": "Michael Williams, A110",
+      "url": "https://www.uvic.ca/research-innovation/office-vpri/index.php"
+    },
+    {
+      "name": "Victoria Subatomic Physics & Accelerator Research Centre (VISPA)",
+      "categories": ["Academics", "Research"],
+      "description": "VISPA brings together people with the skills and expertise to investigate the fundamental constituents of the universe.",
+      "url": "https://www.uvic.ca/science/physics/vispa/"
+    },
+    {
+      "name": "Vikes Active Living",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "Our Active Living program provides facilities, fitness and mind/body classes, and special events.",
+      "url": "https://vikesrec.ca/"
+    },
+    {
+      "name": "Vikes Intramurals",
+      "categories": ["Arts & culture, recreation"],
+      "description": "Vikes intramurals gives students and community members the chance to live an active lifestyle through sport leagues and tournaments.",
+      "url": "https://vikesrec.ca/intramurals"
+    },
+    {
+      "name": "Vikes Sport Clubs",
+      "categories": ["Arts & culture, recreation"],
+      "description": "Vikes Sport Clubs has more than 30 student-led sport and recreation clubs available.",
+      "url": "https://vikesrec.ca/clubs"
+    },
+    {
+      "name": "Vikes Varsity Athletics",
+      "categories": ["Arts & culture, recreation", "Campus services"],
+      "description": "Find information on varsity sports at UVic, including info on tryouts, scholarships and facilities.",
+      "url": "https://govikesgo.com/"
+    },
+    {
+      "name": "Visual Arts",
+      "categories": ["Academics", "Departments, faculties & units"],
+      "description": "In the Department of Visual Arts, our students create art through classroom learning and hands-on practice.",
+      "location": "Visual Arts, A244",
+      "url": "https://www.uvic.ca/finearts/visualarts/"
+    },
+    {
+      "name": "Web of Science",
+      "categories": ["Academics", "Online tools", "Research"],
+      "description": "The Web of Science database provides access to citation information, so that researchers can see who has cited their publications.",
+      "location": "Michael Williams, A110",
+      "url": "http://apps.webofknowledge.com.ezproxy.library.uvic.ca/WOS_GeneralSearch_input.do?product=WOS&search_mode=GeneralSearch&SID=6BF6nSMPmdvfxCbUaNL&preferencesSaved="
+    },
+    {
+      "name": "Welcome Centre",
+      "categories": ["Campus services"],
+      "description": "The Welcome Centre provides campus information and tours.",
+      "location": "Jamie Cassels Centre",
+      "url": "/campus/tours-and-visits/index.php"
+    }
+  ],
+  "statistics": {
+    "total_resources": 269,
+    "categories_count": {
+      "Academics": 103,
+      "Arts & culture, recreation": 38,
+      "Campus services": 132,
+      "Departments, faculties & units": 86,
+      "Indigenous": 21,
+      "International": 16,
+      "Online tools": 30,
+      "Research": 48
+    }
+  }
+}
