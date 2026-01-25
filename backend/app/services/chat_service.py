@@ -2,6 +2,7 @@ from datetime import datetime
 from openai import OpenAI
 from ..config import settings
 from ..models.schemas import ChatMode, ChatResponse
+from .intent_matcher import get_intent_matcher
 
 # Configure OpenRouter client
 client = OpenAI(
@@ -147,9 +148,21 @@ class ChatService:
     def get_contextual_response(message: str, mode: ChatMode) -> ChatResponse:
         """Generate a response using OpenRouter API with mode-specific context."""
 
+        # For Mental Health mode, try pattern matching from dataset first
+        if mode == ChatMode.MENTAL_HEALTH:
+            intent_matcher = get_intent_matcher()
+            match = intent_matcher.match_intent(message, threshold=0.5)
+
+            if match and match["confidence"] >= 0.5:
+                # High confidence match - use dataset response directly
+                return ChatResponse(
+                    message=match["response"],
+                    timestamp=datetime.utcnow()
+                )
+
         # Get mode-specific prompt
         mode_prompt = MODE_PROMPTS.get(mode, MODE_PROMPTS[ChatMode.WELLNESS])
-        
+
         # Combine base + mode-specific prompts
         full_system_prompt = f"{BASE_SYSTEM_PROMPT}\n\n{mode_prompt}"
 
