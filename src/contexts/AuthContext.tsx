@@ -26,11 +26,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USER_KEY = "lantern_user";
 
+// Default user - Adi is signed in by default
+const DEFAULT_USER: User = {
+  id: "default-adi-user",
+  netlink_id: "adi",
+  display_name: "Adi",
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state from localStorage or default to Adi
   useEffect(() => {
     const storedToken = getAuthToken();
     const storedUser = localStorage.getItem(USER_KEY);
@@ -41,10 +48,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Verify token is still valid
         verifyToken();
       } catch {
-        clearAuth();
+        // Fall back to default user (Adi)
+        setUser(DEFAULT_USER);
+        localStorage.setItem(USER_KEY, JSON.stringify(DEFAULT_USER));
         setIsLoading(false);
       }
     } else {
+      // No stored auth - set Adi as default signed-in user
+      setUser(DEFAULT_USER);
+      localStorage.setItem(USER_KEY, JSON.stringify(DEFAULT_USER));
       setIsLoading(false);
     }
   }, []);
