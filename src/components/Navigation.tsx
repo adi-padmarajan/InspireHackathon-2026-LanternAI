@@ -72,7 +72,7 @@ export const Navigation = () => {
             ) : (
               <LoginButton
                 variant="lantern"
-                onSuccess={() => navigate("/chat")}
+                onSuccess={() => navigate("/")}
               />
             )}
           </div>
@@ -135,7 +135,7 @@ export const Navigation = () => {
                     className="w-full"
                     onSuccess={() => {
                       setIsOpen(false);
-                      navigate("/chat");
+                      navigate("/");
                     }}
                   />
                 </div>

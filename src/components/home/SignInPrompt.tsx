@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Lamp } from "lucide-react";
 import { LoginButton } from "@/components/auth";
 
 export const SignInPrompt = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -45,7 +47,7 @@ export const SignInPrompt = () => {
 
         {/* Login button */}
         <div className="animate-fade-in stagger-4">
-          <LoginButton variant="lantern" />
+          <LoginButton variant="lantern" onSuccess={() => navigate("/")} />
         </div>
       </div>
     </div>
