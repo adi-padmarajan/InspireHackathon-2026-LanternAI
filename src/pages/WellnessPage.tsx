@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import RelaxationSounds from "@/components/wellness/RelaxationSounds";
 import { 
   Smile, 
   Meh, 
@@ -181,6 +182,9 @@ const WellnessPage = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Relaxation Sounds */}
+              <RelaxationSounds />
             </div>
 
             {/* Wellness Tips Sidebar */}
