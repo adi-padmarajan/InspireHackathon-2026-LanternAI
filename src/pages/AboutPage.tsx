@@ -1,5 +1,9 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { HeroSection } from "@/components/HeroSection";
+import { FeaturesSection } from "@/components/FeaturesSection";
+import { PersonasSection } from "@/components/PersonasSection";
+import { CTASection } from "@/components/CTASection";
 import { Card, CardContent } from "@/components/ui/card";
 import { LanternLogo } from "@/components/LanternLogo";
 import { 
@@ -34,25 +38,30 @@ const values = [
   },
 ];
 
-const team = [
-  { name: "Built for INSPIRE Hackathon", role: "January 30-31, 2026" },
-];
-
 const AboutPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="pt-24 pb-16">
+      {/* Hero Section from original home page */}
+      <HeroSection />
+      
+      {/* Features Section from original home page */}
+      <FeaturesSection />
+      
+      {/* Personas Section from original home page */}
+      <PersonasSection />
+      
+      <main className="py-16">
         <div className="container mx-auto px-4">
-          {/* Hero */}
+          {/* About Lantern */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="flex justify-center mb-6">
               <LanternLogo size="lg" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6">
               About <span className="text-primary">Lantern</span>
-            </h1>
+            </h2>
             <p className="text-xl text-muted-foreground">
               Like a lantern illuminating a dark path, we help students navigate the challenges 
               of university life at the University of Victoria.
@@ -186,6 +195,9 @@ const AboutPage = () => {
           </section>
         </div>
       </main>
+
+      {/* CTA Section from original home page */}
+      <CTASection />
 
       <Footer />
     </div>
