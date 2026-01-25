@@ -371,4 +371,74 @@
   .animate-message-in {
     animation: message-fade-in 0.3s ease-out;
   }
+
+  /* Weather-based ambient backgrounds */
+  .weather-sunny {
+    --weather-ambient: 45 100% 50%;
+    --weather-bg-opacity: 0.03;
+  }
+
+  .weather-warm {
+    --weather-ambient: 35 95% 55%;
+    --weather-bg-opacity: 0.04;
+  }
+
+  .weather-cloudy {
+    --weather-ambient: 220 15% 60%;
+    --weather-bg-opacity: 0.02;
+  }
+
+  .weather-rainy {
+    --weather-ambient: 210 50% 45%;
+    --weather-bg-opacity: 0.04;
+  }
+
+  .weather-stormy {
+    --weather-ambient: 250 40% 35%;
+    --weather-bg-opacity: 0.05;
+  }
+
+  .weather-cold {
+    --weather-ambient: 200 70% 55%;
+    --weather-bg-opacity: 0.03;
+  }
+
+  .weather-snowy {
+    --weather-ambient: 200 30% 85%;
+    --weather-bg-opacity: 0.05;
+  }
+
+  /* Apply weather ambient to body */
+  .weather-sunny body,
+  .weather-warm body,
+  .weather-cloudy body,
+  .weather-rainy body,
+  .weather-stormy body,
+  .weather-cold body,
+  .weather-snowy body {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--weather-ambient) / var(--weather-bg-opacity)) 0%,
+      hsl(var(--background)) 30%
+    );
+  }
+
+  /* Weather-specific lantern glow adjustments */
+  .weather-sunny .lantern-glow,
+  .weather-warm .lantern-glow {
+    box-shadow: 0 0 60px hsl(38 95% 55% / 0.5),
+                0 0 120px hsl(45 100% 50% / 0.25);
+  }
+
+  .weather-rainy .lantern-glow,
+  .weather-stormy .lantern-glow {
+    box-shadow: 0 0 60px hsl(38 85% 50% / 0.35),
+                0 0 100px hsl(210 50% 45% / 0.15);
+  }
+
+  .weather-cold .lantern-glow,
+  .weather-snowy .lantern-glow {
+    box-shadow: 0 0 60px hsl(38 80% 55% / 0.4),
+                0 0 100px hsl(200 60% 60% / 0.15);
+  }
 }

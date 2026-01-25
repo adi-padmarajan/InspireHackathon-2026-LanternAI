@@ -1,14 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Lamp } from "lucide-react";
 import { getPersonalizedGreeting } from "@/lib/greetings";
+import { useWeather } from "@/hooks/useWeather";
 
 interface PersonalizedGreetingProps {
   userName?: string;
 }
 
 export const PersonalizedGreeting = ({ userName = "Adi" }: PersonalizedGreetingProps) => {
-  const [greeting, setGreeting] = useState(() => getPersonalizedGreeting(userName));
+  const { weather, greetingWeather, isLoading } = useWeather();
   const [isVisible, setIsVisible] = useState(false);
+
+  // Memoize greeting to prevent re-randomizing on every render
+  const greeting = useMemo(
+    () => getPersonalizedGreeting(userName, greetingWeather),
+    [userName, greetingWeather]
+  );
 
   useEffect(() => {
     // Fade in animation
@@ -52,6 +59,19 @@ export const PersonalizedGreeting = ({ userName = "Adi" }: PersonalizedGreetingP
         <p className="text-xl md:text-2xl text-muted-foreground text-center max-w-lg animate-fade-in stagger-3">
           {greeting.sub}
         </p>
+
+        {/* Live weather indicator */}
+        {weather && !isLoading && (
+          <div className="mt-6 animate-fade-in stagger-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 backdrop-blur-sm text-muted-foreground text-sm">
+              <span>{weather.temperature}°C</span>
+              <span className="text-muted-foreground/60">·</span>
+              <span>{weather.description}</span>
+              <span className="text-muted-foreground/60">·</span>
+              <span>Victoria</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

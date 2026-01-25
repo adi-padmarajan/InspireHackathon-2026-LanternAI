@@ -1,12 +1,14 @@
-// Dynamic greeting system based on time of day and weather conditions
+// Dynamic greeting system based on time of day and live weather conditions
+
+export type GreetingWeather = "sunny" | "cloudy" | "rainy" | "cold" | "warm";
 
 export interface GreetingContext {
   timeOfDay: "morning" | "afternoon" | "evening" | "night";
-  weather?: "sunny" | "cloudy" | "rainy" | "cold" | "warm";
+  weather: GreetingWeather;
   userName?: string;
 }
 
-const getTimeOfDay = (): GreetingContext["timeOfDay"] => {
+export const getTimeOfDay = (): GreetingContext["timeOfDay"] => {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return "morning";
   if (hour >= 12 && hour < 17) return "afternoon";
@@ -14,34 +16,12 @@ const getTimeOfDay = (): GreetingContext["timeOfDay"] => {
   return "night";
 };
 
-// Simulated weather for Victoria, BC (in real app, would fetch from API)
-const getSimulatedWeather = (): GreetingContext["weather"] => {
-  const month = new Date().getMonth();
-  const random = Math.random();
-  
-  // Victoria weather patterns
-  if (month >= 10 || month <= 2) {
-    // Nov-Feb: Mostly rainy/cold
-    if (random < 0.6) return "rainy";
-    if (random < 0.85) return "cloudy";
-    return "cold";
-  } else if (month >= 6 && month <= 8) {
-    // Jun-Aug: Mostly sunny/warm
-    if (random < 0.7) return "sunny";
-    if (random < 0.9) return "warm";
-    return "cloudy";
-  } else {
-    // Spring/Fall: Mixed
-    if (random < 0.3) return "sunny";
-    if (random < 0.6) return "cloudy";
-    if (random < 0.8) return "rainy";
-    return "warm";
-  }
-};
-
-export const getGreetingContext = (userName?: string): GreetingContext => ({
+export const getGreetingContext = (
+  userName?: string,
+  weather: GreetingWeather = "cloudy"
+): GreetingContext => ({
   timeOfDay: getTimeOfDay(),
-  weather: getSimulatedWeather(),
+  weather,
   userName,
 });
 
@@ -138,10 +118,13 @@ export const getGreeting = (context: GreetingContext): GreetingMessage => {
   return fallbackGreetings[context.timeOfDay];
 };
 
-export const getPersonalizedGreeting = (userName?: string): GreetingMessage & { userName?: string } => {
-  const context = getGreetingContext(userName);
+export const getPersonalizedGreeting = (
+  userName?: string,
+  weather: GreetingWeather = "cloudy"
+): GreetingMessage & { userName?: string } => {
+  const context = getGreetingContext(userName, weather);
   const greeting = getGreeting(context);
-  
+
   return {
     ...greeting,
     userName,
