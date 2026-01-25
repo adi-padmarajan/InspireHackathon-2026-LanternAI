@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+import secrets
 
 
 class Settings(BaseSettings):
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8080"]
 
     # Supabase
     supabase_url: str = ""
@@ -16,6 +17,11 @@ class Settings(BaseSettings):
 
     # OpenRouter API
     openrouter_api_key: str = ""
+
+    # JWT Authentication
+    jwt_secret_key: str = secrets.token_hex(32)  # Generate default if not set
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 1440  # 24 hours
 
     class Config:
         env_file = ".env"

@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanternLogo } from "./LanternLogo";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoginButton, UserMenu } from "@/components/auth";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -16,6 +18,8 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -56,9 +60,21 @@ export const Navigation = () => {
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            <Button variant="lantern" asChild>
-              <Link to="/chat">Start Chat</Link>
-            </Button>
+
+            {/* Auth-aware buttons */}
+            {isAuthenticated ? (
+              <>
+                <UserMenu />
+                <Button variant="lantern" asChild>
+                  <Link to="/chat">Start Chat</Link>
+                </Button>
+              </>
+            ) : (
+              <LoginButton
+                variant="lantern"
+                onSuccess={() => navigate("/chat")}
+              />
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -99,11 +115,31 @@ export const Navigation = () => {
                   {link.name}
                 </Link>
               ))}
-              <Button variant="lantern" className="mt-2" asChild>
-                <Link to="/chat" onClick={() => setIsOpen(false)}>
-                  Start Chat
-                </Link>
-              </Button>
+
+              {/* Mobile auth section */}
+              {isAuthenticated ? (
+                <>
+                  <div className="px-4 py-2 border-t border-border mt-2">
+                    <UserMenu />
+                  </div>
+                  <Button variant="lantern" className="mt-2" asChild>
+                    <Link to="/chat" onClick={() => setIsOpen(false)}>
+                      Start Chat
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <div className="mt-2">
+                  <LoginButton
+                    variant="lantern"
+                    className="w-full"
+                    onSuccess={() => {
+                      setIsOpen(false);
+                      navigate("/chat");
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

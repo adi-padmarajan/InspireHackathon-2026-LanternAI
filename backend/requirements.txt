@@ -6,3 +6,4 @@ pydantic==2.9.2
 pydantic-settings==2.5.2
 python-multipart==0.0.12
 openai==1.58.1
+python-jose[cryptography]==3.3.0

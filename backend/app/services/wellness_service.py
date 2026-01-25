@@ -10,7 +10,10 @@ class WellnessService:
         self.table_name = "mood_entries"
 
     async def create_mood_entry(
-        self, mood: MoodLevel, note: Optional[str] = None
+        self,
+        mood: MoodLevel,
+        note: Optional[str] = None,
+        user_id: Optional[str] = None
     ) -> MoodEntry:
         """Create a new mood entry in Supabase."""
         data = {
@@ -18,6 +21,10 @@ class WellnessService:
             "note": note,
             "created_at": datetime.utcnow().isoformat(),
         }
+
+        # Add user_id if provided (authenticated request)
+        if user_id:
+            data["user_id"] = user_id
 
         result = self.supabase.table(self.table_name).insert(data).execute()
 
@@ -29,15 +36,19 @@ class WellnessService:
             created_at=entry["created_at"],
         )
 
-    async def get_mood_history(self, limit: int = 30) -> list[MoodEntry]:
+    async def get_mood_history(
+        self,
+        limit: int = 30,
+        user_id: Optional[str] = None
+    ) -> list[MoodEntry]:
         """Get recent mood entries from Supabase."""
-        result = (
-            self.supabase.table(self.table_name)
-            .select("*")
-            .order("created_at", desc=True)
-            .limit(limit)
-            .execute()
-        )
+        query = self.supabase.table(self.table_name).select("*")
+
+        # Filter by user_id if provided (authenticated request)
+        if user_id:
+            query = query.eq("user_id", user_id)
+
+        result = query.order("created_at", desc=True).limit(limit).execute()
 
         return [
             MoodEntry(
@@ -49,9 +60,15 @@ class WellnessService:
             for entry in result.data
         ]
 
-    async def get_mood_stats(self) -> dict[str, int]:
+    async def get_mood_stats(self, user_id: Optional[str] = None) -> dict[str, int]:
         """Get mood statistics from Supabase."""
-        result = self.supabase.table(self.table_name).select("mood").execute()
+        query = self.supabase.table(self.table_name).select("mood")
+
+        # Filter by user_id if provided (authenticated request)
+        if user_id:
+            query = query.eq("user_id", user_id)
+
+        result = query.execute()
 
         stats: dict[str, int] = {}
         for entry in result.data:

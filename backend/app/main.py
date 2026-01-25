@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 from .config import settings
-from .routers import chat_router, wellness_router
+from .routers import chat_router, wellness_router, auth_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -21,6 +21,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(wellness_router, prefix="/api")
 
