@@ -21,7 +21,7 @@ export const FloatingModeSelector = ({
   const currentMode = getModeConfig(mode);
 
   return (
-    <div className="relative z-50 flex items-center justify-between gap-3 px-4 py-3 bg-card backdrop-blur-sm border-b border-border/50">
+    <div className="sticky top-16 z-40 flex items-center justify-between gap-3 px-4 py-3 bg-card border-b border-border/50">
       {/* Mode Selector */}
       <div className="relative">
         <button
