@@ -25,7 +25,7 @@ const cardVariants = {
     y: 0,
     transition: {
       delay: i * 0.03,
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 25,
     },
@@ -43,7 +43,7 @@ const checkVariants = {
     scale: 1,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 500,
       damping: 25,
     },
