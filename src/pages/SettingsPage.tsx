@@ -11,9 +11,10 @@ import * as LucideIcons from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { themeCategories, ThemeCategory } from '@/lib/themes';
-import { AmbientBackground, ThemeTransitionOverlay } from '@/components/AmbientBackground';
+import { ThemeTransitionOverlay } from '@/components/AmbientBackground';
 import { ThemePreviewCard } from '@/components/settings/ThemePreviewCard';
 import { CustomizationPanel } from '@/components/settings/CustomizationPanel';
+import { SettingsBackground } from '@/components/settings/SettingsBackground';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -243,8 +244,8 @@ const SettingsPage = () => {
       animate="enter"
       exit="exit"
     >
-      {/* Theme-aware ambient background */}
-      <AmbientBackground />
+      {/* Enhanced Settings background */}
+      <SettingsBackground />
 
       {/* Theme transition overlay */}
       <ThemeTransitionOverlay />

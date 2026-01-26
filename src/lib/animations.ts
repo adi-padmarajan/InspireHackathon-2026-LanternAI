@@ -291,7 +291,7 @@ export const breathingAnimation = {
   transition: {
     duration: 4,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
 
@@ -304,7 +304,7 @@ export const glowPulse = {
   transition: {
     duration: 3,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
 
@@ -318,7 +318,7 @@ export const floatingAnimation = {
   transition: {
     duration: 6,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
 
@@ -328,7 +328,7 @@ export const floatingRotate = {
   transition: {
     duration: 5,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
 
@@ -344,7 +344,7 @@ export const flameFlicker = {
   transition: {
     duration: 2,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
 
@@ -359,7 +359,7 @@ export const typingDot = (delay: number) => ({
   transition: {
     duration: 1.2,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
     delay,
   },
 });
