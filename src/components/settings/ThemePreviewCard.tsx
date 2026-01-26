@@ -97,7 +97,7 @@ export const ThemePreviewCard = ({
       rotateX: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 15,
         delay: index * 0.08,
@@ -109,7 +109,7 @@ export const ThemePreviewCard = ({
       rotateY: 2,
       rotateX: -2,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 20,
       },
