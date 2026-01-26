@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { WelcomeHero } from "@/components/chat/WelcomeHero";
 import { ChatBubble } from "@/components/chat/ChatBubble";
@@ -7,7 +8,9 @@ import { ModeSelectorGrid } from "@/components/chat/ModeSelectorGrid";
 import { ModeQuickPrompts } from "@/components/chat/ModeQuickPrompts";
 import { FloatingModeSelector } from "@/components/chat/FloatingModeSelector";
 import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { type ChatMode, getModeConfig } from "@/lib/chatModes";
+import { pageVariants, springPresets } from "@/lib/animations";
 
 const API_BASE_URL = "http://localhost:8000";
 
@@ -168,79 +171,129 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col chat-ambient-bg">
+    <motion.div
+      className="min-h-screen flex flex-col chat-ambient-bg relative overflow-hidden"
+      variants={pageVariants}
+      initial="initial"
+      animate="enter"
+      exit="exit"
+    >
+      {/* Subtle ambient background */}
+      <AmbientBackground variant="subtle" particleCount={8} />
+
       <Navigation />
 
       {/* Main Chat Container */}
-      <main className="flex-1 pt-16 flex flex-col">
+      <main className="flex-1 pt-16 flex flex-col relative z-10">
         <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
           {/* Mode Selector Header - Only show when chat has started */}
-          {hasStartedChat && (
-            <FloatingModeSelector
-              mode={mode}
-              onModeChange={handleModeChange}
-              onNewChat={handleNewChat}
-            />
-          )}
+          <AnimatePresence>
+            {hasStartedChat && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={springPresets.gentle}
+              >
+                <FloatingModeSelector
+                  mode={mode}
+                  onModeChange={handleModeChange}
+                  onNewChat={handleNewChat}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Chat Content Area */}
           <div
             ref={messagesContainerRef}
             className="flex-1 overflow-y-auto chat-scroll px-4 md:px-6"
           >
-            {!hasStartedChat ? (
-              /* Welcome State with Mode Selection */
-              <div className="h-full flex flex-col py-6">
-                <WelcomeHero />
-                <div className="flex-1 pb-4 mt-6">
-                  <ModeSelectorGrid onSelectMode={handleModeSelect} />
-                </div>
-              </div>
-            ) : (
-              /* Chat Messages */
-              <div className="py-6 space-y-6">
-                {messages.map((message, index) => (
-                  <ChatBubble
-                    key={message.id}
-                    message={message}
-                    isLatest={
-                      index === messages.length - 1 &&
-                      message.role === "assistant"
-                    }
-                  />
-                ))}
-
-                {isLoading && <TypingIndicator />}
-
-                {/* Show quick prompts after greeting */}
-                {messages.length === 1 &&
-                  messages[0].role === "assistant" &&
-                  !isLoading && (
-                    <div className="mt-4">
-                      <ModeQuickPrompts
-                        mode={mode}
-                        onSelectPrompt={handleQuickPrompt}
+            <AnimatePresence mode="wait">
+              {!hasStartedChat ? (
+                /* Welcome State with Mode Selection */
+                <motion.div
+                  key="welcome"
+                  className="h-full flex flex-col py-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <WelcomeHero />
+                  <div className="flex-1 pb-4 mt-6">
+                    <ModeSelectorGrid onSelectMode={handleModeSelect} />
+                  </div>
+                </motion.div>
+              ) : (
+                /* Chat Messages */
+                <motion.div
+                  key="chat"
+                  className="py-6 space-y-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AnimatePresence>
+                    {messages.map((message, index) => (
+                      <ChatBubble
+                        key={message.id}
+                        message={message}
+                        isLatest={
+                          index === messages.length - 1 &&
+                          message.role === "assistant"
+                        }
                       />
-                    </div>
-                  )}
+                    ))}
+                  </AnimatePresence>
 
-                <div ref={messagesEndRef} />
-              </div>
-            )}
+                  <AnimatePresence>
+                    {isLoading && <TypingIndicator />}
+                  </AnimatePresence>
+
+                  {/* Show quick prompts after greeting */}
+                  <AnimatePresence>
+                    {messages.length === 1 &&
+                      messages[0].role === "assistant" &&
+                      !isLoading && (
+                        <motion.div
+                          className="mt-4"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ delay: 0.3, ...springPresets.gentle }}
+                        >
+                          <ModeQuickPrompts
+                            mode={mode}
+                            onSelectPrompt={handleQuickPrompt}
+                          />
+                        </motion.div>
+                      )}
+                  </AnimatePresence>
+
+                  <div ref={messagesEndRef} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Input Area - Fixed at bottom */}
-          <div className="sticky bottom-0 p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent pt-8">
+          <motion.div
+            className="sticky bottom-0 p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent pt-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, ...springPresets.gentle }}
+          >
             <EnhancedChatInput
               value={input}
               onChange={setInput}
               onSend={handleSend}
               isLoading={isLoading}
             />
-          </div>
+          </motion.div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

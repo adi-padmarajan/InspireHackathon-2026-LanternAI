@@ -1,6 +1,8 @@
 import { formatDistanceToNow } from "date-fns";
 import { Lamp, User, CheckCheck } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { messageVariants, springPresets } from "@/lib/animations";
 
 interface Message {
   id: string;
@@ -43,24 +45,43 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
   const isAssistant = message.role === "assistant";
 
   return (
-    <div
+    <motion.div
       className={cn(
-        "flex gap-3 max-w-full animate-fade-in",
+        "flex gap-3 max-w-full",
         isUser ? "flex-row-reverse" : "flex-row"
       )}
+      variants={isUser ? messageVariants.user : messageVariants.assistant}
+      initial="hidden"
+      animate="visible"
+      layout
     >
-      {/* Avatar */}
-      <div className={cn(
-        "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300",
-        isAssistant && "bg-gradient-to-br from-lantern-glow/20 to-lantern-glow-soft/30 shadow-sm",
-        isUser && "bg-gradient-to-br from-primary/20 to-primary/10"
-      )}>
+      {/* Avatar with pulse on new message */}
+      <motion.div
+        className={cn(
+          "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300",
+          isAssistant && "bg-gradient-to-br from-lantern-glow/20 to-lantern-glow-soft/30 shadow-sm",
+          isUser && "bg-gradient-to-br from-primary/20 to-primary/10"
+        )}
+        animate={isLatest && isAssistant ? {
+          scale: [1, 1.1, 1],
+          boxShadow: [
+            "0 0 0 0 rgba(232, 180, 95, 0)",
+            "0 0 0 8px rgba(232, 180, 95, 0.2)",
+            "0 0 0 0 rgba(232, 180, 95, 0)",
+          ],
+        } : {}}
+        transition={{
+          duration: 2,
+          repeat: isLatest ? Infinity : 0,
+          ease: "easeInOut",
+        }}
+      >
         {isAssistant ? (
           <Lamp className="h-4 w-4 text-lantern-glow" />
         ) : (
           <User className="h-4 w-4 text-primary" />
         )}
-      </div>
+      </motion.div>
 
       {/* Message Content */}
       <div className={cn(
@@ -68,21 +89,26 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
         isUser ? "items-end" : "items-start"
       )}>
         {/* Name Label */}
-        <span className={cn(
-          "text-xs font-medium mb-1.5 px-1",
-          isAssistant ? "text-lantern-glow" : "text-primary"
-        )}>
+        <motion.span
+          className={cn(
+            "text-xs font-medium mb-1.5 px-1",
+            isAssistant ? "text-lantern-glow" : "text-primary"
+          )}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
           {isAssistant ? "Lantern" : "You"}
-        </span>
+        </motion.span>
 
         {/* Bubble */}
-        <div
+        <motion.div
           className={cn(
-            "relative px-4 py-3 rounded-2xl transition-all duration-300",
+            "relative px-4 py-3 rounded-2xl",
             isAssistant && [
               "bg-card border border-border/50",
               "rounded-tl-md",
-              "shadow-sm hover:shadow-md",
+              "shadow-sm",
               isLatest && "ring-1 ring-primary/20"
             ],
             isUser && [
@@ -92,6 +118,10 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
               "shadow-md"
             ]
           )}
+          whileHover={{
+            scale: 1.01,
+            transition: springPresets.snappy,
+          }}
         >
           {/* Message Text */}
           <div className={cn(
@@ -102,25 +132,47 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
             {formatMessageContent(message.content)}
           </div>
 
-          {/* Subtle glow for assistant messages */}
+          {/* Subtle glow for latest assistant message */}
           {isAssistant && isLatest && (
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-lantern-glow/5 to-lantern-glow-soft/5 rounded-2xl blur-xl" />
+            <motion.div
+              className="absolute inset-0 -z-10 bg-gradient-to-br from-lantern-glow/5 to-lantern-glow-soft/5 rounded-2xl blur-xl"
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.02, 1],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
           )}
-        </div>
+        </motion.div>
 
         {/* Timestamp and Status */}
-        <div className={cn(
-          "flex items-center gap-1.5 mt-1.5 px-1",
-          isUser ? "flex-row-reverse" : "flex-row"
-        )}>
+        <motion.div
+          className={cn(
+            "flex items-center gap-1.5 mt-1.5 px-1",
+            isUser ? "flex-row-reverse" : "flex-row"
+          )}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
           <span className="text-[10px] text-muted-foreground/60">
             {formatDistanceToNow(message.timestamp, { addSuffix: true })}
           </span>
           {isUser && (
-            <CheckCheck className="h-3 w-3 text-primary/60" />
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, ...springPresets.bouncy }}
+            >
+              <CheckCheck className="h-3 w-3 text-primary/60" />
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -8,7 +8,6 @@ import { WeatherProvider } from "@/contexts/WeatherContext";
 import { ProtectedRoute } from "@/components/auth";
 import Index from "./pages/Index";
 import ChatPage from "./pages/ChatPage";
-import ResourcesPage from "./pages/ResourcesPage";
 import WellnessPage from "./pages/WellnessPage";
 import AboutPage from "./pages/AboutPage";
 import NotFound from "./pages/NotFound";
@@ -27,7 +26,6 @@ const App = () => (
               {/* Public routes */}
               <Route path="/" element={<Index />} />
               <Route path="/chat" element={<ChatPage />} />
-              <Route path="/resources" element={<ResourcesPage />} />
               <Route path="/about" element={<AboutPage />} />
 
               {/* Protected routes - require authentication */}

@@ -1,10 +1,13 @@
+import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { PersonalizedGreeting } from "@/components/home/PersonalizedGreeting";
 import { QuickActions } from "@/components/home/QuickActions";
 import { WarmMessage } from "@/components/home/WarmMessage";
 import { SignInPrompt } from "@/components/home/SignInPrompt";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { useAuth } from "@/contexts/AuthContext";
+import { pageVariants } from "@/lib/animations";
 
 const Index = () => {
   const { user, isAuthenticated } = useAuth();
@@ -13,11 +16,28 @@ const Index = () => {
   const userName = user?.display_name;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <motion.div
+      className="min-h-screen flex flex-col bg-background relative overflow-hidden"
+      variants={pageVariants}
+      initial="initial"
+      animate="enter"
+      exit="exit"
+    >
+      {/* Ambient floating particles */}
+      <AmbientBackground variant="fireflies" particleCount={12} />
+
+      {/* Gradient orbs */}
+      <AmbientBackground variant="orbs" />
+
       <Navigation />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-20">
-        <div className="w-full max-w-4xl mx-auto space-y-12 md:space-y-16">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-20 relative z-10">
+        <motion.div
+          className="w-full max-w-4xl mx-auto space-y-12 md:space-y-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           {isAuthenticated && userName ? (
             <>
               {/* Personalized Greeting for signed-in users */}
@@ -38,11 +58,11 @@ const Index = () => {
 
           {/* Quick Actions - always visible */}
           <QuickActions />
-        </div>
+        </motion.div>
       </main>
 
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

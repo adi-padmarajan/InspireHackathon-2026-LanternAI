@@ -1,6 +1,8 @@
 import { Send, Sparkles, Phone } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
+import { springPresets } from "@/lib/animations";
 
 interface EnhancedChatInputProps {
   value: string;
@@ -35,20 +37,39 @@ export const EnhancedChatInput = ({
   };
 
   return (
-    <div className="relative">
-      {/* Ambient glow when focused */}
-      {isFocused && (
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-primary/5 to-transparent rounded-3xl blur-xl" />
-      )}
+    <motion.div
+      className="relative"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={springPresets.gentle}
+    >
+      {/* Animated ambient glow when focused */}
+      <AnimatePresence>
+        {isFocused && (
+          <motion.div
+            className="absolute inset-0 -z-10 bg-gradient-to-t from-primary/10 to-transparent rounded-3xl blur-xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Main Input Container */}
-      <div
+      <motion.div
         className={cn(
-          "relative bg-card border rounded-2xl transition-all duration-300",
+          "relative bg-card border rounded-2xl transition-colors duration-300",
           isFocused
             ? "border-primary/30 shadow-lg shadow-primary/5"
             : "border-border/50 shadow-sm"
         )}
+        animate={{
+          boxShadow: isFocused
+            ? "0 10px 40px -10px hsl(var(--primary) / 0.15)"
+            : "0 2px 10px -5px hsl(0 0% 0% / 0.1)",
+        }}
+        transition={{ duration: 0.3 }}
       >
         {/* Input Area */}
         <div className="flex items-end gap-3 p-3">
@@ -75,54 +96,91 @@ export const EnhancedChatInput = ({
             />
 
             {/* Character hint for long messages */}
-            {value.length > 200 && (
-              <div className="absolute bottom-0 right-0 text-[10px] text-muted-foreground/50">
-                {value.length}/500
-              </div>
-            )}
+            <AnimatePresence>
+              {value.length > 200 && (
+                <motion.div
+                  className="absolute bottom-0 right-0 text-[10px] text-muted-foreground/50"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                >
+                  {value.length}/500
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Send Button */}
-          <button
+          {/* Send Button with animations */}
+          <motion.button
             onClick={onSend}
             disabled={!value.trim() || isLoading}
             className={cn(
               "flex-shrink-0 p-3 rounded-xl",
-              "transition-all duration-300 ease-out",
+              "transition-colors duration-300",
               "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-card",
               value.trim() && !isLoading
-                ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+                ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md"
                 : "bg-muted text-muted-foreground cursor-not-allowed"
             )}
+            whileHover={value.trim() && !isLoading ? { scale: 1.1 } : {}}
+            whileTap={value.trim() && !isLoading ? { scale: 0.95 } : {}}
+            transition={springPresets.snappy}
             aria-label="Send message"
           >
-            {isLoading ? (
-              <Sparkles className="h-5 w-5 animate-pulse" />
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </button>
+            <AnimatePresence mode="wait">
+              {isLoading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ rotate: 0, opacity: 0 }}
+                  animate={{ rotate: 360, opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    rotate: { duration: 1, repeat: Infinity, ease: "linear" },
+                  }}
+                >
+                  <Sparkles className="h-5 w-5" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="send"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <Send className="h-5 w-5" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Crisis Support Footer */}
-      <div className="flex items-center justify-center gap-2 mt-3 px-2">
+      <motion.div
+        className="flex items-center justify-center gap-2 mt-3 px-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
           <span>Need immediate support?</span>
-          <a
+          <motion.a
             href="tel:1-800-784-2433"
             className={cn(
               "inline-flex items-center gap-1 font-medium",
               "text-primary/80 hover:text-primary transition-colors",
               "focus:outline-none focus:underline"
             )}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
           >
             <Phone className="h-3 w-3" />
             <span>1-800-784-2433</span>
-          </a>
+          </motion.a>
           <span className="text-muted-foreground/40">(Crisis Line BC)</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
