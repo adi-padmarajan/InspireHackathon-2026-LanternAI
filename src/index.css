@@ -54,6 +54,22 @@
     --lantern-glow: 38 95% 55%;
     --lantern-glow-soft: 38 90% 75%;
 
+    /* Theme-specific tokens (can be overridden by ThemeContext) */
+    --theme-glow: 38 95% 55%;
+    --theme-glow-soft: 38 90% 75%;
+    --theme-particle: 38 95% 55%;
+    --theme-orb-1: 38 95% 55%;
+    --theme-orb-2: 258 89% 66%;
+
+    /* Animation configuration */
+    --animation-scale: 1;
+    --glow-intensity: 0.7;
+    --particle-opacity: 1;
+    --float-amplitude: 10px;
+
+    /* Theme transition timing */
+    --theme-transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
     /* Forest greens palette */
     --forest-deep: 152 45% 18%;
     --forest-medium: 152 40% 35%;
@@ -440,5 +456,215 @@
   .weather-snowy .lantern-glow {
     box-shadow: 0 0 60px hsl(38 80% 55% / 0.4),
                 0 0 100px hsl(200 60% 60% / 0.15);
+  }
+
+  /* ============================================================================
+     THEME SYSTEM - Dynamic Theme Support
+     ============================================================================ */
+
+  /* Theme-aware glow classes using CSS variables */
+  .theme-glow {
+    box-shadow: 0 0 60px hsl(var(--theme-glow) / calc(0.4 * var(--glow-intensity))),
+                0 0 120px hsl(var(--theme-glow) / calc(0.2 * var(--glow-intensity)));
+  }
+
+  .theme-glow-sm {
+    box-shadow: 0 0 20px hsl(var(--theme-glow) / calc(0.3 * var(--glow-intensity)));
+  }
+
+  .theme-glow-soft {
+    box-shadow: 0 0 30px hsl(var(--theme-glow-soft) / calc(0.2 * var(--glow-intensity))),
+                0 0 60px hsl(var(--theme-glow-soft) / calc(0.1 * var(--glow-intensity)));
+  }
+
+  /* Theme pulse glow animation */
+  .theme-pulse-glow {
+    animation: theme-pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes theme-pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 40px hsl(var(--theme-glow) / calc(0.3 * var(--glow-intensity)));
+    }
+    50% {
+      box-shadow: 0 0 80px hsl(var(--theme-glow) / calc(0.5 * var(--glow-intensity)));
+    }
+  }
+
+  /* Theme-aware floating animation */
+  .theme-float {
+    animation: theme-float 6s ease-in-out infinite;
+  }
+
+  @keyframes theme-float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(calc(-1 * var(--float-amplitude)));
+    }
+  }
+
+  /* ============================================================================
+     THEME TRANSITIONS - Cinematic Effects
+     ============================================================================ */
+
+  /* Smooth transition wrapper for theme switching */
+  .theme-transitioning {
+    --theme-transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .theme-transitioning *:not(.theme-transition-overlay):not(.theme-transition-overlay *) {
+    transition:
+      background-color var(--theme-transition),
+      border-color var(--theme-transition),
+      color var(--theme-transition),
+      box-shadow var(--theme-transition),
+      fill var(--theme-transition),
+      stroke var(--theme-transition) !important;
+  }
+
+  /* ============================================================================
+     ANIMATION INTENSITY CLASSES
+     ============================================================================ */
+
+  /* No animations */
+  .animation-none {
+    --animation-scale: 0;
+    --particle-opacity: 0;
+  }
+
+  .animation-none * {
+    animation-duration: 0s !important;
+    transition-duration: 0.1s !important;
+  }
+
+  /* Subtle animations */
+  .animation-subtle {
+    --animation-scale: 0.5;
+    --particle-opacity: 0.5;
+  }
+
+  .animation-subtle .theme-float,
+  .animation-subtle .float-animation {
+    animation-duration: 10s;
+  }
+
+  .animation-subtle .theme-pulse-glow,
+  .animation-subtle .pulse-glow {
+    animation-duration: 5s;
+  }
+
+  /* Normal animations (default) */
+  .animation-normal {
+    --animation-scale: 1;
+    --particle-opacity: 1;
+  }
+
+  /* Energetic animations */
+  .animation-energetic {
+    --animation-scale: 1.5;
+    --particle-opacity: 1;
+  }
+
+  .animation-energetic .theme-float,
+  .animation-energetic .float-animation {
+    animation-duration: 4s;
+  }
+
+  .animation-energetic .theme-pulse-glow,
+  .animation-energetic .pulse-glow {
+    animation-duration: 2s;
+  }
+
+  /* Respect user preference for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .theme-transitioning * {
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ============================================================================
+     PARTICLE SYSTEM STYLES
+     ============================================================================ */
+
+  .particle-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+    opacity: var(--particle-opacity);
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .particle-firefly {
+    background: radial-gradient(circle, hsl(var(--theme-particle)) 0%, transparent 70%);
+    box-shadow: 0 0 10px hsl(var(--theme-glow) / 0.5);
+  }
+
+  .particle-bubble {
+    background: radial-gradient(circle at 30% 30%, hsl(var(--theme-particle) / 0.8) 0%, hsl(var(--theme-particle) / 0.2) 50%, transparent 70%);
+    border: 1px solid hsl(var(--theme-particle) / 0.3);
+  }
+
+  .particle-star {
+    background: hsl(var(--theme-particle));
+    box-shadow: 0 0 6px hsl(var(--theme-particle)), 0 0 12px hsl(var(--theme-glow) / 0.5);
+  }
+
+  .particle-snow {
+    background: radial-gradient(circle, hsl(var(--theme-particle)) 0%, hsl(var(--theme-particle) / 0.5) 50%, transparent 70%);
+  }
+
+  .particle-leaf {
+    background: linear-gradient(135deg, hsl(var(--theme-particle)) 0%, hsl(var(--theme-orb-2)) 100%);
+    border-radius: 50% 0 50% 0;
+    transform-origin: center;
+  }
+
+  .particle-spark {
+    background: hsl(var(--theme-particle));
+    box-shadow: 0 0 4px hsl(var(--theme-particle)), 0 0 8px hsl(var(--theme-glow));
+  }
+
+  /* Aurora wave effect */
+  .aurora-wave {
+    position: absolute;
+    width: 200%;
+    height: 150%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      hsl(var(--theme-particle) / 0.1) 20%,
+      hsl(var(--theme-orb-2) / 0.15) 40%,
+      hsl(var(--theme-particle) / 0.1) 60%,
+      transparent 100%
+    );
+    filter: blur(40px);
+    animation: aurora-wave 15s ease-in-out infinite;
+  }
+
+  @keyframes aurora-wave {
+    0%, 100% {
+      transform: translateX(-25%) translateY(0) rotate(-5deg);
+    }
+    50% {
+      transform: translateX(0%) translateY(-10%) rotate(5deg);
+    }
   }
 }

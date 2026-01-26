@@ -23,11 +23,8 @@ const Index = () => {
       animate="enter"
       exit="exit"
     >
-      {/* Ambient floating particles */}
-      <AmbientBackground variant="fireflies" particleCount={12} />
-
-      {/* Gradient orbs */}
-      <AmbientBackground variant="orbs" />
+      {/* Theme-aware ambient background */}
+      <AmbientBackground />
 
       <Navigation />
 

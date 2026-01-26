@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, Settings, Palette } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { LanternLogo } from "./LanternLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { LoginButton, UserMenu } from "@/components/auth";
 import {
   mobileMenuVariants,
@@ -17,15 +18,16 @@ const navLinks = [
   { name: "Chat", path: "/chat" },
   { name: "Wellness", path: "/wellness" },
   { name: "About", path: "/about" },
+  { name: "Settings", path: "/settings" },
 ];
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { isDark, toggleColorMode, currentTheme } = useTheme();
 
   // Track scroll for nav background
   useEffect(() => {
@@ -35,11 +37,6 @@ export const Navigation = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle("dark");
-  };
 
   return (
     <motion.nav
@@ -119,8 +116,9 @@ export const Navigation = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={toggleTheme}
+                onClick={toggleColorMode}
                 className="rounded-full relative overflow-hidden"
+                title={`Current theme: ${currentTheme.name}`}
               >
                 <AnimatePresence mode="wait">
                   {isDark ? (
@@ -180,7 +178,7 @@ export const Navigation = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={toggleTheme}
+                onClick={toggleColorMode}
                 className="rounded-full"
               >
                 <AnimatePresence mode="wait">

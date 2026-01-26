@@ -178,8 +178,8 @@ const ChatPage = () => {
       animate="enter"
       exit="exit"
     >
-      {/* Subtle ambient background */}
-      <AmbientBackground variant="subtle" particleCount={8} />
+      {/* Theme-aware ambient background */}
+      <AmbientBackground />
 
       <Navigation />
 

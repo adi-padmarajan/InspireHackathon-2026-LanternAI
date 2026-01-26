@@ -1,202 +1,137 @@
 /**
  * AmbientBackground Component
- * Creates a warm, living atmosphere with floating particles
- * Gives the companion-like "breathing" presence to the UI
+ * Theme-aware ambient particles and effects
+ * Renders the appropriate particle system based on current theme
  */
 
 import { motion } from "framer-motion";
-import { useMemo } from "react";
 import { shouldReduceMotion } from "@/lib/animations";
+import { useTheme } from "@/contexts/ThemeContext";
+import {
+  FirefliesBackground,
+  BubblesBackground,
+  StarsBackground,
+  SnowBackground,
+  LeavesBackground,
+  SparksBackground,
+  AuroraBackground,
+  OrbsBackground,
+  particleComponents,
+} from "@/components/ambient/particles";
+import { ThemeParticleConfig, AnimationIntensity } from "@/lib/themes";
 
-interface Particle {
-  id: number;
-  size: number;
-  x: number;
-  y: number;
-  duration: number;
-  delay: number;
-  opacity: number;
-}
+// ============================================================================
+// INTENSITY MULTIPLIER
+// ============================================================================
+
+const getIntensityMultiplier = (intensity: AnimationIntensity): number => {
+  const multipliers: Record<AnimationIntensity, number> = {
+    none: 0,
+    subtle: 0.5,
+    normal: 1,
+    energetic: 1.5,
+  };
+  return multipliers[intensity];
+};
+
+// ============================================================================
+// PROPS INTERFACE
+// ============================================================================
 
 interface AmbientBackgroundProps {
-  particleCount?: number;
-  variant?: "fireflies" | "orbs" | "subtle";
   className?: string;
 }
 
-export const AmbientBackground = ({
-  particleCount = 15,
-  variant = "fireflies",
-  className = "",
-}: AmbientBackgroundProps) => {
+// ============================================================================
+// MAIN AMBIENT BACKGROUND COMPONENT
+// ============================================================================
+
+export const AmbientBackground = ({ className = "" }: AmbientBackgroundProps) => {
   const reduceMotion = shouldReduceMotion();
+  const { currentTheme, settings } = useTheme();
 
-  // Generate random particles
-  const particles = useMemo<Particle[]>(() => {
-    return Array.from({ length: particleCount }, (_, i) => ({
-      id: i,
-      size: variant === "orbs"
-        ? Math.random() * 200 + 100
-        : Math.random() * 4 + 2,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      duration: Math.random() * 10 + 15,
-      delay: Math.random() * 5,
-      opacity: variant === "subtle"
-        ? Math.random() * 0.15 + 0.05
-        : Math.random() * 0.4 + 0.2,
-    }));
-  }, [particleCount, variant]);
+  // Get theme configuration
+  const themeConfig = currentTheme.particles;
+  let intensity = getIntensityMultiplier(settings.animationIntensity);
+  const backgroundStyle = settings.backgroundStyle;
 
-  if (reduceMotion) {
-    // Static fallback for reduced motion
+  // Handle reduced motion
+  if (reduceMotion || intensity === 0) {
     return (
-      <div className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}>
-        {variant === "orbs" && (
-          <>
-            <div
-              className="absolute w-96 h-96 rounded-full blur-3xl opacity-10"
-              style={{
-                background: "radial-gradient(circle, hsl(38 95% 55%) 0%, transparent 70%)",
-                top: "10%",
-                left: "20%",
-              }}
-            />
-            <div
-              className="absolute w-80 h-80 rounded-full blur-3xl opacity-10"
-              style={{
-                background: "radial-gradient(circle, hsl(258 89% 66%) 0%, transparent 70%)",
-                bottom: "20%",
-                right: "15%",
-              }}
-            />
-          </>
-        )}
+      <div className={`fixed inset-0 pointer-events-none overflow-hidden z-0 ${className}`}>
+        {/* Static gradient fallback */}
+        <div
+          className="absolute w-96 h-96 rounded-full blur-3xl opacity-5"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--theme-orb-1)) 0%, transparent 70%)",
+            top: "10%",
+            left: "20%",
+          }}
+        />
+        <div
+          className="absolute w-80 h-80 rounded-full blur-3xl opacity-5"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--theme-orb-2)) 0%, transparent 70%)",
+            bottom: "20%",
+            right: "15%",
+          }}
+        />
       </div>
     );
   }
 
-  return (
-    <div className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}>
-      {/* Gradient orbs - large ambient glows */}
-      {variant === "orbs" && (
-        <>
-          <motion.div
-            className="absolute w-96 h-96 rounded-full blur-3xl"
-            style={{
-              background: "radial-gradient(circle, hsl(38 95% 55% / 0.15) 0%, transparent 70%)",
-              top: "5%",
-              left: "10%",
-            }}
-            animate={{
-              x: [0, 50, 0],
-              y: [0, 30, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute w-80 h-80 rounded-full blur-3xl"
-            style={{
-              background: "radial-gradient(circle, hsl(258 89% 66% / 0.1) 0%, transparent 70%)",
-              bottom: "10%",
-              right: "5%",
-            }}
-            animate={{
-              x: [0, -40, 0],
-              y: [0, -20, 0],
-              scale: [1, 1.15, 1],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
-            }}
-          />
-          <motion.div
-            className="absolute w-64 h-64 rounded-full blur-3xl"
-            style={{
-              background: "radial-gradient(circle, hsl(38 90% 60% / 0.08) 0%, transparent 70%)",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0.8, 0.5],
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1,
-            }}
-          />
-        </>
-      )}
+  // Adjust based on background style setting
+  let effectiveConfig = { ...themeConfig };
 
-      {/* Floating particles - fireflies or subtle dots */}
-      {(variant === "fireflies" || variant === "subtle") &&
-        particles.map((particle) => (
-          <motion.div
-            key={particle.id}
-            className="absolute rounded-full"
-            style={{
-              width: particle.size,
-              height: particle.size,
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              background: variant === "fireflies"
-                ? "radial-gradient(circle, hsl(38 95% 55%) 0%, hsl(38 95% 55% / 0) 70%)"
-                : "radial-gradient(circle, hsl(258 89% 66% / 0.5) 0%, transparent 70%)",
-              boxShadow: variant === "fireflies"
-                ? `0 0 ${particle.size * 3}px hsl(38 95% 55% / 0.5)`
-                : "none",
-            }}
-            animate={{
-              y: [0, -150, 0],
-              x: [0, Math.random() * 60 - 30, 0],
-              opacity: [0, particle.opacity, 0],
-              scale: [0.5, 1.2, 0.5],
-            }}
-            transition={{
-              duration: particle.duration,
-              repeat: Infinity,
-              delay: particle.delay,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+  if (backgroundStyle === 'minimal') {
+    effectiveConfig = {
+      ...themeConfig,
+      count: Math.max(3, Math.floor(themeConfig.count / 3)),
+      variant: 'orbs',
+    };
+    intensity *= 0.5;
+  } else if (backgroundStyle === 'orbs') {
+    effectiveConfig = {
+      ...themeConfig,
+      variant: 'orbs',
+      count: Math.min(5, themeConfig.count),
+    };
+  } else if (backgroundStyle === 'dynamic') {
+    intensity *= 1.2;
+  }
+
+  const ParticleComponent = particleComponents[effectiveConfig.variant];
+
+  return (
+    <div className={`fixed inset-0 pointer-events-none overflow-hidden z-0 ${className}`}>
+      <ParticleComponent config={effectiveConfig} intensity={intensity} />
     </div>
   );
 };
 
-/**
- * GlowOrb Component
- * A single animated glowing orb for accent areas
- */
+// ============================================================================
+// GLOW ORB COMPONENT (Theme-aware)
+// ============================================================================
+
 interface GlowOrbProps {
-  color?: "warm" | "primary" | "accent";
+  color?: "warm" | "primary" | "accent" | "theme";
   size?: "sm" | "md" | "lg";
   className?: string;
 }
 
 export const GlowOrb = ({
-  color = "warm",
+  color = "theme",
   size = "md",
   className = "",
 }: GlowOrbProps) => {
   const reduceMotion = shouldReduceMotion();
 
+  // Theme-aware colors using CSS variables
   const colorMap = {
-    warm: "hsl(38 95% 55%)",
-    primary: "hsl(258 89% 66%)",
-    accent: "hsl(152 45% 35%)",
+    warm: "hsl(var(--theme-glow))",
+    primary: "hsl(var(--primary))",
+    accent: "hsl(var(--theme-orb-2))",
+    theme: "hsl(var(--theme-orb-1))",
   };
 
   const sizeMap = {
@@ -229,10 +164,10 @@ export const GlowOrb = ({
   );
 };
 
-/**
- * WarmGlow Component
- * Creates a warm lantern-like glow effect behind elements
- */
+// ============================================================================
+// WARM GLOW COMPONENT (Theme-aware)
+// ============================================================================
+
 interface WarmGlowProps {
   intensity?: "subtle" | "medium" | "strong";
   className?: string;
@@ -254,7 +189,7 @@ export const WarmGlow = ({
     <motion.div
       className={`absolute inset-0 rounded-full blur-3xl pointer-events-none ${className}`}
       style={{
-        background: "radial-gradient(circle, hsl(38 95% 55%) 0%, transparent 60%)",
+        background: "radial-gradient(circle, hsl(var(--theme-glow)) 0%, transparent 60%)",
       }}
       animate={
         reduceMotion
@@ -274,5 +209,94 @@ export const WarmGlow = ({
         ease: "easeInOut",
       }}
     />
+  );
+};
+
+// ============================================================================
+// THEME TRANSITION OVERLAY
+// ============================================================================
+
+interface ThemeTransitionOverlayProps {
+  className?: string;
+}
+
+export const ThemeTransitionOverlay = ({ className = "" }: ThemeTransitionOverlayProps) => {
+  const { isTransitioning, currentTheme } = useTheme();
+
+  if (!isTransitioning) return null;
+
+  return (
+    <motion.div
+      className={`fixed inset-0 z-[100] pointer-events-none theme-transition-overlay ${className}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {/* Radial wipe effect */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background: currentTheme.preview.gradient,
+        }}
+        initial={{
+          clipPath: 'circle(0% at 50% 50%)',
+          opacity: 0.8
+        }}
+        animate={{
+          clipPath: 'circle(150% at 50% 50%)',
+          opacity: 0
+        }}
+        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      />
+
+      {/* Center glow burst */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full"
+        style={{
+          background: `radial-gradient(circle, hsl(var(--theme-glow)) 0%, transparent 70%)`,
+        }}
+        initial={{ scale: 0, opacity: 0.8 }}
+        animate={{ scale: 3, opacity: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      />
+
+      {/* Particle burst */}
+      {Array.from({ length: 20 }).map((_, i) => {
+        const angle = (i / 20) * 360;
+        const distance = 200 + Math.random() * 100;
+        return (
+          <motion.div
+            key={i}
+            className="absolute top-1/2 left-1/2 rounded-full"
+            style={{
+              width: 4 + Math.random() * 8,
+              height: 4 + Math.random() * 8,
+              background: `hsl(var(--theme-particle))`,
+              boxShadow: `0 0 8px hsl(var(--theme-glow))`,
+            }}
+            initial={{ x: 0, y: 0, opacity: 1 }}
+            animate={{
+              x: Math.cos(angle * (Math.PI / 180)) * distance,
+              y: Math.sin(angle * (Math.PI / 180)) * distance,
+              opacity: 0,
+              scale: 0,
+            }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
+        );
+      })}
+
+      {/* Theme name flash */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1, 1, 1.1] }}
+        transition={{ duration: 0.8, times: [0, 0.3, 0.7, 1] }}
+      >
+        <span className="text-4xl font-serif font-bold text-white drop-shadow-2xl">
+          {currentTheme.name}
+        </span>
+      </motion.div>
+    </motion.div>
   );
 };
