@@ -76,6 +76,42 @@ export async function apiFetch<T>(
 }
 
 /**
+ * Upload a file with authentication
+ */
+export async function uploadFile<T>(
+  endpoint: string,
+  file: File
+): Promise<T> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const headers: HeadersInit = {};
+  const token = getAuthToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (response.status === 401) {
+    removeAuthToken();
+    localStorage.removeItem("lantern_user");
+    throw new Error("Unauthorized");
+  }
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Upload Error: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * API endpoints
  */
 export const api = {
@@ -131,5 +167,136 @@ export const api = {
       apiFetch<{ success: boolean; data: Record<string, number> }>(
         "/api/wellness/stats"
       ),
+  },
+
+  // Image endpoints
+  images: {
+    searchUnsplash: (query: string, page = 1, perPage = 20) =>
+      apiFetch<{
+        total: number;
+        total_pages: number;
+        results: Array<{
+          id: string;
+          width: number;
+          height: number;
+          color: string;
+          blur_hash: string;
+          description: string | null;
+          alt_description: string | null;
+          urls: {
+            raw: string;
+            full: string;
+            regular: string;
+            small: string;
+            thumb: string;
+          };
+          user: {
+            id: string;
+            username: string;
+            name: string;
+            links: { html: string };
+          };
+        }>;
+      }>(`/api/images/unsplash/search?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`, {
+        requireAuth: false,
+      }),
+
+    getRandomUnsplash: (query = "nature", count = 10) =>
+      apiFetch<{
+        success: boolean;
+        data: Array<{
+          id: string;
+          source: string;
+          url: string;
+          thumbnail_url?: string;
+          blur_hash?: string;
+          attribution?: {
+            photographer_name: string;
+            photographer_username: string;
+            photographer_url: string;
+            unsplash_url: string;
+          };
+          width: number;
+          height: number;
+        }>;
+      }>(`/api/images/unsplash/random?query=${encodeURIComponent(query)}&count=${count}`, {
+        requireAuth: false,
+      }),
+
+    trackUnsplashDownload: (photoId: string) =>
+      apiFetch<{ success: boolean }>(`/api/images/unsplash/track/${photoId}`, {
+        method: "POST",
+        requireAuth: false,
+      }),
+
+    getCurated: (category?: string) =>
+      apiFetch<{
+        success: boolean;
+        data: Array<{
+          id: string;
+          source: string;
+          url: string;
+          thumbnail_url?: string;
+          blur_hash?: string;
+          attribution?: {
+            photographer_name: string;
+            photographer_username: string;
+            photographer_url: string;
+            unsplash_url: string;
+          };
+          width: number;
+          height: number;
+        }>;
+      }>(`/api/images/curated${category ? `?category=${category}` : ""}`, {
+        requireAuth: false,
+      }),
+
+    getCuratedCategories: () =>
+      apiFetch<{
+        success: boolean;
+        data: Array<{
+          id: string;
+          name: string;
+          query: string;
+          icon: string;
+        }>;
+      }>("/api/images/curated/categories", {
+        requireAuth: false,
+      }),
+
+    getUserUploads: (limit = 20) =>
+      apiFetch<{
+        success: boolean;
+        data: Array<{
+          id: string;
+          source: string;
+          url: string;
+          thumbnail_url?: string;
+          width: number;
+          height: number;
+          uploaded_at?: string;
+        }>;
+      }>(`/api/images/user-uploads?limit=${limit}`),
+
+    deleteUpload: (imageId: string) =>
+      apiFetch<{ success: boolean }>(`/api/images/upload/${imageId}`, {
+        method: "DELETE",
+      }),
+
+    saveSettings: (settings: unknown) =>
+      apiFetch<{ success: boolean; message: string }>("/api/images/settings", {
+        method: "POST",
+        body: { settings },
+      }),
+
+    getSettings: () =>
+      apiFetch<{
+        success: boolean;
+        data: {
+          use_global_background: boolean;
+          global_background: unknown;
+          theme_backgrounds: Record<string, unknown>;
+        } | null;
+      }>("/api/images/settings"),
   },
 };

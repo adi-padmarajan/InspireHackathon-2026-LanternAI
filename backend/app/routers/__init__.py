@@ -1,5 +1,6 @@
 from .chat import router as chat_router
 from .wellness import router as wellness_router
 from .auth import router as auth_router
+from .images import router as images_router
 
-__all__ = ["chat_router", "wellness_router", "auth_router"]
+__all__ = ["chat_router", "wellness_router", "auth_router", "images_router"]

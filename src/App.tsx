@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { WeatherProvider } from "@/contexts/WeatherContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/auth";
+import { BackgroundLayer } from "@/components/BackgroundLayer";
 import Index from "./pages/Index";
 import ChatPage from "./pages/ChatPage";
 import WellnessPage from "./pages/WellnessPage";
@@ -20,6 +21,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <ThemeProvider>
+        <BackgroundLayer />
         <WeatherProvider>
           <TooltipProvider>
             <Toaster />

@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     # OpenRouter API
     openrouter_api_key: str = ""
 
+    # Unsplash API
+    unsplash_access_key: str = ""
+
     # JWT Authentication
     jwt_secret_key: str = secrets.token_hex(32)  # Generate default if not set
     jwt_algorithm: str = "HS256"

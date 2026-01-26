@@ -21,6 +21,12 @@ import { cn } from '@/lib/utils';
 import { pageVariants, staggerContainer, fadeInUp } from '@/lib/animations';
 import { Navigation } from '@/components/Navigation';
 
+// Check if custom background is active for conditional rendering
+const useHasCustomBackground = () => {
+  const { currentBackground } = useTheme();
+  return currentBackground?.enabled && currentBackground?.image;
+};
+
 // ============================================================================
 // THEME ICON HELPER
 // ============================================================================
@@ -235,17 +241,21 @@ const AccessibilitySettings = () => {
 
 const SettingsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState<ThemeCategory | 'all'>('all');
+  const hasCustomBackground = useHasCustomBackground();
 
   return (
     <motion.div
-      className="min-h-screen relative"
+      className={cn(
+        "min-h-screen relative",
+        hasCustomBackground ? "bg-transparent" : ""
+      )}
       variants={pageVariants}
       initial="initial"
       animate="enter"
       exit="exit"
     >
-      {/* Enhanced Settings background */}
-      <SettingsBackground />
+      {/* Enhanced Settings background - hide when custom background is active */}
+      {!hasCustomBackground && <SettingsBackground />}
 
       {/* Theme transition overlay */}
       <ThemeTransitionOverlay />

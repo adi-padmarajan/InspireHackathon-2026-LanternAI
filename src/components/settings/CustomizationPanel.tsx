@@ -9,6 +9,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { AnimationIntensity, BackgroundStyle } from '@/lib/themes';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { ImageCustomizationPanel } from './image-customization';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
@@ -307,6 +308,7 @@ export const CustomizationPanel = () => {
       transition={{ duration: 0.4, delay: 0.1 }}
     >
       <ColorModeSelector />
+      <ImageCustomizationPanel />
       <AnimationIntensitySelector />
       <BackgroundStyleSelector />
       <AccentColorPicker />

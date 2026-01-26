@@ -8,6 +8,7 @@ import { PersonasSection } from "@/components/PersonasSection";
 import { CTASection } from "@/components/CTASection";
 import { Card, CardContent } from "@/components/ui/card";
 import { LanternLogo } from "@/components/LanternLogo";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   Heart,
   Users,
@@ -23,6 +24,7 @@ import {
   scrollReveal,
   cardHover3D,
 } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 const values = [
   {
@@ -70,26 +72,35 @@ const AboutPage = () => {
     target: containerRef,
     offset: ["start start", "end end"]
   });
+  const { currentBackground } = useTheme();
+
+  // Check if custom background image is active
+  const hasCustomBackground = currentBackground?.enabled && currentBackground?.image;
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   return (
     <motion.div
       ref={containerRef}
-      className="min-h-screen bg-background relative"
+      className={cn(
+        "min-h-screen relative",
+        hasCustomBackground ? "bg-transparent" : "bg-background"
+      )}
       variants={pageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
     >
-      {/* Parallax background glow */}
-      <motion.div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ y: backgroundY }}
-      >
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
-      </motion.div>
+      {/* Parallax background glow - hide when custom background is active */}
+      {!hasCustomBackground && (
+        <motion.div
+          className="fixed inset-0 pointer-events-none overflow-hidden"
+          style={{ y: backgroundY }}
+        >
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
+        </motion.div>
+      )}
 
       <Navigation />
 

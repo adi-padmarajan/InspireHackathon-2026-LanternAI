@@ -9,8 +9,10 @@ import { ModeQuickPrompts } from "@/components/chat/ModeQuickPrompts";
 import { FloatingModeSelector } from "@/components/chat/FloatingModeSelector";
 import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
 import { AmbientBackground } from "@/components/AmbientBackground";
+import { useTheme } from "@/contexts/ThemeContext";
 import { type ChatMode, getModeConfig } from "@/lib/chatModes";
 import { pageVariants, springPresets } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 const API_BASE_URL = "http://localhost:8000";
 
@@ -29,6 +31,10 @@ const ChatPage = () => {
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const { currentBackground } = useTheme();
+
+  // Check if custom background image is active
+  const hasCustomBackground = currentBackground?.enabled && currentBackground?.image;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -172,14 +178,17 @@ const ChatPage = () => {
 
   return (
     <motion.div
-      className="min-h-screen flex flex-col chat-ambient-bg relative overflow-hidden"
+      className={cn(
+        "min-h-screen flex flex-col relative overflow-hidden",
+        hasCustomBackground ? "bg-transparent" : "chat-ambient-bg"
+      )}
       variants={pageVariants}
       initial="initial"
       animate="enter"
       exit="exit"
     >
-      {/* Theme-aware ambient background */}
-      <AmbientBackground />
+      {/* Theme-aware ambient background - hide when custom background is active */}
+      {!hasCustomBackground && <AmbientBackground />}
 
       <Navigation />
 

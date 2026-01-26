@@ -7,24 +7,33 @@ import { WarmMessage } from "@/components/home/WarmMessage";
 import { SignInPrompt } from "@/components/home/SignInPrompt";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { pageVariants } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const { user, isAuthenticated } = useAuth();
+  const { currentBackground } = useTheme();
 
   // Get the user's display name when authenticated
   const userName = user?.display_name;
 
+  // Check if custom background image is active
+  const hasCustomBackground = currentBackground?.enabled && currentBackground?.image;
+
   return (
     <motion.div
-      className="min-h-screen flex flex-col bg-background relative overflow-hidden"
+      className={cn(
+        "min-h-screen flex flex-col relative overflow-hidden",
+        hasCustomBackground ? "bg-transparent" : "bg-background"
+      )}
       variants={pageVariants}
       initial="initial"
       animate="enter"
       exit="exit"
     >
-      {/* Theme-aware ambient background */}
-      <AmbientBackground />
+      {/* Theme-aware ambient background - hide when custom background is active */}
+      {!hasCustomBackground && <AmbientBackground />}
 
       <Navigation />
 

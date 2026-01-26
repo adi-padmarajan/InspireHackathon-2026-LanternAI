@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
 import {
   Theme,
   ThemeSettings,
@@ -11,6 +11,14 @@ import {
   defaultThemeSettings,
   lanternTheme,
 } from '@/lib/themes';
+import {
+  BackgroundSettings,
+  ThemeBackgroundSettings,
+  defaultBackgroundSettings,
+  defaultThemeBackgroundSettings,
+  loadBackgroundSettings,
+  saveBackgroundSettings,
+} from '@/lib/imageSettings';
 
 // ============================================================================
 // TYPES
@@ -23,6 +31,10 @@ export interface ThemeContextType {
   isTransitioning: boolean;
   isDark: boolean;
 
+  // Background image state
+  backgroundSettings: ThemeBackgroundSettings;
+  currentBackground: BackgroundSettings | null;
+
   // Actions
   setTheme: (themeId: string) => void;
   setColorMode: (mode: 'light' | 'dark' | 'system') => void;
@@ -31,6 +43,11 @@ export interface ThemeContextType {
   setCustomAccentColor: (color: string | null) => void;
   resetToDefaults: () => void;
   toggleColorMode: () => void;
+
+  // Background image actions
+  setBackgroundSettings: (settings: BackgroundSettings) => void;
+  setGlobalBackground: (useGlobal: boolean) => void;
+  clearBackground: () => void;
 
   // Utilities
   getThemeById: (id: string) => Theme | undefined;
@@ -165,6 +182,19 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [isDark, setIsDark] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Background image settings
+  const [backgroundSettings, setBackgroundSettingsState] = useState<ThemeBackgroundSettings>(
+    defaultThemeBackgroundSettings
+  );
+
+  // Compute current background based on theme and global/per-theme setting
+  const currentBackground = useMemo(() => {
+    if (backgroundSettings.useGlobalBackground) {
+      return backgroundSettings.globalBackground;
+    }
+    return backgroundSettings.themeBackgrounds[currentTheme.id] || null;
+  }, [backgroundSettings, currentTheme.id]);
+
   // Initialize from localStorage
   useEffect(() => {
     const loadedSettings = loadSettings();
@@ -172,6 +202,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
     setSettings(loadedSettings);
     setCurrentTheme(theme);
+
+    // Load background settings
+    const loadedBackgroundSettings = loadBackgroundSettings();
+    setBackgroundSettingsState(loadedBackgroundSettings);
 
     // Determine actual color mode
     const actualMode = loadedSettings.colorMode === 'system'
@@ -284,6 +318,52 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     saveSettings(newSettings);
   }, [currentTheme, settings]);
 
+  // Background settings setter
+  const setBackgroundSettingsFn = useCallback((newSettings: BackgroundSettings) => {
+    setBackgroundSettingsState(prev => {
+      const updated = { ...prev };
+
+      if (prev.useGlobalBackground) {
+        updated.globalBackground = newSettings;
+      } else {
+        updated.themeBackgrounds = {
+          ...prev.themeBackgrounds,
+          [currentTheme.id]: newSettings,
+        };
+      }
+
+      saveBackgroundSettings(updated);
+      return updated;
+    });
+  }, [currentTheme.id]);
+
+  // Set global vs per-theme background
+  const setGlobalBackground = useCallback((useGlobal: boolean) => {
+    setBackgroundSettingsState(prev => {
+      const updated = { ...prev, useGlobalBackground: useGlobal };
+      saveBackgroundSettings(updated);
+      return updated;
+    });
+  }, []);
+
+  // Clear background
+  const clearBackground = useCallback(() => {
+    setBackgroundSettingsState(prev => {
+      const updated = { ...prev };
+
+      if (prev.useGlobalBackground) {
+        updated.globalBackground = null;
+      } else {
+        const newThemeBackgrounds = { ...prev.themeBackgrounds };
+        delete newThemeBackgrounds[currentTheme.id];
+        updated.themeBackgrounds = newThemeBackgrounds;
+      }
+
+      saveBackgroundSettings(updated);
+      return updated;
+    });
+  }, [currentTheme.id]);
+
   // Reset to defaults
   const resetToDefaults = useCallback(() => {
     const actualMode = defaultThemeSettings.colorMode === 'system'
@@ -293,10 +373,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setSettings(defaultThemeSettings);
     setCurrentTheme(lanternTheme);
     setIsDark(actualMode === 'dark');
+    setBackgroundSettingsState(defaultThemeBackgroundSettings);
 
     applyThemeToDOM(lanternTheme, actualMode, null);
     applyAnimationIntensity(defaultThemeSettings.animationIntensity);
     saveSettings(defaultThemeSettings);
+    saveBackgroundSettings(defaultThemeBackgroundSettings);
   }, []);
 
   const value: ThemeContextType = {
@@ -304,6 +386,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     settings,
     isTransitioning,
     isDark,
+    backgroundSettings,
+    currentBackground,
     setTheme,
     setColorMode,
     setAnimationIntensity,
@@ -311,6 +395,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setCustomAccentColor,
     resetToDefaults,
     toggleColorMode,
+    setBackgroundSettings: setBackgroundSettingsFn,
+    setGlobalBackground,
+    clearBackground,
     getThemeById,
     getThemesByCategory,
     allThemes,

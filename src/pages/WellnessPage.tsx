@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import RelaxationSounds from "@/components/wellness/RelaxationSounds";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   Smile,
   Meh,
@@ -24,6 +25,7 @@ import {
   scrollReveal,
   cardHover3D,
 } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 const moodOptions = [
   { icon: Smile, label: "Great", value: 5, color: "text-chart-1" },
@@ -133,6 +135,10 @@ const WellnessPage = () => {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [isLogged, setIsLogged] = useState(false);
+  const { currentBackground } = useTheme();
+
+  // Check if custom background image is active
+  const hasCustomBackground = currentBackground?.enabled && currentBackground?.image;
 
   const handleLogMood = () => {
     if (selectedMood) {
@@ -143,7 +149,10 @@ const WellnessPage = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-background"
+      className={cn(
+        "min-h-screen",
+        hasCustomBackground ? "bg-transparent" : "bg-background"
+      )}
       variants={pageVariants}
       initial="initial"
       animate="animate"
