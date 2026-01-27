@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import RelaxationSounds from "@/components/wellness/RelaxationSounds";
 import BreathingExercise from "@/components/wellness/BreathingExercise";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Smile,
   Meh,
@@ -16,54 +17,52 @@ import {
   Moon,
   Heart,
   TrendingUp,
-  Calendar,
-  Sparkles
+  Sparkles,
+  Wind,
 } from "lucide-react";
-import {
-  springPresets,
-  staggerContainer,
-  staggerChild,
-  scrollReveal,
-  cardHover3D,
-} from "@/lib/animations";
+import { cardHover3D } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
+/* -------------------------------------------------------------------------- */
+/* DATA                                                                        */
+/* -------------------------------------------------------------------------- */
+
 const moodOptions = [
-  { icon: Smile, label: "Great", value: 5, color: "text-green-500", bgColor: "bg-green-100 dark:bg-green-900/20" },
-  { icon: Smile, label: "Good", value: 4, color: "text-blue-500", bgColor: "bg-blue-100 dark:bg-blue-900/20" },
-  { icon: Meh, label: "Okay", value: 3, color: "text-yellow-500", bgColor: "bg-yellow-100 dark:bg-yellow-900/20" },
-  { icon: Frown, label: "Low", value: 2, color: "text-orange-500", bgColor: "bg-orange-100 dark:bg-orange-900/20" },
-  { icon: CloudRain, label: "Struggling", value: 1, color: "text-red-500", bgColor: "bg-red-100 dark:bg-red-900/20" },
+  { icon: Smile, label: "Great", value: 5, color: "text-green-600", bgColor: "bg-green-100 dark:bg-green-900/30" },
+  { icon: Smile, label: "Good", value: 4, color: "text-blue-600", bgColor: "bg-blue-100 dark:bg-blue-900/30" },
+  { icon: Meh, label: "Okay", value: 3, color: "text-yellow-600", bgColor: "bg-yellow-100 dark:bg-yellow-900/30" },
+  { icon: Frown, label: "Low", value: 2, color: "text-orange-600", bgColor: "bg-orange-100 dark:bg-orange-900/30" },
+  { icon: CloudRain, label: "Struggling", value: 1, color: "text-red-600", bgColor: "bg-red-100 dark:bg-red-900/30" },
 ];
 
 const wellnessTips = [
   {
     title: "Light Therapy",
-    description: "Consider using a light therapy lamp for 20-30 minutes each morning during dark winter months.",
+    description: "Consider using a light therapy lamp for 20 to 30 minutes each morning during dark winter months.",
     icon: Sun,
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-50 dark:bg-yellow-900/10",
+    color: "text-yellow-600",
+    bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
   },
   {
     title: "Movement Break",
-    description: "Even a 10-minute walk outside during daylight can boost your mood significantly.",
+    description: "Even a 10 minute walk outside during daylight can boost your mood.",
     icon: TrendingUp,
-    color: "text-green-500",
-    bgColor: "bg-green-50 dark:bg-green-900/10",
+    color: "text-green-600",
+    bgColor: "bg-green-100 dark:bg-green-900/20",
   },
   {
     title: "Sleep Hygiene",
-    description: "Try to maintain consistent sleep/wake times, even on weekends. Aim for 7-9 hours.",
+    description: "Maintain consistent sleep and wake times, even on weekends.",
     icon: Moon,
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-50 dark:bg-indigo-900/10",
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-100 dark:bg-indigo-900/20",
   },
   {
     title: "Social Connection",
-    description: "Reach out to one person today—a text, call, or coffee chat can make a difference.",
+    description: "Reach out to one person today. A small check in matters.",
     icon: Heart,
-    color: "text-pink-500",
-    bgColor: "bg-pink-50 dark:bg-pink-900/10",
+    color: "text-red-600",
+    bgColor: "bg-red-100 dark:bg-red-900/20",
   },
 ];
 
@@ -71,487 +70,417 @@ const recentMoods = [
   { date: "Today", mood: 4, note: "Had a good study session" },
   { date: "Yesterday", mood: 3, note: "Feeling neutral" },
   { date: "2 days ago", mood: 2, note: "Stressed about assignment" },
-  { date: "3 days ago", mood: 4, note: "Met up with friends" },
-  { date: "4 days ago", mood: 3, note: "" },
 ];
 
-const pageVariants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: { duration: 0.5, staggerChildren: 0.1 }
-  },
-  exit: { opacity: 0, transition: { duration: 0.3 } }
+interface SavedMood {
+  id: string;
+  userId: string;
+  mood: number;
+  note: string;
+  date: string;
+}
+
+interface Recommendation {
+  title: string;
+  description: string;
+  action: string;
+  icon: React.ElementType;
+}
+
+const moodRecommendations: Record<number, Recommendation[]> = {
+  5: [
+    {
+      title: "Keep the momentum",
+      description: "You're feeling great! Share this energy with others.",
+      action: "Chat with a friend",
+      icon: Heart,
+    },
+    {
+      title: "Document your wins",
+      description: "Reflect on what's making you feel good today.",
+      action: "Journal your thoughts",
+      icon: Moon,
+    },
+    {
+      title: "Help someone else",
+      description: "Spread positivity by supporting someone in need.",
+      action: "Volunteer or help a friend",
+      icon: TrendingUp,
+    },
+  ],
+  4: [
+    {
+      title: "Maintain your vibe",
+      description: "You're in a good place. Keep up healthy habits.",
+      action: "Continue what you're doing",
+      icon: Sun,
+    },
+    {
+      title: "Social time",
+      description: "Good moods are great for connecting with others.",
+      action: "Reach out to someone",
+      icon: Heart,
+    },
+    {
+      title: "Plan something fun",
+      description: "While you're feeling positive, plan something to look forward to.",
+      action: "Make plans",
+      icon: TrendingUp,
+    },
+  ],
+  3: [
+    {
+      title: "Self-care check",
+      description: "A neutral mood might mean you need a little boost.",
+      action: "Try a relaxation sound",
+      icon: Moon,
+    },
+    {
+      title: "Movement helps",
+      description: "Even light activity can shift your energy.",
+      action: "Take a short walk",
+      icon: TrendingUp,
+    },
+    {
+      title: "Connect with others",
+      description: "Sometimes a simple chat can help.",
+      action: "Text a friend",
+      icon: Heart,
+    },
+  ],
+  2: [
+    {
+      title: "Breathing exercise",
+      description: "Calm your mind with guided breathing techniques.",
+      action: "Start breathing exercise",
+      icon: Wind,
+    },
+    {
+      title: "Take a break",
+      description: "Step away and give yourself a moment to reset.",
+      action: "Rest for 10 minutes",
+      icon: Moon,
+    },
+    {
+      title: "Reach out",
+      description: "Don't isolate. Talk to someone you trust.",
+      action: "Chat with Lantern AI",
+      icon: Heart,
+    },
+  ],
+  1: [
+    {
+      title: "Crisis support",
+      description: "You might need immediate support. Please reach out.",
+      action: "Access crisis resources",
+      icon: Heart,
+    },
+    {
+      title: "Talk to someone",
+      description: "Speaking about it can help. You're not alone.",
+      action: "Chat with Lantern",
+      icon: Heart,
+    },
+    {
+      title: "Breathing exercise",
+      description: "Ground yourself with breathing techniques.",
+      action: "Start breathing exercise",
+      icon: Wind,
+    },
+  ],
 };
 
-const headerVariants = {
-  initial: { opacity: 0, y: 30 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { ...springPresets.gentle, delay: 0.2 }
-  }
-};
-
-const moodButtonVariants = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: (i: number) => ({
-    opacity: 1,
-    scale: 1,
-    transition: { ...springPresets.bouncy, delay: 0.3 + i * 0.08 }
-  }),
-  hover: {
-    scale: 1.08,
-    y: -4,
-    transition: springPresets.snappy
-  },
-  tap: { scale: 0.95 },
-  selected: {
-    scale: 1.1,
-    transition: springPresets.bouncy
-  }
-};
-
-const checkInItemVariants = {
-  initial: { opacity: 0, x: -20 },
-  animate: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: { ...springPresets.gentle, delay: i * 0.1 }
-  }),
-  hover: {
-    x: 8,
-    backgroundColor: "rgba(var(--accent), 0.5)",
-    transition: springPresets.snappy
-  }
-};
-
-const successVariants = {
-  initial: { scale: 0, rotate: -180 },
-  animate: {
-    scale: 1,
-    rotate: 0,
-    transition: springPresets.bouncy
-  },
-  exit: {
-    scale: 0,
-    rotate: 180,
-    transition: { duration: 0.3 }
-  }
-};
+/* -------------------------------------------------------------------------- */
+/* PAGE                                                                        */
+/* -------------------------------------------------------------------------- */
 
 const WellnessPage = () => {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [isLogged, setIsLogged] = useState(false);
+  const [savedMoods, setSavedMoods] = useState<SavedMood[]>([]);
+  const breathingRef = useRef<HTMLDivElement>(null);
+  const relaxationRef = useRef<HTMLDivElement>(null);
   const { currentBackground } = useTheme();
+  const { user, isAuthenticated } = useAuth();
+  
 
-  // Check if custom background (image or wallpaper) is active
-  const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || currentBackground?.wallpaper);
+  const hasCustomBackground =
+    currentBackground?.enabled &&
+    (currentBackground?.image || (currentBackground as any)?.wallpaper);
 
-  const handleLogMood = () => {
-    if (selectedMood) {
+
+  // Handle recommendation action clicks
+  const handleRecommendationClick = (action: string) => {
+    if (action.includes("Chat")) {
+      // Navigate to chat page
+      window.location.href = "/chat";
+    } else if (action.includes("breathing")) {
+      // Scroll to breathing exercise
+      setTimeout(() => {
+        breathingRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (action.includes("crisis")) {
+      // Open crisis resources
+      window.location.href = "/chat?mode=crisis";
+    } else if (action.includes("relaxation")) {
+      // Scroll to relaxation sounds
+      setTimeout(() => {
+        relaxationRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (action.includes("walk") || action.includes("Rest")) {
+      // Just show a notification for these
+      alert("Take care of yourself! This is a great step towards feeling better.");
+    }
+  };
+
+  // Load moods from localStorage on mount
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const storageKey = `moods_${user.id}`;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        try {
+          setSavedMoods(JSON.parse(stored));
+        } catch {
+          setSavedMoods([]);
+        }
+      }
+    }
+  }, [isAuthenticated, user]);
+
+  const handleLogMood = async () => {
+    if (!selectedMood || !isAuthenticated || !user) {
+      alert("Please log in to save your mood");
+      return;
+    }
+
+    try {
+      const newMood: SavedMood = {
+        id: `mood-${Date.now()}`,
+        userId: user.id,
+        mood: selectedMood,
+        note: note,
+        date: new Date().toLocaleDateString(),
+      };
+
+      // Try to save to backend first
+      try {
+        const response = await fetch("http://localhost:8000/api/moods", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("auth_token") || ""}`,
+          },
+          body: JSON.stringify({
+            mood: selectedMood,
+            note: note,
+            userId: user.id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Backend save failed");
+        }
+      } catch (backendError) {
+        console.warn("Backend not available, saving locally:", backendError);
+        // Continue with local save
+      }
+
+      // Save to localStorage (always works)
+      const storageKey = `moods_${user.id}`;
+      const updated = [newMood, ...savedMoods];
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      setSavedMoods(updated);
+
+      // Reset form and show success
+      setSelectedMood(null);
+      setNote("");
       setIsLogged(true);
       setTimeout(() => setIsLogged(false), 3000);
+    } catch (error) {
+      console.error("Error saving mood:", error);
+      alert("Failed to save mood. Please try again.");
     }
   };
 
   return (
     <motion.div
       className={cn(
-        "min-h-screen",
+        "min-h-screen relative",
         hasCustomBackground ? "bg-transparent" : "bg-background"
       )}
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
+      {/* Navigation always on top */}
       <Navigation />
 
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <motion.div
-            className="text-center max-w-3xl mx-auto mb-12"
-            variants={headerVariants}
-            initial="initial"
-            animate="animate"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ ...springPresets.bouncy, delay: 0.1 }}
-              className="inline-block mb-4 p-4 rounded-full bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20"
-            >
-              <motion.div
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Heart className="h-12 w-12 text-primary mx-auto" />
-              </motion.div>
-            </motion.div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-4">
-              Wellness <motion.span
-                className="text-primary inline-block"
-                animate={{
-                  textShadow: [
-                    "0 0 10px rgba(var(--primary), 0)",
-                    "0 0 20px rgba(var(--primary), 0.3)",
-                    "0 0 10px rgba(var(--primary), 0)"
-                  ]
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >Check-in</motion.span>
-            </h1>
-            <motion.p
-              className="text-lg text-muted-foreground"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              Track your mood, discover patterns, and get personalized wellness suggestions.
-              Small check-ins lead to big insights.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mt-6 flex flex-wrap justify-center gap-2"
-            >
-              {["🧘‍♀️ Breathe", "📝 Journal", "🌞 Light Therapy", "🤝 Connect"].map((tip, index) => (
-                <motion.span
-                  key={tip}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.8 + index * 0.1, type: "spring" }}
-                  className="px-3 py-1 bg-accent/50 rounded-full text-sm text-foreground"
-                >
-                  {tip}
-                </motion.span>
-              ))}
-            </motion.div>
-          </motion.div>
+      {/* Main content */}
+      <main className="container max-w-6xl mx-auto px-4 pt-24 pb-16 relative z-10">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
+          <h1 className="text-4xl font-serif font-bold mb-4">
+            Wellness Check in
+          </h1>
+          <p className="text-muted-foreground">
+            Track your mood and build healthy daily habits.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Mood Check-in */}
-            <motion.div
-              className="lg:col-span-2"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springPresets.gentle, delay: 0.3 }}
-            >
-              <Card className="forest-card overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-serif">
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.2, 1]
-                      }}
-                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main column */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="forest-card">
+              <CardHeader>
+                <CardTitle>How are you feeling?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap justify-center gap-4 mb-6">
+                  {moodOptions.map((mood) => (
+                    <button
+                      key={mood.value}
+                      onClick={() => setSelectedMood(mood.value)}
+                      className={cn(
+                        "p-4 rounded-xl transition",
+                        selectedMood === mood.value
+                          ? `${mood.bgColor} ring-2 ring-primary`
+                          : "bg-card hover:bg-accent"
+                      )}
                     >
-                      <Heart className="h-5 w-5 text-primary" />
-                    </motion.div>
-                    How are you feeling?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {/* Mood Selector */}
-                  <div className="flex flex-wrap justify-center gap-4 mb-6">
-                    {moodOptions.map((mood, index) => (
-                      <motion.button
-                        key={mood.value}
-                        custom={index}
-                        variants={moodButtonVariants}
-                        initial="initial"
-                        animate={selectedMood === mood.value ? "selected" : "animate"}
-                        whileHover="hover"
-                        whileTap="tap"
-                        onClick={() => setSelectedMood(mood.value)}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 ${
-                          selectedMood === mood.value
-                            ? `${mood.bgColor} ring-2 ring-primary shadow-lg`
-                            : `bg-card hover:${mood.bgColor} hover:shadow-md`
-                        }`}
-                      >
-                        {selectedMood === mood.value && (
-                          <motion.div
-                            className="absolute inset-0 rounded-xl bg-primary/10"
-                            layoutId="moodHighlight"
-                            transition={springPresets.snappy}
-                          />
-                        )}
-                        <motion.div
-                          animate={selectedMood === mood.value ? {
-                            rotate: [0, -10, 10, 0],
-                            scale: [1, 1.1, 1]
-                          } : {}}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <mood.icon className={`h-10 w-10 ${mood.color} relative z-10`} />
-                        </motion.div>
-                        <span className="text-sm font-medium text-foreground relative z-10">{mood.label}</span>
-                      </motion.button>
-                    ))}
-                  </div>
+                      <mood.icon className={`h-8 w-8 ${mood.color}`} />
+                      <p className="text-sm mt-2">{mood.label}</p>
+                    </button>
+                  ))}
+                </div>
 
-                  {/* Note Input */}
+                {/* Personalized Recommendations */}
+                {selectedMood && (
                   <motion.div
-                    className="mb-6"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-6 p-4 bg-accent/20 rounded-lg border border-accent/50"
                   >
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Add a note (optional)
-                    </label>
-                    <motion.textarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      placeholder="What's on your mind? Any specific events or feelings..."
-                      className="w-full h-24 bg-background border border-input rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none transition-shadow"
-                      whileFocus={{
-                        boxShadow: "0 0 0 3px rgba(var(--primary), 0.1)",
-                      }}
-                    />
-                  </motion.div>
-
-                  {/* Log Button */}
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      variant="lantern"
-                      className="w-full relative overflow-hidden"
-                      onClick={handleLogMood}
-                      disabled={!selectedMood}
-                    >
-                      <AnimatePresence mode="wait">
-                        {isLogged ? (
-                          <motion.span
-                            key="success"
-                            variants={successVariants}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            className="flex items-center gap-2"
-                          >
-                            <Sparkles className="h-4 w-4" />
-                            Mood Logged!
-                          </motion.span>
-                        ) : (
-                          <motion.span
-                            key="default"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                          >
-                            Log My Mood
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </Button>
-                  </motion.div>
-
-                  <motion.p
-                    className="text-xs text-muted-foreground text-center mt-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                  >
-                    Your mood data is private and helps you track patterns over time.
-                  </motion.p>
-                </CardContent>
-              </Card>
-
-              {/* Mood History */}
-              <motion.div
-                variants={scrollReveal}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <Card className="forest-card mt-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-serif">
-                      <motion.div
-                        animate={{ rotate: [0, 10, -10, 0] }}
-                        transition={{ duration: 4, repeat: Infinity }}
-                      >
-                        <Calendar className="h-5 w-5 text-primary" />
-                      </motion.div>
-                      Recent Check-ins
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    <h3 className="font-semibold mb-4 text-foreground">Suggestions for you:</h3>
                     <div className="space-y-3">
-                      {recentMoods.map((entry, index) => {
-                        const moodOption = moodOptions.find(m => m.value === entry.mood);
-                        const MoodIcon = moodOption?.icon || Meh;
+                      {moodRecommendations[selectedMood]?.map((rec, i) => {
+                        const RecIcon = rec.icon;
                         return (
-                          <motion.div
-                            key={index}
-                            custom={index}
-                            variants={checkInItemVariants}
-                            initial="initial"
-                            whileInView="animate"
-                            whileHover="hover"
-                            viewport={{ once: true }}
-                            className="flex items-center gap-4 p-3 rounded-lg bg-accent/30 cursor-default"
-                          >
-                            <motion.div
-                              whileHover={{ scale: 1.2, rotate: 10 }}
-                              transition={springPresets.snappy}
-                            >
-                              <MoodIcon className={`h-6 w-6 ${moodOption?.color}`} />
-                            </motion.div>
+                          <div key={i} className="p-3 bg-background rounded-lg flex gap-3">
+                            <RecIcon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-foreground">{entry.date}</p>
-                              {entry.note && (
-                                <p className="text-xs text-muted-foreground">{entry.note}</p>
-                              )}
+                              <p className="font-medium text-sm">{rec.title}</p>
+                              <p className="text-xs text-muted-foreground">{rec.description}</p>
+                              <button 
+                                onClick={() => handleRecommendationClick(rec.action)}
+                                className="text-xs text-primary hover:underline mt-1"
+                              >
+                                → {rec.action}
+                              </button>
                             </div>
-                            <span className="text-sm text-muted-foreground">{moodOption?.label}</span>
-                          </motion.div>
+                          </div>
                         );
                       })}
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  </motion.div>
+                )}
 
-              {/* Relaxation Sounds */}
-              <motion.div
-                variants={scrollReveal}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <RelaxationSounds />
-              </motion.div>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Optional note"
+                  className="w-full h-24 rounded-lg p-3 border bg-background"
+                />
 
-              {/* Breathing Exercises */}
-              <motion.div
-                variants={scrollReveal}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <BreathingExercise />
-              </motion.div>
-            </motion.div>
-
-            {/* Wellness Tips Sidebar */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ ...springPresets.gentle, delay: 0.5 }}
-            >
-              <motion.div
-                variants={cardHover3D}
-                whileHover="hover"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <Card className="forest-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 font-serif">
-                      <motion.div
-                        animate={{
-                          rotate: [0, 360],
-                          scale: [1, 1.1, 1]
-                        }}
-                        transition={{
-                          rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                          scale: { duration: 2, repeat: Infinity }
-                        }}
+                <Button
+                  className="w-full mt-4"
+                  onClick={handleLogMood}
+                  disabled={!selectedMood}
+                >
+                  <AnimatePresence mode="wait">
+                    {isLogged ? (
+                      <motion.span
+                        key="logged"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="flex gap-2 items-center"
                       >
-                        <Sun className="h-5 w-5 text-secondary" />
-                      </motion.div>
-                      Seasonal Tips
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      Victoria's dark winters can be challenging. Here are some evidence-based strategies:
-                    </p>
-                    <motion.div
-                      variants={staggerContainer}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true }}
-                      className="space-y-4"
-                    >
-                      {wellnessTips.map((tip, index) => (
-                        <motion.div
-                          key={index}
-                          variants={staggerChild}
-                          whileHover={{
-                            scale: 1.02,
-                            x: 4,
-                            transition: springPresets.snappy
-                          }}
-                          className={`p-4 rounded-lg ${tip.bgColor} cursor-default border border-border/50`}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <motion.div
-                              whileHover={{ rotate: 15, scale: 1.2 }}
-                              transition={springPresets.snappy}
-                            >
-                              <tip.icon className={`h-5 w-5 ${tip.color}`} />
-                            </motion.div>
-                            <h4 className="font-medium text-foreground">{tip.title}</h4>
+                        <Sparkles className="h-4 w-4" />
+                        Mood Logged
+                      </motion.span>
+                    ) : (
+                      <span>Log Mood</span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="forest-card">
+              <CardHeader>
+                <CardTitle>Recent Check ins</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {isAuthenticated && user ? (
+                  savedMoods.length > 0 ? (
+                    savedMoods.map((entry) => {
+                      const moodOption = moodOptions.find(m => m.value === entry.mood);
+                      const MoodIcon = moodOption?.icon || Meh;
+                      return (
+                        <div key={entry.id} className="p-3 bg-accent/30 rounded-lg flex gap-3">
+                          <MoodIcon className={`h-6 w-6 ${moodOption?.color}`} />
+                          <div className="flex-1">
+                            <p className="font-medium">{entry.date}</p>
+                            {entry.note && (
+                              <p className="text-sm text-muted-foreground">
+                                {entry.note}
+                              </p>
+                            )}
                           </div>
-                          <p className="text-sm text-muted-foreground">{tip.description}</p>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                          <span className="text-sm text-muted-foreground">{moodOption?.label}</span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-muted-foreground">No moods logged yet</p>
+                  )
+                ) : (
+                  <p className="text-muted-foreground">Please log in to view your mood history</p>
+                )}
+              </CardContent>
+            </Card>
 
-              {/* Quick Actions */}
-              <motion.div
-                variants={scrollReveal}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <Card className="forest-card mt-6">
-                  <CardHeader>
-                    <CardTitle className="font-serif text-lg">Need Support?</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {[
-                      { href: "/chat", icon: "💬", label: "Talk to Lantern", color: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300" },
-                      { href: "/chat?mode=crisis", icon: "🆘", label: "Crisis Resources", color: "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300" },
-                      { href: "tel:2507218341", icon: "📞", label: "UVic Counselling", color: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300" },
-                    ].map((action, index) => (
-                      <motion.div
-                        key={action.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ ...springPresets.gentle, delay: index * 0.1 }}
-                        whileHover={{ scale: 1.02, x: 4 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Button variant="outline" className={`w-full justify-start ${action.color} border-border/50 hover:shadow-md transition-shadow`} asChild>
-                          <a href={action.href}>
-                            <span className="mr-2">{action.icon}</span>
-                            {action.label}
-                          </a>
-                        </Button>
-                      </motion.div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </motion.div>
+            <div ref={relaxationRef}>
+              <RelaxationSounds />
+            </div>
+            <div ref={breathingRef}>
+              <BreathingExercise />
+            </div>
           </div>
+
+          {/* Sidebar */}
+          <motion.div variants={cardHover3D} whileHover="hover">
+            <Card className="forest-card">
+              <CardHeader>
+                <CardTitle>Seasonal Tips</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {wellnessTips.map((tip, i) => (
+                  <div key={i} className={`p-4 rounded-lg ${tip.bgColor}`}>
+                    <tip.icon className={`h-5 w-5 ${tip.color}`} />
+                    <h4 className="font-medium mt-2">{tip.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {tip.description}
+                    </p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </main>
 
