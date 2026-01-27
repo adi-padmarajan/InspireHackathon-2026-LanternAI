@@ -167,6 +167,7 @@ const MoodPresetCard = ({
 }) => {
   const getPreviewBackground = () => {
     const { wallpaper } = preset;
+    if (!wallpaper) return 'linear-gradient(135deg, #334155, #475569)';
     switch (wallpaper.type) {
       case 'gradient':
         return getGradientCSS(wallpaper);
@@ -177,14 +178,14 @@ const MoodPresetCard = ({
       case 'dynamic':
         return `linear-gradient(135deg, ${wallpaper.colors.join(', ')})`;
       default:
-        return '#1a1a1a';
+        return 'linear-gradient(135deg, #334155, #475569)';
     }
   };
 
   return (
     <motion.button
       className={cn(
-        'relative overflow-hidden rounded-2xl p-4 text-left transition-all',
+        'relative overflow-hidden rounded-2xl p-4 text-left transition-all w-full',
         'bg-card border-2 hover:shadow-lg',
         isSelected
           ? 'border-primary shadow-lg shadow-primary/20'
@@ -194,17 +195,20 @@ const MoodPresetCard = ({
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
     >
-      {/* Preview gradient */}
+      {/* Preview gradient - using negative margins to extend to card edges */}
       <div
-        className="h-24 -mx-4 -mt-4 mb-4 relative overflow-hidden"
+        className="h-20 -mx-4 -mt-4 mb-3 relative overflow-hidden"
         style={{ background: getPreviewBackground() }}
       >
+        {/* Inset border for light gradients */}
+        <div className="absolute inset-0 ring-1 ring-inset ring-black/5" />
+        
         {/* Overlay for readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
 
         {/* Emoji badge */}
         <motion.div
-          className="absolute top-3 right-3 text-2xl"
+          className="absolute top-3 right-3 text-2xl drop-shadow-lg"
           animate={{ y: [0, -3, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -215,7 +219,7 @@ const MoodPresetCard = ({
       {/* Content */}
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-foreground">{preset.name}</h3>
+          <h3 className="font-semibold text-foreground text-sm">{preset.name}</h3>
           {isSelected && (
             <motion.div
               initial={{ scale: 0 }}
@@ -393,19 +397,16 @@ const MoodsTabContent = ({
 
       <MoodCategoryPills selected={categoryFilter} onSelect={setCategoryFilter} />
 
-      <motion.div
-        className="grid grid-cols-2 gap-3"
-        layout
-      >
+      <div className="grid grid-cols-2 gap-3 auto-rows-fr">
         <AnimatePresence mode="popLayout">
-          {filteredPresets.map((preset) => (
+          {filteredPresets.map((preset, index) => (
             <motion.div
               key={preset.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2, delay: index * 0.03 }}
+              className="min-h-0"
             >
               <MoodPresetCard
                 preset={preset}
@@ -415,7 +416,7 @@ const MoodsTabContent = ({
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -481,18 +482,16 @@ const WallpapersTabContent = ({
           </div>
         </div>
       ) : (
-        <motion.div
-          className="grid grid-cols-3 gap-2"
-          layout
-        >
+        <div className="grid grid-cols-3 gap-2">
           <AnimatePresence mode="popLayout">
-            {wallpapers.map((wallpaper) => (
+            {wallpapers.map((wallpaper, index) => (
               <motion.div
                 key={wallpaper.id}
                 layout
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ delay: index * 0.02 }}
               >
                 <WallpaperPreview
                   wallpaper={wallpaper}
@@ -503,7 +502,7 @@ const WallpapersTabContent = ({
               </motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       )}
     </div>
   );
