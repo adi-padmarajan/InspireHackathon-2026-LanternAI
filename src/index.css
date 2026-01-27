@@ -577,6 +577,22 @@
     animation-duration: 2s;
   }
 
+  /* Cinematic animations - Maximum visual impact */
+  .animation-cinematic {
+    --animation-scale: 2;
+    --particle-opacity: 1;
+  }
+
+  .animation-cinematic .theme-float,
+  .animation-cinematic .float-animation {
+    animation-duration: 3s;
+  }
+
+  .animation-cinematic .theme-pulse-glow,
+  .animation-cinematic .pulse-glow {
+    animation-duration: 1.5s;
+  }
+
   /* Respect user preference for reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,

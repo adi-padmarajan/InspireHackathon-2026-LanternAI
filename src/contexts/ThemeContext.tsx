@@ -137,6 +137,7 @@ const applyAnimationIntensity = (intensity: AnimationIntensity) => {
     subtle: 0.5,
     normal: 1,
     energetic: 1.5,
+    cinematic: 2.0,
   };
 
   root.style.setProperty('--animation-scale', String(multipliers[intensity]));
