@@ -1,7 +1,9 @@
 /**
  * Image Settings Types and Utilities
- * For Notion-like background image customization
+ * Award-winning customization with wallpapers, gradients, and images
  */
+
+import type { Wallpaper } from './wallpapers';
 
 // ============================================================================
 // TYPES
@@ -38,6 +40,7 @@ export interface BackgroundImage {
 export interface BackgroundSettings {
   enabled: boolean;
   image: BackgroundImage | null;
+  wallpaper?: Wallpaper | null; // NEW: Support for gradient/mesh/pattern/dynamic wallpapers
   position: ImagePosition;
   overlayOpacity: number; // 0-100
   overlayColor: OverlayColorMode;

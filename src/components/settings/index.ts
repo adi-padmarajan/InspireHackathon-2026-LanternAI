@@ -7,3 +7,4 @@ export {
   AccentColorPicker,
   ResetButton,
 } from './CustomizationPanel';
+export { CustomizationStudio } from './CustomizationStudio';
