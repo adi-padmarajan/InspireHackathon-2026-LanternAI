@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import RelaxationSounds from "@/components/wellness/RelaxationSounds";
+import BreathingExercise from "@/components/wellness/BreathingExercise";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
   Smile,
@@ -28,11 +29,11 @@ import {
 import { cn } from "@/lib/utils";
 
 const moodOptions = [
-  { icon: Smile, label: "Great", value: 5, color: "text-chart-1" },
-  { icon: Smile, label: "Good", value: 4, color: "text-chart-2" },
-  { icon: Meh, label: "Okay", value: 3, color: "text-chart-4" },
-  { icon: Frown, label: "Low", value: 2, color: "text-secondary" },
-  { icon: CloudRain, label: "Struggling", value: 1, color: "text-muted-foreground" },
+  { icon: Smile, label: "Great", value: 5, color: "text-green-500", bgColor: "bg-green-100 dark:bg-green-900/20" },
+  { icon: Smile, label: "Good", value: 4, color: "text-blue-500", bgColor: "bg-blue-100 dark:bg-blue-900/20" },
+  { icon: Meh, label: "Okay", value: 3, color: "text-yellow-500", bgColor: "bg-yellow-100 dark:bg-yellow-900/20" },
+  { icon: Frown, label: "Low", value: 2, color: "text-orange-500", bgColor: "bg-orange-100 dark:bg-orange-900/20" },
+  { icon: CloudRain, label: "Struggling", value: 1, color: "text-red-500", bgColor: "bg-red-100 dark:bg-red-900/20" },
 ];
 
 const wellnessTips = [
@@ -40,21 +41,29 @@ const wellnessTips = [
     title: "Light Therapy",
     description: "Consider using a light therapy lamp for 20-30 minutes each morning during dark winter months.",
     icon: Sun,
+    color: "text-yellow-500",
+    bgColor: "bg-yellow-50 dark:bg-yellow-900/10",
   },
   {
     title: "Movement Break",
     description: "Even a 10-minute walk outside during daylight can boost your mood significantly.",
     icon: TrendingUp,
+    color: "text-green-500",
+    bgColor: "bg-green-50 dark:bg-green-900/10",
   },
   {
     title: "Sleep Hygiene",
     description: "Try to maintain consistent sleep/wake times, even on weekends. Aim for 7-9 hours.",
     icon: Moon,
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-50 dark:bg-indigo-900/10",
   },
   {
     title: "Social Connection",
     description: "Reach out to one person today—a text, call, or coffee chat can make a difference.",
     icon: Heart,
+    color: "text-pink-500",
+    bgColor: "bg-pink-50 dark:bg-pink-900/10",
   },
 ];
 
@@ -173,7 +182,7 @@ const WellnessPage = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ ...springPresets.bouncy, delay: 0.1 }}
-              className="inline-block mb-4"
+              className="inline-block mb-4 p-4 rounded-full bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20"
             >
               <motion.div
                 animate={{
@@ -185,7 +194,7 @@ const WellnessPage = () => {
                 <Heart className="h-12 w-12 text-primary mx-auto" />
               </motion.div>
             </motion.div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-4">
               Wellness <motion.span
                 className="text-primary inline-block"
                 animate={{
@@ -207,6 +216,24 @@ const WellnessPage = () => {
               Track your mood, discover patterns, and get personalized wellness suggestions.
               Small check-ins lead to big insights.
             </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mt-6 flex flex-wrap justify-center gap-2"
+            >
+              {["🧘‍♀️ Breathe", "📝 Journal", "🌞 Light Therapy", "🤝 Connect"].map((tip, index) => (
+                <motion.span
+                  key={tip}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.8 + index * 0.1, type: "spring" }}
+                  className="px-3 py-1 bg-accent/50 rounded-full text-sm text-foreground"
+                >
+                  {tip}
+                </motion.span>
+              ))}
+            </motion.div>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -244,10 +271,10 @@ const WellnessPage = () => {
                         whileHover="hover"
                         whileTap="tap"
                         onClick={() => setSelectedMood(mood.value)}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-colors relative ${
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-300 ${
                           selectedMood === mood.value
-                            ? "bg-accent ring-2 ring-primary"
-                            : "bg-card hover:bg-accent/50"
+                            ? `${mood.bgColor} ring-2 ring-primary shadow-lg`
+                            : `bg-card hover:${mood.bgColor} hover:shadow-md`
                         }`}
                       >
                         {selectedMood === mood.value && (
@@ -406,6 +433,16 @@ const WellnessPage = () => {
               >
                 <RelaxationSounds />
               </motion.div>
+
+              {/* Breathing Exercises */}
+              <motion.div
+                variants={scrollReveal}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+              >
+                <BreathingExercise />
+              </motion.div>
             </motion.div>
 
             {/* Wellness Tips Sidebar */}
@@ -457,14 +494,14 @@ const WellnessPage = () => {
                             x: 4,
                             transition: springPresets.snappy
                           }}
-                          className="p-4 rounded-lg bg-accent/30 cursor-default"
+                          className={`p-4 rounded-lg ${tip.bgColor} cursor-default border border-border/50`}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <motion.div
                               whileHover={{ rotate: 15, scale: 1.2 }}
                               transition={springPresets.snappy}
                             >
-                              <tip.icon className="h-5 w-5 text-primary" />
+                              <tip.icon className={`h-5 w-5 ${tip.color}`} />
                             </motion.div>
                             <h4 className="font-medium text-foreground">{tip.title}</h4>
                           </div>
@@ -489,9 +526,9 @@ const WellnessPage = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {[
-                      { href: "/chat", icon: "💬", label: "Talk to Lantern" },
-                      { href: "/chat?mode=crisis", icon: "🆘", label: "Crisis Resources" },
-                      { href: "tel:2507218341", icon: "📞", label: "UVic Counselling" },
+                      { href: "/chat", icon: "💬", label: "Talk to Lantern", color: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300" },
+                      { href: "/chat?mode=crisis", icon: "🆘", label: "Crisis Resources", color: "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300" },
+                      { href: "tel:2507218341", icon: "📞", label: "UVic Counselling", color: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300" },
                     ].map((action, index) => (
                       <motion.div
                         key={action.href}
@@ -502,7 +539,7 @@ const WellnessPage = () => {
                         whileHover={{ scale: 1.02, x: 4 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <Button variant="outline" className="w-full justify-start" asChild>
+                        <Button variant="outline" className={`w-full justify-start ${action.color} border-border/50 hover:shadow-md transition-shadow`} asChild>
                           <a href={action.href}>
                             <span className="mr-2">{action.icon}</span>
                             {action.label}
