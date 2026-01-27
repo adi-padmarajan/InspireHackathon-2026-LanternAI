@@ -13,7 +13,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { themeCategories, ThemeCategory } from '@/lib/themes';
 import { ThemeTransitionOverlay } from '@/components/AmbientBackground';
 import { ThemePreviewCard } from '@/components/settings/ThemePreviewCard';
-import { CustomizationPanel } from '@/components/settings/CustomizationPanel';
+import { CustomizationStudio } from '@/components/settings/CustomizationStudio';
 import { SettingsBackground } from '@/components/settings/SettingsBackground';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -78,7 +78,7 @@ const SettingsHero = () => {
         Make Lantern Yours
       </h1>
       <p className="text-lg text-muted-foreground max-w-md mx-auto">
-        Choose from {15} beautiful themes and customize every detail to match your style
+        Award-winning customization with stunning wallpapers, moods, and themes
       </p>
     </motion.div>
   );
@@ -283,21 +283,33 @@ const SettingsPage = () => {
         <SettingsHero />
 
         {/* Tabs */}
-        <Tabs defaultValue="themes" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
-            <TabsTrigger value="themes" className="gap-2">
-              <Palette className="h-4 w-4" />
-              Themes
-            </TabsTrigger>
-            <TabsTrigger value="customize" className="gap-2">
+        <Tabs defaultValue="customize" className="w-full">
+          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8 h-12">
+            <TabsTrigger value="customize" className="gap-2 text-sm">
               <Sliders className="h-4 w-4" />
               Customize
             </TabsTrigger>
-            <TabsTrigger value="accessibility" className="gap-2">
+            <TabsTrigger value="themes" className="gap-2 text-sm">
+              <Palette className="h-4 w-4" />
+              Themes
+            </TabsTrigger>
+            <TabsTrigger value="accessibility" className="gap-2 text-sm">
               <Accessibility className="h-4 w-4" />
-              Access
+              Accessibility
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="customize" className="mt-0">
+            <div className="max-w-2xl mx-auto">
+              <motion.div
+                className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border shadow-xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <CustomizationStudio />
+              </motion.div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="themes" className="mt-0">
             <ThemeCategorySelector
@@ -305,18 +317,6 @@ const SettingsPage = () => {
               onSelect={setCategoryFilter}
             />
             <ThemeGrid categoryFilter={categoryFilter} />
-          </TabsContent>
-
-          <TabsContent value="customize" className="mt-0">
-            <div className="max-w-md mx-auto">
-              <motion.div
-                className="p-6 rounded-2xl bg-card border border-border"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <CustomizationPanel />
-              </motion.div>
-            </div>
           </TabsContent>
 
           <TabsContent value="accessibility" className="mt-0">
