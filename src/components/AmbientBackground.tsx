@@ -30,8 +30,9 @@ const getIntensityMultiplier = (intensity: AnimationIntensity): number => {
     subtle: 0.5,
     normal: 1,
     energetic: 1.5,
+    cinematic: 2.0,
   };
-  return multipliers[intensity];
+  return multipliers[intensity] ?? 1;
 };
 
 // ============================================================================
@@ -100,7 +101,27 @@ export const AmbientBackground = ({ className = "" }: AmbientBackgroundProps) =>
     intensity *= 1.2;
   }
 
-  const ParticleComponent = particleComponents[effectiveConfig.variant];
+  // Map new particle variants to existing components
+  const variantFallbacks: Record<string, keyof typeof particleComponents> = {
+    fireflies: 'fireflies',
+    bubbles: 'bubbles',
+    stars: 'stars',
+    snow: 'snow',
+    leaves: 'leaves',
+    sparks: 'sparks',
+    aurora: 'aurora',
+    orbs: 'orbs',
+    // New variants map to similar existing ones
+    rain: 'snow',        // Rain falls like snow
+    embers: 'sparks',    // Embers are like sparks
+    crystals: 'stars',   // Crystals shimmer like stars
+    glitch: 'sparks',    // Glitch effects use sparks
+    nebula: 'orbs',      // Nebula uses orb effects
+    lightning: 'sparks', // Lightning flashes like sparks
+  };
+
+  const mappedVariant = variantFallbacks[effectiveConfig.variant] || 'orbs';
+  const ParticleComponent = particleComponents[mappedVariant];
 
   return (
     <div className={`fixed inset-0 pointer-events-none overflow-hidden z-0 ${className}`}>
