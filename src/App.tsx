@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WeatherProvider } from "@/contexts/WeatherContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { SceneProvider } from "@/contexts/SceneContext";
 import { ProtectedRoute } from "@/components/auth";
 import { BackgroundLayer } from "@/components/BackgroundLayer";
 import Index from "./pages/Index";
@@ -21,12 +22,13 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <ThemeProvider>
-        <BackgroundLayer />
-        <WeatherProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <SceneProvider>
+          <BackgroundLayer />
+          <WeatherProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
@@ -64,9 +66,10 @@ const App = () => (
             </BrowserRouter>
           </TooltipProvider>
         </WeatherProvider>
-      </ThemeProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+      </SceneProvider>
+    </ThemeProvider>
+  </AuthProvider>
+</QueryClientProvider>
 );
 
 export default App;
