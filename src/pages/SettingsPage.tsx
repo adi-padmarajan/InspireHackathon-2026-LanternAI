@@ -24,7 +24,7 @@ import { Navigation } from '@/components/Navigation';
 // Check if custom background is active for conditional rendering
 const useHasCustomBackground = () => {
   const { currentBackground } = useTheme();
-  return currentBackground?.enabled && currentBackground?.image;
+  return currentBackground?.enabled && (currentBackground?.image || (currentBackground as any)?.wallpaper);
 };
 
 // ============================================================================
