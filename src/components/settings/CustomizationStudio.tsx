@@ -98,6 +98,9 @@ const WallpaperPreview = ({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
+      {/* Inset border for light-colored backgrounds */}
+      <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-[inherit]" />
+
       {/* Pattern overlay for pattern type */}
       {wallpaper.type === 'pattern' && (
         <div
@@ -144,9 +147,9 @@ const WallpaperPreview = ({
         </motion.div>
       )}
 
-      {/* Name overlay on hover */}
-      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <p className="text-xs text-white font-medium truncate">{wallpaper.name}</p>
+      {/* Name overlay - always visible */}
+      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+        <p className="text-xs text-white font-medium truncate drop-shadow-sm">{wallpaper.name}</p>
       </div>
     </motion.button>
   );
