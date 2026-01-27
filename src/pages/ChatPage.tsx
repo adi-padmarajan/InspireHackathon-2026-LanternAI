@@ -33,8 +33,8 @@ const ChatPage = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { currentBackground } = useTheme();
 
-  // Check if custom background image is active
-  const hasCustomBackground = currentBackground?.enabled && currentBackground?.image;
+  // Check if custom background (image or wallpaper) is active
+  const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || (currentBackground as any)?.wallpaper);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
