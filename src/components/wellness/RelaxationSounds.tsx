@@ -182,7 +182,12 @@ const RelaxationSounds = () => {
   const playSound = useCallback((soundId: string) => {
     // Initialize audio context if needed
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (AudioContextClass) {
+        audioContextRef.current = new AudioContextClass();
+      } else {
+        return; // No AudioContext support
+      }
       gainNodeRef.current = audioContextRef.current.createGain();
       gainNodeRef.current.connect(audioContextRef.current.destination);
     }

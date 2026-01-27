@@ -1,6 +1,11 @@
+import React from 'react';
 import { useColorSettingsStore } from '../store/colorSettingsStore';
 
-export const Logo: React.FC<LogoProps> = ({ /* existing props */ }) => {
+interface LogoProps {
+  className?: string;
+}
+
+export const Logo: React.FC<LogoProps> = () => {
   const { logoLeafColor, logoFlowerColor, logoTextColor } = useColorSettingsStore();
   
   // Update SVG elements to use the custom colors:

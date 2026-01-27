@@ -24,7 +24,7 @@ import { Navigation } from '@/components/Navigation';
 // Check if custom background is active for conditional rendering
 const useHasCustomBackground = () => {
   const { currentBackground } = useTheme();
-  return currentBackground?.enabled && (currentBackground?.image || (currentBackground as any)?.wallpaper);
+  return currentBackground?.enabled && (currentBackground?.image || currentBackground?.wallpaper);
 };
 
 // ============================================================================
@@ -32,7 +32,7 @@ const useHasCustomBackground = () => {
 // ============================================================================
 
 const CategoryIcon = ({ name, className }: { name: string; className?: string }) => {
-  const IconComponent = (LucideIcons as any)[name] || LucideIcons.Sparkles;
+  const IconComponent = (LucideIcons as Record<string, React.ComponentType<{ className?: string }>>)[name] || LucideIcons.Sparkles;
   return <IconComponent className={className} />;
 };
 

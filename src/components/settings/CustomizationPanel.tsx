@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Sun, Moon, Monitor, Sparkles, Circle, Minus, Zap, Palette, RotateCcw } from 'lucide-react';
+import { Sun, Moon, Monitor, Sparkles, Circle, Minus, Zap, Palette, RotateCcw, type LucideIcon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { AnimationIntensity, BackgroundStyle } from '@/lib/themes';
 import { Button } from '@/components/ui/button';
@@ -71,7 +71,7 @@ export const ColorModeSelector = () => {
 export const AnimationIntensitySelector = () => {
   const { settings, setAnimationIntensity } = useTheme();
 
-  const intensities: { id: AnimationIntensity; icon: any; label: string; description: string }[] = [
+  const intensities: { id: AnimationIntensity; icon: LucideIcon; label: string; description: string }[] = [
     { id: 'none', icon: Minus, label: 'None', description: 'No animations' },
     { id: 'subtle', icon: Circle, label: 'Subtle', description: 'Minimal movement' },
     { id: 'normal', icon: Sparkles, label: 'Normal', description: 'Balanced animations' },
