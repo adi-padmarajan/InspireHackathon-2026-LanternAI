@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, HTTPException, Depends, status
 from ..auth.jwt_handler import create_access_token
 from ..auth.dependencies import get_current_user, TokenData
@@ -5,6 +6,8 @@ from ..services.user_service import UserService
 from ..models.schemas import ApiResponse
 from ..models.user import UserLogin, UserResponse, AuthResponse
 from ..config.supabase import get_supabase_client
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -46,9 +49,10 @@ async def login(
         )
 
     except Exception as e:
+        logger.error("Login failed: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Login failed: {str(e)}"
+            detail="Login failed. Please try again."
         )
 
 

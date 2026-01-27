@@ -10,7 +10,8 @@ import {
   Sparkles, Palette, Wand2,
   Sun, Moon, Monitor, Check, Search, Upload, X, Sliders,
   Play, RotateCcw, Zap, Circle, Minus, Layers, Loader2,
-  Mountain, Waves, TreePine, Building2, Sunrise, Camera
+  Mountain, Waves, TreePine, Building2, Sunrise, Camera,
+  type LucideIcon,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ import {
 } from '@/lib/wallpapers';
 import {
   BackgroundImage,
+  BackgroundSettings,
   UnsplashPhoto,
   unsplashPhotoToBackgroundImage,
   curatedCategories,
@@ -306,7 +308,7 @@ const StudioTabs = ({
   activeTab: StudioTab;
   onTabChange: (tab: StudioTab) => void;
 }) => {
-  const tabs: { id: StudioTab; label: string; icon: any }[] = [
+  const tabs: { id: StudioTab; label: string; icon: LucideIcon }[] = [
     { id: 'moods', label: 'Moods', icon: Wand2 },
     { id: 'wallpapers', label: 'Wallpapers', icon: Layers },
     { id: 'colors', label: 'Colors', icon: Palette },
@@ -506,10 +508,10 @@ const CuratedCategoryPills = ({
   selected: string | null;
   onSelect: (category: string | null) => void;
 }) => {
-  const iconMap: Record<string, any> = {
+  const iconMap: Record<string, LucideIcon> = {
     Mountain,
-    Palette: LucideIcons.Palette,
-    Square: LucideIcons.Square,
+    Palette: LucideIcons.Palette as LucideIcon,
+    Square: LucideIcons.Square as LucideIcon,
     Sparkles,
     Waves,
     TreePine,
@@ -992,7 +994,7 @@ const EffectsTabContent = ({
 }) => {
   const { settings, setAnimationIntensity, setBackgroundStyle } = useTheme();
 
-  const intensities: { id: AnimationIntensity; icon: any; label: string }[] = [
+  const intensities: { id: AnimationIntensity; icon: LucideIcon; label: string }[] = [
     { id: 'none', icon: Minus, label: 'None' },
     { id: 'subtle', icon: Circle, label: 'Subtle' },
     { id: 'normal', icon: Sparkles, label: 'Normal' },
@@ -1165,7 +1167,7 @@ export function CustomizationStudio() {
     }
 
     // Apply the image as background
-    const settings: any = {
+    const newSettings: BackgroundSettings = {
       enabled: true,
       image: {
         id: image.id,
@@ -1186,12 +1188,12 @@ export function CustomizationStudio() {
       saturation: 100,
     };
 
-    setBackgroundSettings(settings);
+    setBackgroundSettings(newSettings);
   }, [overlayOpacity, blur, setBackgroundSettings]);
 
   const applyWallpaper = (wallpaper: Wallpaper, opacity: number, blurAmount: number) => {
     // Convert wallpaper to background settings format
-    let backgroundImage: any = null;
+    let backgroundImage: BackgroundImage | null = null;
 
     if (wallpaper.type === 'image') {
       backgroundImage = {
@@ -1206,7 +1208,7 @@ export function CustomizationStudio() {
     }
 
     // For non-image wallpapers, we'll store them differently
-    const settings: any = {
+    const newSettings: BackgroundSettings = {
       enabled: true,
       image: backgroundImage,
       wallpaper: wallpaper.type !== 'image' ? wallpaper : null,
@@ -1218,7 +1220,7 @@ export function CustomizationStudio() {
       saturation: 100,
     };
 
-    setBackgroundSettings(settings);
+    setBackgroundSettings(newSettings);
   };
 
   const handleOverlayChange = (value: number) => {
@@ -1227,11 +1229,11 @@ export function CustomizationStudio() {
       applyWallpaper(selectedWallpaper, value, blur);
     } else if (selectedImageId && currentBackground?.image) {
       // Re-apply image with new overlay
-      const settings: any = {
+      const newSettings: BackgroundSettings = {
         ...currentBackground,
         overlayOpacity: value,
       };
-      setBackgroundSettings(settings);
+      setBackgroundSettings(newSettings);
     }
   };
 
@@ -1241,11 +1243,11 @@ export function CustomizationStudio() {
       applyWallpaper(selectedWallpaper, overlayOpacity, value);
     } else if (selectedImageId && currentBackground?.image) {
       // Re-apply image with new blur
-      const settings: any = {
+      const newSettings: BackgroundSettings = {
         ...currentBackground,
         blur: value,
       };
-      setBackgroundSettings(settings);
+      setBackgroundSettings(newSettings);
     }
   };
 

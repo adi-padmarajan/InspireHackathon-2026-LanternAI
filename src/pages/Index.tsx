@@ -19,7 +19,7 @@ const Index = () => {
   const userName = user?.display_name;
 
   // Check if custom background (image or wallpaper) is active
-  const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || (currentBackground as any)?.wallpaper);
+  const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || currentBackground?.wallpaper);
 
   return (
     <motion.div

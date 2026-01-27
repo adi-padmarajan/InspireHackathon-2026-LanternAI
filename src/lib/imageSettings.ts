@@ -233,10 +233,11 @@ export const getOverlayGradient = (
       }
       // Fall through to theme
     case 'theme':
-    default:
+    default: {
       // Use theme-aware overlay
       const baseColor = isDark ? '0, 0, 0' : '255, 255, 255';
       return `linear-gradient(to bottom, rgba(${baseColor}, ${alpha * 0.6}), rgba(${baseColor}, ${alpha * 0.9}))`;
+    }
   }
 };
 

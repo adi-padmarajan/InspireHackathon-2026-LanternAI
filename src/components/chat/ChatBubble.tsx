@@ -1,3 +1,4 @@
+import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Lamp, User, CheckCheck } from "lucide-react";
 import { motion } from "framer-motion";
@@ -16,16 +17,43 @@ interface ChatBubbleProps {
   isLatest?: boolean;
 }
 
+/**
+ * Parse bold markdown (**text**) into React elements safely without dangerouslySetInnerHTML.
+ * This prevents XSS attacks by not using innerHTML.
+ */
+const parseBoldText = (text: string): React.ReactNode[] => {
+  const parts: React.ReactNode[] = [];
+  const regex = /\*\*(.*?)\*\*/g;
+  let lastIndex = 0;
+  let match;
+  let keyIndex = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    // Add the bold text
+    parts.push(
+      <strong key={keyIndex++} className="font-semibold text-foreground">
+        {match[1]}
+      </strong>
+    );
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
+};
+
 const formatMessageContent = (content: string) => {
   return content.split('\n').map((line, i) => {
-    // Handle bold text
-    const formattedLine = line.replace(
-      /\*\*(.*?)\*\*/g,
-      '<strong class="font-semibold text-foreground">$1</strong>'
-    );
-
     // Check if it's a list item
-    const isListItem = line.startsWith('•') || line.startsWith('-') || line.match(/^\d+\./);
+    const isListItem = line.startsWith('•') || line.startsWith('-') || /^\d+\./.test(line);
 
     return (
       <p
@@ -34,8 +62,9 @@ const formatMessageContent = (content: string) => {
           i > 0 && 'mt-2',
           isListItem && 'pl-4 relative before:absolute before:left-0 before:content-[""] before:w-1.5 before:h-1.5 before:bg-primary/50 before:rounded-full before:top-2'
         )}
-        dangerouslySetInnerHTML={{ __html: formattedLine || '&nbsp;' }}
-      />
+      >
+        {line ? parseBoldText(line) : '\u00A0'}
+      </p>
     );
   });
 };

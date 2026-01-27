@@ -1,8 +1,11 @@
 import json
+import logging
 import random
 import re
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class IntentMatcher:
@@ -21,10 +24,10 @@ class IntentMatcher:
                 data = json.load(f)
                 self.intents = data.get("intents", [])
         except FileNotFoundError:
-            print(f"Warning: Dataset not found at {dataset_path}")
+            logger.warning("Dataset not found at %s", dataset_path)
             self.intents = []
         except json.JSONDecodeError as e:
-            print(f"Warning: Failed to parse dataset: {e}")
+            logger.warning("Failed to parse dataset: %s", e)
             self.intents = []
 
     def _normalize_text(self, text: str) -> str:

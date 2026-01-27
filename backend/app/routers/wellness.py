@@ -1,9 +1,12 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from supabase import Client
 from ..models.schemas import MoodEntryInput, MoodEntry, ApiResponse
 from ..services.wellness_service import WellnessService
 from ..auth.dependencies import get_current_user, TokenData
 from ..config import get_supabase_client
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/wellness", tags=["wellness"])
 
@@ -13,7 +16,8 @@ def get_wellness_service() -> WellnessService:
         client = get_supabase_client()
         return WellnessService(client)
     except ValueError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to initialize wellness service: %s", e)
+        raise HTTPException(status_code=500, detail="Service temporarily unavailable")
 
 
 @router.post("/mood", response_model=ApiResponse[MoodEntry])
@@ -31,7 +35,8 @@ async def create_mood_entry(
         )
         return ApiResponse(success=True, data=entry)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to create mood entry: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to save mood entry")
 
 
 @router.get("/mood", response_model=ApiResponse[list[MoodEntry]])
@@ -48,7 +53,8 @@ async def get_mood_history(
         )
         return ApiResponse(success=True, data=entries)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get mood history: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to retrieve mood history")
 
 
 @router.get("/stats", response_model=ApiResponse[dict[str, int]])
@@ -61,4 +67,5 @@ async def get_mood_stats(
         stats = await service.get_mood_stats(user_id=current_user.user_id)
         return ApiResponse(success=True, data=stats)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get mood stats: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to retrieve mood statistics")

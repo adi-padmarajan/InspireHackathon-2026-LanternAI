@@ -478,7 +478,7 @@ export function BackgroundLayer() {
   const { currentBackground, isDark } = useTheme();
 
   const hasBackground = currentBackground?.enabled;
-  const wallpaper = (currentBackground as any)?.wallpaper as Wallpaper | null;
+  const wallpaper = currentBackground?.wallpaper ?? null;
   const image = currentBackground?.image;
 
   const renderBackground = () => {

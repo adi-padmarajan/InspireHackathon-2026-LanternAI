@@ -3,10 +3,13 @@ Images Router
 API endpoints for background image customization
 """
 
+import logging
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Query, status
 from typing import Optional
 
 from ..auth.dependencies import get_current_user, TokenData
+
+logger = logging.getLogger(__name__)
 from ..services.image_service import ImageService
 from ..models.schemas import ApiResponse
 from ..models.image_settings import (
@@ -53,9 +56,10 @@ async def search_unsplash(
         )
         return results
     except Exception as e:
+        logger.error("Unsplash search failed: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unsplash search failed: {str(e)}"
+            detail="Unsplash search failed. Please try again."
         )
 
 
@@ -91,9 +95,10 @@ async def get_random_unsplash(
 
         return ApiResponse(success=True, data=images)
     except Exception as e:
+        logger.error("Failed to get random photos: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get random photos: {str(e)}"
+            detail="Failed to get random photos. Please try again."
         )
 
 
@@ -159,12 +164,13 @@ async def upload_image(
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=str(e)  # ValueError messages are safe to return (validation errors)
         )
     except Exception as e:
+        logger.error("Upload failed: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Upload failed: {str(e)}"
+            detail="Upload failed. Please try again."
         )
 
 
@@ -256,9 +262,10 @@ async def save_background_settings(
         )
         return SaveSettingsResponse(success=True, message="Settings saved successfully")
     except Exception as e:
+        logger.error("Failed to save settings: %s", e, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save settings: {str(e)}"
+            detail="Failed to save settings. Please try again."
         )
 
 
