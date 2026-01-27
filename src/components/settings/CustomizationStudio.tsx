@@ -3,20 +3,24 @@
  * Cinematic, immersive background and theme customization
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as LucideIcons from 'lucide-react';
 import {
-  Sparkles, Palette, Image, Wand2, Grid3X3, ChevronRight,
+  Sparkles, Palette, Wand2,
   Sun, Moon, Monitor, Check, Search, Upload, X, Sliders,
-  Play, Pause, RotateCcw, Zap, Circle, Minus, Layers
+  Play, RotateCcw, Zap, Circle, Minus, Layers, Loader2,
+  Mountain, Waves, TreePine, Building2, Sunrise, Camera
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
 import {
   Wallpaper,
+  ImageWallpaper,
   MoodPreset,
   MoodCategory,
   curatedGradients,
@@ -28,8 +32,13 @@ import {
   moodCategories,
   getGradientCSS,
   getMeshGradientCSS,
-  getWallpapersByMood,
 } from '@/lib/wallpapers';
+import {
+  BackgroundImage,
+  UnsplashPhoto,
+  unsplashPhotoToBackgroundImage,
+  curatedCategories,
+} from '@/lib/imageSettings';
 import { AnimationIntensity, BackgroundStyle } from '@/lib/themes';
 
 // ============================================================================
@@ -425,18 +434,353 @@ const MoodsTabContent = ({
 };
 
 // ============================================================================
+// IMAGE PREVIEW COMPONENT (for Unsplash images)
+// ============================================================================
+
+const ImagePreview = ({
+  image,
+  isSelected,
+  onClick,
+}: {
+  image: BackgroundImage;
+  isSelected?: boolean;
+  onClick?: () => void;
+}) => {
+  return (
+    <motion.button
+      className={cn(
+        'relative overflow-hidden h-24 w-full rounded-xl transition-all group',
+        isSelected
+          ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+          : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-1 hover:ring-offset-background'
+      )}
+      onClick={onClick}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <img
+        src={image.thumbnailUrl || image.url}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        loading="lazy"
+      />
+
+      {/* Selection indicator */}
+      {isSelected && (
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center bg-black/30"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            className="w-8 h-8 rounded-full bg-primary flex items-center justify-center"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Check className="w-4 h-4 text-primary-foreground" />
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Attribution on hover */}
+      {image.attribution && (
+        <div className="absolute inset-x-0 bottom-0 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          <p className="text-[10px] text-white/80 truncate">
+            by {image.attribution.photographerName}
+          </p>
+        </div>
+      )}
+    </motion.button>
+  );
+};
+
+// ============================================================================
+// CURATED CATEGORY PILLS
+// ============================================================================
+
+const CuratedCategoryPills = ({
+  selected,
+  onSelect,
+}: {
+  selected: string | null;
+  onSelect: (category: string | null) => void;
+}) => {
+  const iconMap: Record<string, any> = {
+    Mountain,
+    Palette: LucideIcons.Palette,
+    Square: LucideIcons.Square,
+    Sparkles,
+    Waves,
+    TreePine,
+    Building2,
+    Sunrise,
+  };
+
+  return (
+    <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
+      <motion.button
+        className={cn(
+          'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-colors',
+          selected === null
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
+        )}
+        onClick={() => onSelect(null)}
+        whileTap={{ scale: 0.98 }}
+      >
+        <Camera className="w-3 h-3" />
+        <span>All</span>
+      </motion.button>
+      {curatedCategories.map((cat) => {
+        const Icon = iconMap[cat.icon] || Sparkles;
+        return (
+          <motion.button
+            key={cat.id}
+            className={cn(
+              'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-colors',
+              selected === cat.id
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
+            )}
+            onClick={() => onSelect(cat.id)}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Icon className="w-3 h-3" />
+            <span>{cat.name}</span>
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+};
+
+// ============================================================================
+// UNSPLASH IMAGES CONTENT
+// ============================================================================
+
+const UnsplashImagesContent = ({
+  selectedImageId,
+  onImageSelect,
+}: {
+  selectedImageId: string | null;
+  onImageSelect: (image: BackgroundImage) => void;
+}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<BackgroundImage[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [curatedImages, setCuratedImages] = useState<BackgroundImage[]>([]);
+  const [isLoadingCurated, setIsLoadingCurated] = useState(false);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Search Unsplash
+  useEffect(() => {
+    if (!debouncedQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const searchUnsplash = async () => {
+      setIsSearching(true);
+      setSearchError(null);
+      try {
+        const response = await api.images.searchUnsplash(debouncedQuery, 1, 20);
+        const images = response.results.map((photo: UnsplashPhoto) =>
+          unsplashPhotoToBackgroundImage(photo)
+        );
+        setSearchResults(images);
+        setTotalPages(response.total_pages);
+        setPage(1);
+      } catch (error) {
+        setSearchError('Failed to search images');
+        console.error('Search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    searchUnsplash();
+  }, [debouncedQuery]);
+
+  // Load more search results
+  const loadMore = useCallback(async () => {
+    if (isSearching || page >= totalPages || !debouncedQuery) return;
+
+    setIsSearching(true);
+    try {
+      const response = await api.images.searchUnsplash(debouncedQuery, page + 1, 20);
+      const images = response.results.map((photo: UnsplashPhoto) =>
+        unsplashPhotoToBackgroundImage(photo)
+      );
+      setSearchResults(prev => [...prev, ...images]);
+      setPage(prev => prev + 1);
+    } catch (error) {
+      console.error('Load more error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [isSearching, page, totalPages, debouncedQuery]);
+
+  // Load curated images by category
+  useEffect(() => {
+    const loadCurated = async () => {
+      setIsLoadingCurated(true);
+      try {
+        const category = curatedCategories.find(c => c.id === selectedCategory);
+        const query = category?.query || 'wallpaper background';
+        const response = await api.images.searchUnsplash(query, 1, 24);
+        const images = response.results.map((photo: UnsplashPhoto) =>
+          unsplashPhotoToBackgroundImage(photo)
+        );
+        setCuratedImages(images);
+      } catch (error) {
+        console.error('Failed to load curated:', error);
+      } finally {
+        setIsLoadingCurated(false);
+      }
+    };
+
+    if (!debouncedQuery) {
+      loadCurated();
+    }
+  }, [selectedCategory, debouncedQuery]);
+
+  // Handle scroll for infinite loading
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 100) {
+      loadMore();
+    }
+  }, [loadMore]);
+
+  const displayImages = debouncedQuery ? searchResults : curatedImages;
+  const isLoading = debouncedQuery ? isSearching : isLoadingCurated;
+
+  return (
+    <div className="space-y-3">
+      {/* Search bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Search millions of photos..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9 pr-8"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Category pills (only show when not searching) */}
+      {!debouncedQuery && (
+        <CuratedCategoryPills
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+        />
+      )}
+
+      {/* Images grid */}
+      <div
+        ref={scrollRef}
+        className="max-h-[320px] overflow-y-auto scrollbar-hide"
+        onScroll={handleScroll}
+      >
+        {isLoading && displayImages.length === 0 ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : displayImages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Camera className="w-10 h-10 text-muted-foreground mb-3" />
+            <p className="text-sm text-muted-foreground">
+              {debouncedQuery ? 'No images found' : 'Search for beautiful photos'}
+            </p>
+          </div>
+        ) : (
+          <motion.div className="grid grid-cols-3 gap-2" layout>
+            <AnimatePresence mode="popLayout">
+              {displayImages.map((image) => (
+                <motion.div
+                  key={image.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ImagePreview
+                    image={image}
+                    isSelected={selectedImageId === image.id}
+                    onClick={() => onImageSelect(image)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
+
+        {/* Loading more indicator */}
+        {isLoading && displayImages.length > 0 && (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          </div>
+        )}
+      </div>
+
+      {/* Unsplash attribution */}
+      <p className="text-[10px] text-muted-foreground text-center">
+        Photos provided by{' '}
+        <a
+          href="https://unsplash.com/?utm_source=lantern&utm_medium=referral"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-foreground"
+        >
+          Unsplash
+        </a>
+      </p>
+    </div>
+  );
+};
+
+// ============================================================================
 // WALLPAPERS TAB CONTENT
 // ============================================================================
 
 const WallpapersTabContent = ({
   selectedWallpaper,
+  selectedImageId,
   onWallpaperSelect,
+  onImageSelect,
 }: {
   selectedWallpaper: Wallpaper | null;
+  selectedImageId: string | null;
   onWallpaperSelect: (wallpaper: Wallpaper) => void;
+  onImageSelect: (image: BackgroundImage) => void;
 }) => {
   const [wallpaperTab, setWallpaperTab] = useState<WallpaperTab>('gradients');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const getWallpapers = (): Wallpaper[] => {
     switch (wallpaperTab) {
@@ -451,7 +795,7 @@ const WallpapersTabContent = ({
       case 'dynamic':
         return curatedDynamicWallpapers;
       case 'images':
-        return []; // Will be handled separately with Unsplash
+        return [];
       default:
         return [];
     }
@@ -464,26 +808,10 @@ const WallpapersTabContent = ({
       <WallpaperTabs activeTab={wallpaperTab} onTabChange={setWallpaperTab} />
 
       {wallpaperTab === 'images' ? (
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search Unsplash..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Upload className="w-10 h-10 text-muted-foreground mb-3" />
-            <p className="text-sm text-muted-foreground">
-              Search for images or upload your own
-            </p>
-            <Button variant="outline" size="sm" className="mt-3">
-              Upload Image
-            </Button>
-          </div>
-        </div>
+        <UnsplashImagesContent
+          selectedImageId={selectedImageId}
+          onImageSelect={onImageSelect}
+        />
       ) : (
         <div className="grid grid-cols-3 gap-2">
           <AnimatePresence mode="popLayout">
@@ -800,6 +1128,9 @@ export function CustomizationStudio() {
   const [activeTab, setActiveTab] = useState<StudioTab>('moods');
   const [selectedMood, setSelectedMood] = useState<MoodPreset | null>(null);
   const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null);
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(
+    currentBackground?.image?.id || null
+  );
   const [overlayOpacity, setOverlayOpacity] = useState(
     currentBackground?.overlayOpacity ?? 30
   );
@@ -808,6 +1139,7 @@ export function CustomizationStudio() {
   const handleMoodSelect = useCallback((mood: MoodPreset) => {
     setSelectedMood(mood);
     setSelectedWallpaper(mood.wallpaper);
+    setSelectedImageId(null);
     setOverlayOpacity(mood.overlayOpacity);
     setBlur(mood.blur);
 
@@ -817,9 +1149,45 @@ export function CustomizationStudio() {
 
   const handleWallpaperSelect = useCallback((wallpaper: Wallpaper) => {
     setSelectedWallpaper(wallpaper);
-    setSelectedMood(null); // Clear mood selection when manually selecting wallpaper
+    setSelectedImageId(null);
+    setSelectedMood(null);
     applyWallpaper(wallpaper, overlayOpacity, blur);
   }, [overlayOpacity, blur]);
+
+  const handleImageSelect = useCallback((image: BackgroundImage) => {
+    setSelectedImageId(image.id);
+    setSelectedWallpaper(null);
+    setSelectedMood(null);
+
+    // Track Unsplash download
+    if (image.source === 'unsplash' || image.attribution) {
+      api.images.trackUnsplashDownload(image.id).catch(() => {});
+    }
+
+    // Apply the image as background
+    const settings: any = {
+      enabled: true,
+      image: {
+        id: image.id,
+        source: image.source,
+        url: image.url,
+        thumbnailUrl: image.thumbnailUrl,
+        blurHash: image.blurHash,
+        attribution: image.attribution,
+        width: image.width,
+        height: image.height,
+      },
+      wallpaper: null,
+      position: { x: 50, y: 50 },
+      overlayOpacity: overlayOpacity,
+      overlayColor: 'theme',
+      blur: blur,
+      brightness: 100,
+      saturation: 100,
+    };
+
+    setBackgroundSettings(settings);
+  }, [overlayOpacity, blur, setBackgroundSettings]);
 
   const applyWallpaper = (wallpaper: Wallpaper, opacity: number, blurAmount: number) => {
     // Convert wallpaper to background settings format
@@ -857,6 +1225,13 @@ export function CustomizationStudio() {
     setOverlayOpacity(value);
     if (selectedWallpaper) {
       applyWallpaper(selectedWallpaper, value, blur);
+    } else if (selectedImageId && currentBackground?.image) {
+      // Re-apply image with new overlay
+      const settings: any = {
+        ...currentBackground,
+        overlayOpacity: value,
+      };
+      setBackgroundSettings(settings);
     }
   };
 
@@ -864,6 +1239,13 @@ export function CustomizationStudio() {
     setBlur(value);
     if (selectedWallpaper) {
       applyWallpaper(selectedWallpaper, overlayOpacity, value);
+    } else if (selectedImageId && currentBackground?.image) {
+      // Re-apply image with new blur
+      const settings: any = {
+        ...currentBackground,
+        blur: value,
+      };
+      setBackgroundSettings(settings);
     }
   };
 
@@ -892,7 +1274,9 @@ export function CustomizationStudio() {
           {activeTab === 'wallpapers' && (
             <WallpapersTabContent
               selectedWallpaper={selectedWallpaper}
+              selectedImageId={selectedImageId}
               onWallpaperSelect={handleWallpaperSelect}
+              onImageSelect={handleImageSelect}
             />
           )}
           {activeTab === 'colors' && <ColorsTabContent />}
