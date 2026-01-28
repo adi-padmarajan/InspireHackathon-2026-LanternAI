@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import RelaxationSounds from "@/components/wellness/RelaxationSounds";
 import BreathingExercise from "@/components/wellness/BreathingExercise";
+import GratitudeJar from "@/components/wellness/GratitudeJar";
+import DailyAffirmations from "@/components/wellness/DailyAffirmations";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -203,12 +205,9 @@ const WellnessPage = () => {
   const relaxationRef = useRef<HTMLDivElement>(null);
   const { currentBackground } = useTheme();
   const { user, isAuthenticated } = useAuth();
-  
 
-  const hasCustomBackground =
-    currentBackground?.enabled &&
-    (currentBackground?.image || (currentBackground as any)?.wallpaper);
-
+  // Check if custom background (image or wallpaper) is active
+  const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || (currentBackground as any)?.wallpaper);
 
   // Handle recommendation action clicks
   const handleRecommendationClick = (action: string) => {
@@ -321,7 +320,73 @@ const WellnessPage = () => {
       <main className="container max-w-6xl mx-auto px-4 pt-24 pb-16 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
+          <motion.div
+            initial={{ scale: 0, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
+            className="inline-block mb-4 p-4 rounded-full bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 relative"
+          >
+            {/* Animated glow background */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"
+              animate={{
+                opacity: [0.5, 1, 0.5],
+                scale: [1, 1.15, 1],
+              }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, -8, 8, 0],
+                y: [0, -6, 0],
+              }}
+              transition={{ 
+                duration: 1.8, 
+                repeat: Infinity, 
+                repeatDelay: 2,
+                type: "spring",
+                stiffness: 200,
+                damping: 10
+              }}
+              className="relative z-10"
+            >
+              <motion.div
+                animate={{
+                  opacity: [1, 0.7, 1],
+                }}
+                transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 2 }}
+              >
+                <Heart className="h-12 w-12 text-primary mx-auto drop-shadow-lg" />
+              </motion.div>
+            </motion.div>
+
+            {/* Floating particles */}
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-primary rounded-full"
+                initial={{
+                  x: Math.cos((i / 3) * Math.PI * 2) * 20,
+                  y: Math.sin((i / 3) * Math.PI * 2) * 20,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: Math.cos((i / 3) * Math.PI * 2) * 35,
+                  y: Math.sin((i / 3) * Math.PI * 2) * 35 - 10,
+                  opacity: [0, 0.6, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  delay: i * 0.15,
+                }}
+                style={{ left: "50%", top: "50%", marginLeft: "-2px", marginTop: "-2px" }}
+              />
+            ))}
+          </motion.div>
           <h1 className="text-4xl font-serif font-bold mb-4">
             Wellness Check in
           </h1>
@@ -460,11 +525,13 @@ const WellnessPage = () => {
             <div ref={breathingRef}>
               <BreathingExercise />
             </div>
+            <GratitudeJar />
           </div>
 
           {/* Sidebar */}
           <motion.div variants={cardHover3D} whileHover="hover">
-            <Card className="forest-card">
+            <DailyAffirmations />
+            <Card className="forest-card mt-6">
               <CardHeader>
                 <CardTitle>Seasonal Tips</CardTitle>
               </CardHeader>
