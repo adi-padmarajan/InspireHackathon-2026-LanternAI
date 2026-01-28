@@ -5,18 +5,18 @@ import {
   Heart,
   MapPin,
   Compass,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { staggerContainer, springPresets } from "@/lib/animations";
+import { springPresets } from "@/lib/animations";
 
 interface QuickAction {
   icon: React.ElementType;
   title: string;
   description: string;
   to: string;
-  gradient: string;
-  iconColor: string;
+  accentColor: string;
+  glowColor: string;
 }
 
 const quickActions: QuickAction[] = [
@@ -25,124 +25,179 @@ const quickActions: QuickAction[] = [
     title: "Talk to me",
     description: "Choose from 8 specialized support modes",
     to: "/chat",
-    gradient: "from-chart-1/20 to-chart-1/5",
-    iconColor: "text-violet-500",
+    accentColor: "text-violet-500",
+    glowColor: "violet",
   },
   {
     icon: Heart,
     title: "How are you feeling?",
-    description: "Track your mood and get personalized wellness insights",
+    description: "Track your mood and get personalized insights",
     to: "/wellness",
-    gradient: "from-chart-2/20 to-chart-2/5",
-    iconColor: "text-rose-500",
+    accentColor: "text-rose-500",
+    glowColor: "rose",
   },
   {
     icon: MapPin,
     title: "Find something on campus",
     description: "Buildings, services, study spots - I know my way around",
     to: "/chat?mode=navigator",
-    gradient: "from-chart-3/20 to-chart-3/5",
-    iconColor: "text-blue-500",
+    accentColor: "text-blue-500",
+    glowColor: "blue",
   },
   {
     icon: Compass,
     title: "Explore support options",
     description: "Counseling, health, academic support - I'll guide you there",
     to: "/chat?mode=resource",
-    gradient: "from-chart-4/20 to-chart-4/5",
-    iconColor: "text-emerald-500",
+    accentColor: "text-emerald-500",
+    glowColor: "emerald",
   },
 ];
 
-// Card animation variants
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    }
+  }
+};
+
 const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
-  visible: (i: number) => ({
+  hidden: {
+    opacity: 0,
+    y: 30,
+    scale: 0.95,
+    filter: "blur(8px)"
+  },
+  visible: {
     opacity: 1,
     y: 0,
     scale: 1,
+    filter: "blur(0px)",
     transition: {
-      delay: i * 0.1 + 0.4,
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
-    },
-  }),
+      duration: 0.6,
+      ease: [0.25, 0.46, 0.45, 0.94]
+    }
+  }
+};
+
+// Get glow colors based on action
+const getGlowStyles = (glowColor: string) => {
+  const colors: Record<string, string> = {
+    violet: "group-hover:shadow-[0_0_40px_hsl(258_89%_66%/0.2)]",
+    rose: "group-hover:shadow-[0_0_40px_hsl(350_89%_60%/0.2)]",
+    blue: "group-hover:shadow-[0_0_40px_hsl(217_91%_60%/0.2)]",
+    emerald: "group-hover:shadow-[0_0_40px_hsl(160_84%_39%/0.2)]",
+  };
+  return colors[glowColor] || colors.violet;
+};
+
+const getIconBgStyles = (glowColor: string) => {
+  const colors: Record<string, string> = {
+    violet: "bg-violet-500/10 group-hover:bg-violet-500/20",
+    rose: "bg-rose-500/10 group-hover:bg-rose-500/20",
+    blue: "bg-blue-500/10 group-hover:bg-blue-500/20",
+    emerald: "bg-emerald-500/10 group-hover:bg-emerald-500/20",
+  };
+  return colors[glowColor] || colors.violet;
 };
 
 export const QuickActions = () => {
   return (
     <motion.div
-      className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 w-full max-w-3xl mx-auto"
-      variants={staggerContainer}
+      className="w-full max-w-4xl mx-auto"
+      variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {quickActions.map((action, index) => (
-        <motion.div
-          key={action.title}
-          custom={index}
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover={{
-            y: -8,
-            scale: 1.02,
-            transition: springPresets.snappy,
-          }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Link to={action.to} className="block h-full">
-            <Card className="h-full forest-card overflow-hidden border-transparent hover:border-primary/20 transition-colors duration-300">
-              <CardContent className={`p-6 bg-gradient-to-br ${action.gradient} h-full relative`}>
-                <div className="flex items-start gap-4">
-                  {/* Icon with hover animation */}
+      {/* Section header */}
+      <motion.div
+        variants={cardVariants}
+        className="flex items-center justify-center gap-2 mb-8"
+      >
+        <Sparkles className="h-4 w-4 text-primary" />
+        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+          Quick Actions
+        </span>
+        <Sparkles className="h-4 w-4 text-primary" />
+      </motion.div>
+
+      {/* Cards grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+        {quickActions.map((action, index) => (
+          <motion.div
+            key={action.title}
+            variants={cardVariants}
+            custom={index}
+          >
+            <Link to={action.to} className="block h-full group">
+              <motion.div
+                className={`
+                  h-full p-6 md:p-7
+                  liquid-action-card
+                  ${getGlowStyles(action.glowColor)}
+                `}
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={springPresets.snappy}
+              >
+                {/* Card content */}
+                <div className="relative z-10 flex items-start gap-4">
+                  {/* Icon container */}
                   <motion.div
-                    className="flex-shrink-0 p-3 rounded-xl bg-background/80 backdrop-blur-sm"
+                    className={`
+                      flex-shrink-0 p-3.5 rounded-2xl
+                      backdrop-blur-sm border border-white/5
+                      transition-all duration-300
+                      ${getIconBgStyles(action.glowColor)}
+                    `}
                     whileHover={{
                       rotate: [0, -5, 5, 0],
                       scale: 1.1,
-                      backgroundColor: "hsl(var(--primary) / 0.1)",
                     }}
                     transition={springPresets.bouncy}
                   >
-                    <action.icon className={`h-6 w-6 ${action.iconColor}`} />
+                    <action.icon className={`h-6 w-6 ${action.accentColor}`} strokeWidth={1.75} />
                   </motion.div>
 
-                  <div className="flex-1 min-w-0">
-                    {/* Title with arrow animation */}
-                    <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
-                      <span className="group-hover:text-primary transition-colors">
-                        {action.title}
-                      </span>
+                  {/* Text content */}
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <h3 className="font-semibold text-foreground text-lg mb-1.5 flex items-center gap-2 group-hover:text-primary transition-colors duration-300">
+                      <span className="text-readable">{action.title}</span>
                       <motion.div
-                        initial={{ opacity: 0, x: -5 }}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 0, x: -8 }}
                         whileHover={{ opacity: 1, x: 0 }}
-                        className="inline-block"
+                        className="inline-flex"
                       >
-                        <ArrowRight className="h-4 w-4 text-primary" />
+                        <ArrowRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </motion.div>
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed text-readable">
                       {action.description}
                     </p>
                   </div>
                 </div>
 
-                {/* Subtle glow on hover */}
+                {/* Decorative gradient on hover */}
                 <motion.div
-                  className="absolute inset-0 pointer-events-none rounded-lg"
-                  initial={{ opacity: 0 }}
-                  whileHover={{
-                    opacity: 1,
-                    boxShadow: "inset 0 0 30px hsl(var(--primary) / 0.1)",
+                  className="absolute inset-0 rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(circle at 30% 30%, hsl(var(--primary) / 0.05) 0%, transparent 60%)`,
                   }}
-                  transition={{ duration: 0.3 }}
                 />
-              </CardContent>
-            </Card>
-          </Link>
-        </motion.div>
-      ))}
+              </motion.div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
     </motion.div>
   );
 };

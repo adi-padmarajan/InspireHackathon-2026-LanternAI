@@ -1,149 +1,205 @@
 import { useMemo } from "react";
-import { Lamp } from "lucide-react";
+import { Sparkles, Sun, Moon, CloudSun } from "lucide-react";
 import { motion } from "framer-motion";
 import { getPersonalizedGreeting } from "@/lib/greetings";
 import { useWeather } from "@/hooks/useWeather";
-import {
-  staggerContainer,
-  staggerChild,
-  floatingAnimation,
-  glowPulse,
-  springPresets,
-} from "@/lib/animations";
-import { WarmGlow } from "@/components/AmbientBackground";
+import { springPresets } from "@/lib/animations";
 
 interface PersonalizedGreetingProps {
   userName?: string;
 }
 
-export const PersonalizedGreeting = ({ userName = "Adi" }: PersonalizedGreetingProps) => {
+// Cinematic animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    }
+  }
+};
+
+const fadeUpVariants = {
+  hidden: {
+    opacity: 0,
+    y: 25,
+    filter: "blur(8px)"
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.7,
+      ease: [0.25, 0.46, 0.45, 0.94]
+    }
+  }
+};
+
+const scaleInVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.8,
+    filter: "blur(8px)"
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.6,
+      ease: [0.34, 1.56, 0.64, 1]
+    }
+  }
+};
+
+// Get time-based icon
+const getTimeIcon = () => {
+  const hour = new Date().getHours();
+  if (hour >= 6 && hour < 12) return Sun;
+  if (hour >= 12 && hour < 18) return CloudSun;
+  return Moon;
+};
+
+export const PersonalizedGreeting = ({ userName = "Friend" }: PersonalizedGreetingProps) => {
   const { weather, greetingWeather, isLoading } = useWeather();
 
-  // Memoize greeting to prevent re-randomizing on every render
   const greeting = useMemo(
     () => getPersonalizedGreeting(userName, greetingWeather),
     [userName, greetingWeather]
   );
 
+  const TimeIcon = getTimeIcon();
+
   return (
     <motion.div
-      variants={staggerContainer}
+      variants={containerVariants}
       initial="hidden"
       animate="visible"
+      className="relative"
     >
-      {/* Lantern glow background */}
-      <div className="relative flex flex-col items-center">
-        {/* Ambient glow */}
+      <div className="relative flex flex-col items-center text-center">
+        {/* Cinematic icon with liquid glass effect */}
         <motion.div
-          className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-[hsl(var(--lantern-glow)/0.2)] via-[hsl(var(--lantern-glow-soft)/0.1)] to-transparent rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Lantern icon */}
-        <motion.div
+          variants={scaleInVariants}
           className="relative mb-8"
-          variants={staggerChild}
         >
-          <WarmGlow intensity="strong" className="scale-150" />
-
+          {/* Outer glow ring */}
           <motion.div
-            className="relative bg-gradient-to-br from-accent to-accent/80 p-8 rounded-full"
-            animate={glowPulse}
-            whileHover={{ scale: 1.05 }}
-            transition={springPresets.gentle}
+            className="absolute inset-0 rounded-full"
+            animate={{
+              boxShadow: [
+                "0 0 40px hsl(var(--theme-glow) / 0.3), 0 0 80px hsl(var(--theme-glow) / 0.15)",
+                "0 0 60px hsl(var(--theme-glow) / 0.45), 0 0 120px hsl(var(--theme-glow) / 0.25)",
+                "0 0 40px hsl(var(--theme-glow) / 0.3), 0 0 80px hsl(var(--theme-glow) / 0.15)",
+              ]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+
+          {/* Icon container with liquid glass */}
+          <motion.div
+            className="relative liquid-icon-container p-6 md:p-8"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            transition={springPresets.bouncy}
           >
-            <motion.div animate={floatingAnimation}>
-              <Lamp className="h-16 w-16 md:h-20 md:w-20 text-primary" />
+            {/* Floating icon */}
+            <motion.div
+              animate={{
+                y: [0, -6, 0],
+                rotate: [0, 3, 0, -3, 0],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <TimeIcon className="h-12 w-12 md:h-14 md:w-14 text-primary" strokeWidth={1.5} />
             </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Weather emoji with bounce */}
+        {/* Weather emoji with playful animation */}
         <motion.div
-          className="text-4xl mb-4"
-          variants={staggerChild}
-          whileHover={{
-            scale: 1.3,
-            rotate: [0, -5, 5, 0],
-          }}
-          transition={springPresets.bouncy}
-        >
-          {greeting.emoji}
-        </motion.div>
-
-        {/* Main greeting with staggered text reveal */}
-        <motion.h1
-          className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground text-center mb-3"
-          variants={staggerChild}
+          variants={scaleInVariants}
+          className="mb-6"
         >
           <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, ...springPresets.gentle }}
+            className="text-5xl md:text-6xl inline-block cursor-default select-none"
+            whileHover={{
+              scale: 1.3,
+              rotate: [0, -8, 8, -8, 0],
+            }}
+            transition={springPresets.bouncy}
           >
-            {greeting.main}
+            {greeting.emoji}
           </motion.span>
+        </motion.div>
+
+        {/* Main greeting - cinematic typography */}
+        <motion.h1
+          variants={fadeUpVariants}
+          className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold text-foreground mb-4 tracking-tight"
+        >
+          <span className="text-readable">{greeting.main}</span>
           {userName && (
-            <motion.span
-              className="text-primary"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, ...springPresets.bouncy }}
-              whileHover={{
-                scale: 1.05,
-                textShadow: "0 0 20px hsl(38 95% 55% / 0.5)",
-              }}
-            >
-              , {userName}
-            </motion.span>
+            <>
+              <span className="text-readable">, </span>
+              <motion.span
+                className="text-gradient-primary inline-block"
+                whileHover={{
+                  scale: 1.05,
+                }}
+                transition={springPresets.bouncy}
+              >
+                {userName}
+              </motion.span>
+            </>
           )}
         </motion.h1>
 
-        {/* Sub greeting */}
+        {/* Sub greeting with elegant fade */}
         <motion.p
-          className="text-xl md:text-2xl text-muted-foreground text-center max-w-lg"
-          variants={staggerChild}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          variants={fadeUpVariants}
+          className="text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-2xl leading-relaxed text-readable"
         >
           {greeting.sub}
         </motion.p>
 
-        {/* Live weather indicator */}
+        {/* Live weather badge with liquid glass */}
         {weather && !isLoading && (
           <motion.div
-            className="mt-6"
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.7, ...springPresets.gentle }}
+            variants={fadeUpVariants}
+            className="mt-8"
           >
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 backdrop-blur-sm text-muted-foreground text-sm"
+              className="inline-flex items-center gap-3 px-5 py-2.5 liquid-weather-badge"
               whileHover={{
                 scale: 1.05,
-                backgroundColor: "hsl(var(--accent) / 0.3)",
+                boxShadow: "0 4px 20px hsl(var(--theme-glow) / 0.15)",
               }}
               transition={springPresets.snappy}
             >
-              <motion.span
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Infinity }}
+              <motion.div
+                className="flex items-center gap-1.5"
+                animate={{ opacity: [0.8, 1, 0.8] }}
+                transition={{ duration: 3, repeat: Infinity }}
               >
-                {weather.temperature}°C
-              </motion.span>
-              <span className="text-muted-foreground/60">·</span>
-              <span>{weather.description}</span>
-              <span className="text-muted-foreground/60">·</span>
-              <span>Victoria</span>
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="font-medium text-foreground">{weather.temperature}°C</span>
+              </motion.div>
+              <span className="w-px h-4 bg-border" />
+              <span className="text-muted-foreground">{weather.description}</span>
+              <span className="w-px h-4 bg-border" />
+              <span className="text-muted-foreground text-sm">Victoria</span>
             </motion.div>
           </motion.div>
         )}
