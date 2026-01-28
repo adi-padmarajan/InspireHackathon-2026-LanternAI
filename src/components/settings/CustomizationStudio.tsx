@@ -75,22 +75,26 @@ const WallpaperPreview = ({
   onClick?: () => void;
   size?: 'small' | 'medium' | 'large';
 }) => {
-  const getBackground = () => {
+  const getBackgroundStyle = (): React.CSSProperties => {
     switch (wallpaper.type) {
       case 'gradient':
-        return getGradientCSS(wallpaper);
+        return { background: getGradientCSS(wallpaper) };
       case 'mesh':
-        return getMeshGradientCSS(wallpaper);
+        return { background: getMeshGradientCSS(wallpaper) };
       case 'solid':
-        return wallpaper.color;
+        return { backgroundColor: wallpaper.color };
       case 'pattern':
-        return wallpaper.baseColor;
+        return { backgroundColor: wallpaper.baseColor };
       case 'dynamic':
-        return `linear-gradient(135deg, ${wallpaper.colors.join(', ')})`;
+        return { background: `linear-gradient(135deg, ${wallpaper.colors.join(', ')})` };
       case 'image':
-        return `url(${wallpaper.thumbnailUrl || wallpaper.url})`;
+        return {
+          backgroundImage: `url(${wallpaper.thumbnailUrl || wallpaper.url})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        };
       default:
-        return '#000';
+        return { backgroundColor: '#1a1a2e' };
     }
   };
 
@@ -103,18 +107,13 @@ const WallpaperPreview = ({
   return (
     <motion.button
       className={cn(
-        'relative overflow-hidden transition-all group',
+        'relative overflow-hidden transition-all group border border-white/10',
         sizeClasses[size],
         isSelected
           ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
           : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-1 hover:ring-offset-background'
       )}
-      style={{
-        background: wallpaper.type === 'image' ? undefined : getBackground(),
-        backgroundImage: wallpaper.type === 'image' ? getBackground() : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
+      style={getBackgroundStyle()}
       onClick={onClick}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
@@ -189,72 +188,69 @@ const MoodPresetCard = ({
   isSelected?: boolean;
   onClick?: () => void;
 }) => {
-  const getPreviewBackground = () => {
+  const getPreviewStyle = (): React.CSSProperties => {
     const { wallpaper } = preset;
-    if (!wallpaper) return 'linear-gradient(135deg, #334155, #475569)';
+    if (!wallpaper) return { background: 'linear-gradient(135deg, #334155, #475569)' };
     switch (wallpaper.type) {
       case 'gradient':
-        return getGradientCSS(wallpaper);
+        return { background: getGradientCSS(wallpaper) };
       case 'mesh':
-        return getMeshGradientCSS(wallpaper);
+        return { background: getMeshGradientCSS(wallpaper) };
       case 'solid':
-        return wallpaper.color;
+        return { backgroundColor: wallpaper.color };
       case 'dynamic':
-        return `linear-gradient(135deg, ${wallpaper.colors.join(', ')})`;
+        return { background: `linear-gradient(135deg, ${wallpaper.colors.join(', ')})` };
       default:
-        return 'linear-gradient(135deg, #334155, #475569)';
+        return { background: 'linear-gradient(135deg, #334155, #475569)' };
     }
   };
 
   return (
     <motion.button
       className={cn(
-        'relative overflow-hidden rounded-2xl p-4 text-left transition-all w-full',
-        'bg-card border-2 hover:shadow-lg',
+        'relative overflow-hidden rounded-xl text-left transition-all w-full h-full flex flex-col',
+        'bg-card border hover:shadow-lg',
         isSelected
-          ? 'border-primary shadow-lg shadow-primary/20'
-          : 'border-border hover:border-primary/50'
+          ? 'border-primary shadow-lg shadow-primary/20 ring-1 ring-primary'
+          : 'border-border/50 hover:border-primary/50'
       )}
       onClick={onClick}
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
     >
-      {/* Preview gradient - using negative margins to extend to card edges */}
+      {/* Preview gradient */}
       <div
-        className="h-20 -mx-4 -mt-4 mb-3 relative overflow-hidden"
-        style={{ background: getPreviewBackground() }}
+        className="h-16 w-full relative overflow-hidden rounded-t-xl"
+        style={getPreviewStyle()}
       >
         {/* Inset border for light gradients */}
-        <div className="absolute inset-0 ring-1 ring-inset ring-black/5" />
-        
-        {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+        <div className="absolute inset-0 ring-1 ring-inset ring-black/10" />
 
         {/* Emoji badge */}
         <motion.div
-          className="absolute top-3 right-3 text-2xl drop-shadow-lg"
-          animate={{ y: [0, -3, 0] }}
+          className="absolute top-2 right-2 text-lg drop-shadow-lg"
+          animate={{ y: [0, -2, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
           {preset.emoji}
         </motion.div>
+
+        {/* Selection check */}
+        {isSelected && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center"
+          >
+            <Check className="w-3 h-3 text-primary-foreground" />
+          </motion.div>
+        )}
       </div>
 
       {/* Content */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-foreground text-sm">{preset.name}</h3>
-          {isSelected && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="w-4 h-4 rounded-full bg-primary flex items-center justify-center"
-            >
-              <Check className="w-2.5 h-2.5 text-primary-foreground" />
-            </motion.div>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground line-clamp-2">{preset.description}</p>
+      <div className="p-2.5 flex-1">
+        <h3 className="font-medium text-foreground text-xs truncate">{preset.name}</h3>
+        <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{preset.description}</p>
       </div>
 
       {/* Accent color indicator */}
@@ -488,8 +484,8 @@ const MoodsTabContent = ({
         ))}
       </div>
 
-      {/* Moods Grid */}
-      <div className="grid grid-cols-2 gap-3 auto-rows-fr max-h-[400px] overflow-y-auto scrollbar-hide pr-1">
+      {/* Moods Grid - 3 columns for spread out layout */}
+      <div className="grid grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto scrollbar-hide pr-1">
         <AnimatePresence mode="popLayout">
           {filteredPresets.map((preset, index) => (
             <motion.div
@@ -497,8 +493,7 @@ const MoodsTabContent = ({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.25, delay: index * 0.02 }}
-              className="min-h-0"
+              transition={{ duration: 0.25, delay: index * 0.015 }}
             >
               <MoodPresetCard
                 preset={preset}
