@@ -36,7 +36,7 @@ export const useColorSettingsStore = create<ColorSettingsStore>()(
       resetToDefaults: () => set(defaultColors),
     }),
     {
-      name: 'verdant-bloom-colors',
+      name: 'lantern-colors',
     }
   )
 );

@@ -1,4 +1,7 @@
-import { ColorSettings } from './ColorSettings';
+import { useState } from 'react';
+import { Home, Settings, Palette } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ColorsTab } from './ColorsTab';
 
 const tabs = [
   { id: 'home', label: 'Home', icon: Home },
@@ -6,30 +9,36 @@ const tabs = [
   { id: 'colors', label: 'Colors', icon: Palette },
 ];
 
-const renderTabContent = (activeTab) => {
-  switch (activeTab) {
-    case 'home':
-      return <HomeScreen />;
-    case 'settings':
-      return <SettingsScreen />;
-    case 'colors':
-      return <ColorSettings />;
-    default:
-      return <HomeScreen />;
-  }
-};
-
 export const SettingsPanel = () => {
   const [activeTab, setActiveTab] = useState('home');
 
-  const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
-  };
-
   return (
-    <div>
-      <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange}>
-        {renderTabContent(activeTab)}
+    <div className="p-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-3 mb-4">
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        <TabsContent value="home">
+          <div className="text-center text-muted-foreground">
+            Home settings coming soon
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="settings">
+          <div className="text-center text-muted-foreground">
+            General settings coming soon
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="colors">
+          <ColorsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
