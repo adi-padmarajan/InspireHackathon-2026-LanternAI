@@ -39,31 +39,44 @@ const Index = () => {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-20 relative z-10">
         <motion.div
-          className="w-full max-w-4xl mx-auto space-y-12 md:space-y-16"
+          className="w-full max-w-4xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {isAuthenticated && userName ? (
-            <>
-              {/* Personalized Greeting for signed-in users */}
-              <PersonalizedGreeting userName={userName} />
+          {/* Glassmorphism container for better text readability */}
+          <div className="relative">
+            {/* Glass effect backdrop - only when custom background is active */}
+            {hasCustomBackground && (
+              <div className="absolute inset-0 -m-6 md:-m-8 rounded-3xl bg-background/60 backdrop-blur-xl border border-border/20 shadow-2xl" />
+            )}
+            
+            <div className={cn(
+              "relative space-y-12 md:space-y-16",
+              hasCustomBackground && "p-6 md:p-8"
+            )}>
+              {isAuthenticated && userName ? (
+                <>
+                  {/* Personalized Greeting for signed-in users */}
+                  <PersonalizedGreeting userName={userName} />
 
-              {/* Warm companion message */}
-              <WarmMessage isAuthenticated={true} userName={userName} />
-            </>
-          ) : (
-            <>
-              {/* Sign in prompt for guests */}
-              <SignInPrompt />
+                  {/* Warm companion message */}
+                  <WarmMessage isAuthenticated={true} userName={userName} />
+                </>
+              ) : (
+                <>
+                  {/* Sign in prompt for guests */}
+                  <SignInPrompt />
 
-              {/* Welcome message for guests */}
-              <WarmMessage isAuthenticated={false} />
-            </>
-          )}
+                  {/* Welcome message for guests */}
+                  <WarmMessage isAuthenticated={false} />
+                </>
+              )}
 
-          {/* Quick Actions - always visible */}
-          <QuickActions />
+              {/* Quick Actions - always visible */}
+              <QuickActions />
+            </div>
+          </div>
         </motion.div>
       </main>
 

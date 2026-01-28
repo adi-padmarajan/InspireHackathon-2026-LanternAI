@@ -30,6 +30,7 @@ const getIntensityMultiplier = (intensity: AnimationIntensity): number => {
     subtle: 0.5,
     normal: 1,
     energetic: 1.5,
+    cinematic: 1.8,
   };
   return multipliers[intensity];
 };
