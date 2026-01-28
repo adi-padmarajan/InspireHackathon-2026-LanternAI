@@ -39,44 +39,51 @@ const Index = () => {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-20 relative z-10">
         <motion.div
-          className="w-full max-w-4xl mx-auto"
+          className="w-full max-w-4xl mx-auto space-y-12 md:space-y-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Glassmorphism container for better text readability */}
-          <div className="relative">
-            {/* Glass effect backdrop - only when custom background is active */}
-            {hasCustomBackground && (
-              <div className="absolute inset-0 -m-6 md:-m-8 rounded-3xl bg-background/60 backdrop-blur-xl border border-border/20 shadow-2xl" />
-            )}
-            
-            <div className={cn(
-              "relative space-y-12 md:space-y-16",
-              hasCustomBackground && "p-6 md:p-8"
-            )}>
-              {isAuthenticated && userName ? (
-                <>
-                  {/* Personalized Greeting for signed-in users */}
-                  <PersonalizedGreeting userName={userName} />
+          {isAuthenticated && userName ? (
+            <>
+              {/* Personalized Greeting with glass effect when custom background is active */}
+              <div className={cn(
+                "relative",
+                hasCustomBackground && "rounded-2xl bg-background/50 backdrop-blur-lg border border-border/20 shadow-lg p-6 md:p-8"
+              )}>
+                <PersonalizedGreeting userName={userName} />
+              </div>
 
-                  {/* Warm companion message */}
-                  <WarmMessage isAuthenticated={true} userName={userName} />
-                </>
-              ) : (
-                <>
-                  {/* Sign in prompt for guests */}
-                  <SignInPrompt />
+              {/* Warm companion message with glass effect */}
+              <div className={cn(
+                "relative",
+                hasCustomBackground && "rounded-2xl bg-background/50 backdrop-blur-lg border border-border/20 shadow-lg p-6 md:p-8"
+              )}>
+                <WarmMessage isAuthenticated={true} userName={userName} />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Sign in prompt with glass effect */}
+              <div className={cn(
+                "relative",
+                hasCustomBackground && "rounded-2xl bg-background/50 backdrop-blur-lg border border-border/20 shadow-lg p-6 md:p-8"
+              )}>
+                <SignInPrompt />
+              </div>
 
-                  {/* Welcome message for guests */}
-                  <WarmMessage isAuthenticated={false} />
-                </>
-              )}
+              {/* Welcome message with glass effect */}
+              <div className={cn(
+                "relative",
+                hasCustomBackground && "rounded-2xl bg-background/50 backdrop-blur-lg border border-border/20 shadow-lg p-6 md:p-8"
+              )}>
+                <WarmMessage isAuthenticated={false} />
+              </div>
+            </>
+          )}
 
-              {/* Quick Actions - always visible */}
-              <QuickActions />
-            </div>
-          </div>
+          {/* Quick Actions - no glass effect, they have their own card styling */}
+          <QuickActions />
         </motion.div>
       </main>
 
