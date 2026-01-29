@@ -9,6 +9,7 @@ interface EnhancedChatInputProps {
   onChange: (value: string) => void;
   onSend: () => void;
   isLoading: boolean;
+  placeholder?: string;
 }
 
 export const EnhancedChatInput = ({
@@ -16,6 +17,7 @@ export const EnhancedChatInput = ({
   onChange,
   onSend,
   isLoading,
+  placeholder,
 }: EnhancedChatInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -82,7 +84,7 @@ export const EnhancedChatInput = ({
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder="Share what's on your mind..."
+              placeholder={placeholder ?? "Share what's on your mind..."}
               rows={1}
               className={cn(
                 "w-full resize-none bg-transparent",

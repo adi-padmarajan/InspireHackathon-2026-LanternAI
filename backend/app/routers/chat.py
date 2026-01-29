@@ -16,7 +16,9 @@ async def send_message(body: ChatMessageInput) -> ApiResponse[ChatResponse]:
     response = ChatService.get_contextual_response(
         message=body.message, 
         mode=body.mode,
-        session_id=body.session_id
+        session_id=body.session_id,
+        profile=body.profile,
+        memory=body.memory
     )
     return ApiResponse(success=True, data=response)
 

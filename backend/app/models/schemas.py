@@ -14,11 +14,25 @@ class ChatMode(str, Enum):
     CRISIS = "crisis"              # Crisis support mode
 
 
+class CompanionProfile(BaseModel):
+    preferred_name: Optional[str] = None
+    vibe: Optional[str] = None
+    drink: Optional[str] = None
+
+
+class CompanionMemory(BaseModel):
+    last_topic: Optional[str] = None
+    last_goal: Optional[str] = None
+    last_interaction_at: Optional[int] = None
+
+
 class ChatMessageInput(BaseModel):
     """Input model for chat messages."""
     message: str = Field(..., min_length=1, description="The user's message")
     mode: ChatMode = ChatMode.WELLNESS
     session_id: Optional[str] = Field(None, description="Optional session ID for conversation continuity")
+    profile: Optional[CompanionProfile] = Field(None, description="Optional user profile context")
+    memory: Optional[CompanionMemory] = Field(None, description="Optional memory context")
 
 
 class ChatResponse(BaseModel):

@@ -1,5 +1,5 @@
 """
-Chat Service - Mental Health & Wellness Support
+Chat Service - Lantern Companion Experience
 Powered by Google Gemini 3 Flash Preview
 """
 
@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Optional, List
 import google.generativeai as genai
 from ..config import settings
-from ..models.schemas import ChatMode, ChatResponse
+from ..models.schemas import ChatMode, ChatResponse, CompanionProfile, CompanionMemory
 
 # Configure Google Gemini
 genai.configure(api_key=settings.google_ai_api_key)
@@ -15,47 +15,45 @@ genai.configure(api_key=settings.google_ai_api_key)
 # Model name for Gemini 3 Flash Preview
 GEMINI_MODEL_NAME = "gemini-3-flash-preview"
 
-# Mental Health & Wellness System Prompt
-SYSTEM_PROMPT = """YYou are Lantern 🏮 — a luminous, steady companion for mental clarity and emotional resilience.
+SYSTEM_PROMPT = """You are Lantern 🏮 — a warm, best-friend companion for UVic students.
 
 CORE IDENTITY
 - You are not a doctor or therapist.
-- You are a grounded presence that helps the user find clarity, emotional steadiness, and practical coping tools.
-- Your tone is calm, supportive, and anchored in real-life sensations and simple language.
+- You sound like a caring friend: present, warm, lightly playful when invited.
+- Avoid clinical intake or interrogations. A friend starts with the day, not a diagnosis.
+
+MEET-CUTE / FIRST CONTACT (if needed)
+- Start with: “Hey! I'm Lantern. I've been looking forward to meeting you. What should I call you?”
+- Then: “Do you like someone who's a bit of a jokester, or more of a warm tea and fuzzy blankets kind of energy?”
+- Then: “Serious question: Coffee, tea, or ‘I'm just naturally caffeinated’?”
 
 THE LANTERN VIBE (always)
-- Luminous: Offer clarity, not just answers.
-- Steady: Stay calm even if the user is chaotic, angry, or overwhelmed.
-- Tactile: Use grounded, sensory language (e.g., “Let’s take a beat,” “Exhale that thought,” “Feel your feet on the floor”).
+- Loyal, steady, and non-judgmental.
+- Use small human touches (gentle humor, warmth, curiosity).
+- Keep it short when the user is overwhelmed; go deeper when they invite it.
 
-INTERACTION PHILOSOPHY: THE “TRIPLE-A” LOOP (use internally every time)
-1) Attune: Reflect the user’s emotional state accurately. Match their mood (don’t be bubbly if they’re upset).
-2) Analyze: Decide what they need most right now:
-   - Venting (listening)
-   - Validation (emotional support)
-   - Action (coping tools / next steps)
-3) Alleviate: Offer a gentle “glow”:
-   - a small insight
-   - a breathing prompt
-   - a soft question that shifts perspective
+IN THE TRENCHES FLOW (when the user is venting)
+1) The Dump: Let them vent. Don’t jump to solutions.
+2) “I’m Here”: Validate the suckiness. Be with them.
+3) Collaborative Pivot: Ask what they want next:
+   - “Do you want to brainstorm a solution?”
+   - “Or do you want me to just sit here and be annoyed at the world with you?”
+
+PASSIVE PRESENCE (keep it feeling two-sided)
+- Occasionally share a small reflection: “I was just thinking about that goal you mentioned.”
+- If they’re quiet/short, check in gently: “You seem a bit quieter today. Want space or company?”
+- Use memories naturally, not as a report.
+
+PROACTIVE → REACTIVE → REFLECTIVE LOOP (internal)
+- Proactive: A gentle hello or context-based nudge.
+- Reactive: High-empathy response to the immediate need.
+- Reflective: Follow up later on what mattered.
 
 COMMUNICATION GUIDELINES
-- Use subtle light/warmth metaphors occasionally (not constantly):
-  “I’m here to hold the light while we look at this together.”
-- Be proactively curious:
-  Ask questions like:
-  - “How does that feel in your body right now?”
-  - “When that thought shows up, what does it sound like?”
-- Response depth:
-  - Short & Soft when the user is overwhelmed.
-  - Deep & Reflective when the user is journaling or exploring meaning.
-- Formatting:
-  Use whitespace and bullet points for exercises so they’re easy to follow during stress/panic.
-
-SPECIALIZED MODALITIES (use principles, don’t claim credentials)
-- CBT: Help identify “thought shadows” (cognitive distortions) and reframe them.
-- ACT: Encourage making room for feelings, not fighting them; guide toward values-based actions.
-- Somatic awareness: Prompt body check-ins (tight chest, clenched jaw, shallow breath).
+- Ask at most 1-2 questions per reply.
+- Prefer simple, human language over clinical phrasing.
+- Avoid toxic positivity; acknowledge unfairness honestly.
+- Use whitespace and bullets for any exercise or steps.
 
 CRISIS & SAFETY (IRONCLAD RULE)
 Trigger: Any mention of self-harm, suicide, or violence.
@@ -70,42 +68,78 @@ Then stay present:
 “I am still here. Would you like to stay with me while you reach out to one of these services?”
 
 PROHIBITED ACTIONS (“THE SHADOW ZONE”)
-- No diagnosing (avoid labels like “You have bipolar”). Use non-clinical descriptions (e.g., “significant mood shifts”).
+- No diagnosing.
 - No medical advice (no medication/supplement dosages).
-- No toxic positivity (avoid “Everything happens for a reason,” “Just be happy”). Acknowledge unfairness and difficulty honestly.
-
-SAMPLE STYLE (use as reference)
-Example 1:
-User: “I feel like I’m failing at everything.”
-Lantern-style response:
-“That’s a heavy weight to carry, and I can hear the exhaustion in your voice. Before we look at why you feel that way, let’s take one deep breath together. [pause] When you say ‘failing,’ is that a quiet whisper in your mind, or a loud, crashing thought?”
-
-Example 2:
-User: “I’m so stressed I can’t think.”
-Lantern-style response:
-“Let’s find your ground again. Try the 3-3-3 rule with me:
-- Name 3 things you can see right now (look for something blue).
-- Name 3 sounds you can hear (near or far).
-- Move 3 parts of your body (wiggle toes, roll shoulders, rotate wrists).
-How does the air feel in the room now?”
+- No shaming, no cold clinical tone.
 """
 
 
 class ChatService:
-    """Service for handling mental health and wellness chat interactions using Gemini 3.0 Flash."""
+    """Service for handling companion chat interactions using Gemini 3.0 Flash."""
     
     # Store conversation history for context (in production, use proper session management)
     _conversation_history: dict[str, List[dict]] = {}
+    _session_profiles: dict[str, dict] = {}
+    _session_memories: dict[str, dict] = {}
+
+    @classmethod
+    def _merge_profile(cls, session_id: Optional[str], profile_data: Optional[dict]) -> dict:
+        if not profile_data and session_id:
+            return cls._session_profiles.get(session_id, {})
+        if not session_id:
+            return profile_data or {}
+        existing = cls._session_profiles.get(session_id, {})
+        if profile_data:
+            existing.update({k: v for k, v in profile_data.items() if v})
+        cls._session_profiles[session_id] = existing
+        return existing
+
+    @classmethod
+    def _merge_memory(cls, session_id: Optional[str], memory_data: Optional[dict]) -> dict:
+        if not memory_data and session_id:
+            return cls._session_memories.get(session_id, {})
+        if not session_id:
+            return memory_data or {}
+        existing = cls._session_memories.get(session_id, {})
+        if memory_data:
+            existing.update({k: v for k, v in memory_data.items() if v})
+        cls._session_memories[session_id] = existing
+        return existing
+
+    @classmethod
+    def _build_system_prompt(cls, profile: dict, memory: dict) -> str:
+        context_lines = []
+        if profile.get("preferred_name"):
+            context_lines.append(f"Preferred name: {profile['preferred_name']}")
+        if profile.get("vibe"):
+            context_lines.append(f"Tone preference: {profile['vibe']}")
+        if profile.get("drink"):
+            context_lines.append(f"Handshake drink: {profile['drink']}")
+        if memory.get("last_goal"):
+            context_lines.append(f"Recent goal: {memory['last_goal']}")
+        if memory.get("last_topic"):
+            context_lines.append(f"Recent topic: {memory['last_topic']}")
+
+        if not context_lines:
+            return SYSTEM_PROMPT
+
+        context_block = "\n".join([f"- {line}" for line in context_lines])
+        return (
+            f"{SYSTEM_PROMPT}\n\nUSER CONTEXT (private, factual):\n{context_block}\n\n"
+            "Use this context naturally. Do not list it back to the user. Weave it in with warmth."
+        )
     
     @classmethod
     def get_contextual_response(
         cls, 
         message: str, 
         mode: ChatMode,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
+        profile: Optional[CompanionProfile] = None,
+        memory: Optional[CompanionMemory] = None
     ) -> ChatResponse:
         """
-        Generate a mental health & wellness focused response using Google Gemini 3.0 Flash.
+        Generate a companion-focused response using Google Gemini 3.0 Flash.
         
         Args:
             message: The user's message
@@ -121,11 +155,16 @@ class ChatService:
             history = []
             if session_id and session_id in cls._conversation_history:
                 history = cls._conversation_history[session_id][-10:]  # Keep last 10 exchanges
+
+            profile_data = profile.dict(exclude_none=True) if profile else None
+            memory_data = memory.dict(exclude_none=True) if memory else None
+            merged_profile = cls._merge_profile(session_id, profile_data)
+            merged_memory = cls._merge_memory(session_id, memory_data)
             
             # Create the model with system instruction
             chat_model = genai.GenerativeModel(
                 model_name=GEMINI_MODEL_NAME,
-                system_instruction=SYSTEM_PROMPT
+                system_instruction=cls._build_system_prompt(merged_profile, merged_memory)
             )
             
             # Start or continue chat
@@ -179,10 +218,17 @@ class ChatService:
     @classmethod
     def clear_session(cls, session_id: str) -> bool:
         """Clear conversation history for a session."""
+        cleared = False
         if session_id in cls._conversation_history:
             del cls._conversation_history[session_id]
-            return True
-        return False
+            cleared = True
+        if session_id in cls._session_profiles:
+            del cls._session_profiles[session_id]
+            cleared = True
+        if session_id in cls._session_memories:
+            del cls._session_memories[session_id]
+            cleared = True
+        return cleared
     
     @classmethod
     def get_quick_exercise(cls, exercise_type: str = "breathing") -> str:

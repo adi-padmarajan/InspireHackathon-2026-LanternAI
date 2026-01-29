@@ -162,7 +162,7 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
         className="mt-8 flex flex-col items-center gap-2"
         variants={staggerChild}
       >
-        <p className="text-xs text-muted-foreground">Start typing whenever you're ready</p>
+        <p className="text-xs text-muted-foreground">Start by telling me what you'd like to be called</p>
         <motion.div
           className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2"
           animate={{ opacity: [0.5, 1, 0.5] }}
