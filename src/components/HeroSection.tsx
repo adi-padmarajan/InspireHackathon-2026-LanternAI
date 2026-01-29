@@ -47,7 +47,6 @@ export const HeroSection = () => {
               </Link>
             </Button>
             <Button variant="outline" size="xl" asChild>
-              <Link to="/about">Learn More</Link>
             </Button>
           </div>
 

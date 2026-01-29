@@ -17,7 +17,6 @@ const navLinks = [
   { name: "Home", path: "/" },
   { name: "Chat", path: "/chat" },
   { name: "Wellness", path: "/wellness" },
-  { name: "About", path: "/about" },
   { name: "Settings", path: "/settings" },
 ];
 

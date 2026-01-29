@@ -12,7 +12,6 @@ import { BackgroundLayer } from "@/components/BackgroundLayer";
 import Index from "./pages/Index";
 import ChatPage from "./pages/ChatPage";
 import WellnessPage from "./pages/WellnessPage";
-import AboutPage from "./pages/AboutPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -32,7 +31,6 @@ const App = () => (
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
-                <Route path="/about" element={<AboutPage />} />
 
                 {/* Protected routes - require authentication */}
                 <Route
