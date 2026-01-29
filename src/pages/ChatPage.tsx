@@ -4,17 +4,14 @@ import { Navigation } from "@/components/Navigation";
 import { WelcomeHero } from "@/components/chat/WelcomeHero";
 import { ChatBubble } from "@/components/chat/ChatBubble";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
-import { ModeSelectorGrid } from "@/components/chat/ModeSelectorGrid";
-import { ModeQuickPrompts } from "@/components/chat/ModeQuickPrompts";
-import { FloatingModeSelector } from "@/components/chat/FloatingModeSelector";
 import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { useTheme } from "@/contexts/ThemeContext";
-import { type ChatMode, getModeConfig } from "@/lib/chatModes";
 import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
 const API_BASE_URL = "http://localhost:8000";
+const DEFAULT_MODE = "wellness";
 
 interface Message {
   id: string;
@@ -27,7 +24,6 @@ const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<ChatMode>("wellness");
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +41,7 @@ const ChatPage = () => {
   }, [messages]);
 
   const sendMessageToAI = useCallback(
-    async (text: string, currentMode: ChatMode) => {
+    async (text: string) => {
       const userMessage: Message = {
         id: Date.now().toString(),
         role: "user",
@@ -64,7 +60,7 @@ const ChatPage = () => {
           },
           body: JSON.stringify({
             message: text.trim(),
-            mode: currentMode,
+            mode: DEFAULT_MODE,
           }),
         });
 
@@ -97,17 +93,13 @@ const ChatPage = () => {
   );
 
   const startChat = useCallback(
-    (selectedMode: ChatMode, initialMessage?: string) => {
-      setMode(selectedMode);
+    (initialMessage?: string) => {
       setHasStartedChat(true);
-
-      // Get mode-specific greeting
-      const modeConfig = getModeConfig(selectedMode);
 
       const greetingMessage: Message = {
         id: "greeting",
         role: "assistant",
-        content: modeConfig.greeting,
+        content: "Hi, I’m Lantern. I’m here to listen and support you. What’s on your mind?",
         timestamp: new Date(),
       };
 
@@ -116,7 +108,7 @@ const ChatPage = () => {
       // If there's an initial message (from quick prompt), send it after greeting
       if (initialMessage) {
         setTimeout(() => {
-          sendMessageToAI(initialMessage, selectedMode);
+          sendMessageToAI(initialMessage);
         }, 500);
       }
     },
@@ -129,58 +121,20 @@ const ChatPage = () => {
 
     // Start chat if not started (using current mode)
     if (!hasStartedChat) {
-      startChat(mode, text);
+      startChat(text);
       setInput("");
       return;
     }
 
-    sendMessageToAI(text, mode);
+    sendMessageToAI(text);
     setInput("");
-  }, [input, isLoading, hasStartedChat, mode, startChat, sendMessageToAI]);
-
-  const handleModeSelect = useCallback(
-    (selectedMode: ChatMode) => {
-      startChat(selectedMode);
-    },
-    [startChat]
-  );
-
-  const handleQuickPrompt = useCallback(
-    (prompt: string) => {
-      if (hasStartedChat) {
-        // If chat is already started, just send the message
-        sendMessageToAI(prompt, mode);
-      }
-    },
-    [hasStartedChat, mode, sendMessageToAI]
-  );
-
-  const handleModeChange = (newMode: ChatMode) => {
-    setMode(newMode);
-
-    if (hasStartedChat) {
-      const modeConfig = getModeConfig(newMode);
-      const systemMessage: Message = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: `I've switched to **${modeConfig.label}** mode. ${modeConfig.description}.\n\nHow can I help you now?`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, systemMessage]);
-    }
-  };
-
-  const handleNewChat = () => {
-    setMessages([]);
-    setHasStartedChat(false);
-    setMode("wellness");
-  };
+  }, [input, isLoading, hasStartedChat, startChat, sendMessageToAI]);
 
   return (
     <motion.div
       className={cn(
         "min-h-screen flex flex-col relative overflow-hidden",
-        hasCustomBackground ? "bg-transparent" : "chat-ambient-bg"
+        hasCustomBackground ? "bg-transparent" : "bg-background"
       )}
       variants={pageVariants}
       initial="initial"
@@ -190,29 +144,21 @@ const ChatPage = () => {
       {/* Theme-aware ambient background - hide when custom background is active */}
       {!hasCustomBackground && <AmbientBackground />}
 
+      {/* Cinematic gradient overlays for depth */}
+      {!hasCustomBackground && (
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background/80 via-background/20 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background/40 to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background/40 to-transparent" />
+        </div>
+      )}
+
       <Navigation />
 
       {/* Main Chat Container */}
       <main className="flex-1 pt-16 flex flex-col relative z-10">
-        <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
-          {/* Mode Selector Header - Only show when chat has started */}
-          <AnimatePresence>
-            {hasStartedChat && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={springPresets.gentle}
-              >
-                <FloatingModeSelector
-                  mode={mode}
-                  onModeChange={handleModeChange}
-                  onNewChat={handleNewChat}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
+        <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full">
           {/* Chat Content Area */}
           <div
             ref={messagesContainerRef}
@@ -230,9 +176,6 @@ const ChatPage = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <WelcomeHero />
-                  <div className="flex-1 pb-4 mt-6">
-                    <ModeSelectorGrid onSelectMode={handleModeSelect} />
-                  </div>
                 </motion.div>
               ) : (
                 /* Chat Messages */
@@ -258,26 +201,6 @@ const ChatPage = () => {
 
                   <AnimatePresence>
                     {isLoading && <TypingIndicator />}
-                  </AnimatePresence>
-
-                  {/* Show quick prompts after greeting */}
-                  <AnimatePresence>
-                    {messages.length === 1 &&
-                      messages[0].role === "assistant" &&
-                      !isLoading && (
-                        <motion.div
-                          className="mt-4"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ delay: 0.3, ...springPresets.gentle }}
-                        >
-                          <ModeQuickPrompts
-                            mode={mode}
-                            onSelectPrompt={handleQuickPrompt}
-                          />
-                        </motion.div>
-                      )}
                   </AnimatePresence>
 
                   <div ref={messagesEndRef} />

@@ -121,7 +121,7 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
         className="text-lg md:text-xl text-muted-foreground text-center max-w-md mb-2"
         variants={staggerChild}
       >
-        Your UVic wellness companion
+        Your UVic companion
       </motion.p>
 
       {/* Subtext */}
@@ -151,7 +151,7 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
           </motion.div>
           <div>
             <p className="text-sm md:text-base text-foreground/90 leading-relaxed">
-              I'm here to support you with <strong>mental health</strong>, <strong>social connections</strong>, <strong>campus accessibility</strong>, and <strong>international student needs</strong>. No judgment, just understanding.
+              I'm here to listen, help you sort through thoughts, and offer steady support. No judgment, just understanding.
             </p>
           </div>
         </div>
@@ -162,7 +162,7 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
         className="mt-8 flex flex-col items-center gap-2"
         variants={staggerChild}
       >
-        <p className="text-xs text-muted-foreground">Choose a topic below or just start typing</p>
+        <p className="text-xs text-muted-foreground">Start typing whenever you're ready</p>
         <motion.div
           className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2"
           animate={{ opacity: [0.5, 1, 0.5] }}
