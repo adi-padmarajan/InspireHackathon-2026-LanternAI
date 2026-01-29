@@ -1,67 +1,62 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+/**
+ * ColorsTab - Color customization settings
+ */
 
-interface ColorSettings {
-  // Text colors
-  usernameColor: string;
-  highlightColor: string;
-  // Logo colors
-  logoIconColor: string;
-  logoBgColor: string;
-}
+import { useState } from 'react';
+import { Palette, Check } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { cn } from '@/lib/utils';
 
-interface ColorSettingsStore extends ColorSettings {
-  setUsernameColor: (color: string) => void;
-  setHighlightColor: (color: string) => void;
-  setLogoIconColor: (color: string) => void;
-  setLogoBgColor: (color: string) => void;
-  resetToDefaults: () => void;
-}
-
-const defaultColors: ColorSettings = {
-  usernameColor: '#a855f7', // Purple (default)
-  highlightColor: '#a855f7',
-  logoIconColor: '#ffffff', // White icon
-  logoBgColor: '#7c3aed', // Purple background
-};
-
-export const useColorSettingsStore = create<ColorSettingsStore>()(
-  persist(
-    (set) => ({
-      ...defaultColors,
-      setUsernameColor: (color: string) => set({ usernameColor: color }),
-      setHighlightColor: (color: string) => set({ highlightColor: color }),
-      setLogoIconColor: (color: string) => set({ logoIconColor: color }),
-      setLogoBgColor: (color: string) => set({ logoBgColor: color }),
-      resetToDefaults: () => set(defaultColors),
-    }),
-    {
-      name: 'verdant-bloom-colors',
-    }
-  )
-);
-
-// Find the accent colors array and add black and white at the beginning:
 const accentColors = [
-  '#000000', // Black
-  '#ffffff', // White
-  '#7c3aed', // Purple (existing)
-  '#ec4899', // Pink
-  '#f97316', // Orange
-  '#eab308', // Yellow
-  '#22c55e', // Green
-  '#06b6d4', // Cyan
-  '#8b5cf6', // Violet
-  '#f472b6', // Light Pink
+  { color: '#7c3aed', name: 'Purple' },
+  { color: '#ec4899', name: 'Pink' },
+  { color: '#f97316', name: 'Orange' },
+  { color: '#eab308', name: 'Yellow' },
+  { color: '#22c55e', name: 'Green' },
+  { color: '#06b6d4', name: 'Cyan' },
+  { color: '#3b82f6', name: 'Blue' },
+  { color: '#ef4444', name: 'Red' },
 ];
 
-// If the color buttons need a visible border for white, update the button styling:
-// Add a border class for visibility when color is white
-<button
-  key={color}
-  onClick={() => handleAccentChange(color)}
-  className={`w-12 h-12 rounded-full transition-transform hover:scale-110 ${
-    selectedAccent === color ? 'ring-2 ring-offset-2 ring-foreground' : ''
-  } ${color === '#ffffff' ? 'border border-muted-foreground/50' : ''}`}
-  style={{ backgroundColor: color }}
-/>
+export const ColorsTab = () => {
+  const { settings, setCustomAccentColor } = useTheme();
+  const [selectedAccent, setSelectedAccent] = useState(settings.customAccentColor);
+
+  const handleAccentChange = (color: string) => {
+    setSelectedAccent(color);
+    setCustomAccentColor(color);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Palette className="h-5 w-5 text-primary" />
+        <h3 className="font-medium text-foreground">Accent Colors</h3>
+      </div>
+
+      <div className="grid grid-cols-4 gap-3">
+        {accentColors.map(({ color, name }) => (
+          <button
+            key={color}
+            onClick={() => handleAccentChange(color)}
+            className={cn(
+              "w-12 h-12 rounded-full transition-transform hover:scale-110",
+              selectedAccent === color 
+                ? "ring-2 ring-offset-2 ring-foreground" 
+                : "",
+              color === '#ffffff' || color === '#000000' 
+                ? "border border-muted-foreground/50" 
+                : ""
+            )}
+            style={{ backgroundColor: color }}
+            title={name}
+          >
+            {selectedAccent === color && (
+              <Check className="h-4 w-4 mx-auto text-white drop-shadow-md" />
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};

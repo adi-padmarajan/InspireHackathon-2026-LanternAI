@@ -1,16 +1,14 @@
 /**
  * Chat Mode Configuration
- * Defines all 8 specialized support modes with their unique identities,
+ * Defines 6 specialized support modes with their unique identities,
  * greetings, quick prompts, and system behaviors.
  */
 
 import {
   Heart,
-  MapPin,
   Users,
   Brain,
   Globe,
-  Accessibility,
   Sun,
   BookOpen,
   type LucideIcon,
@@ -18,11 +16,9 @@ import {
 
 export type ChatMode =
   | "wellness"
-  | "navigator"
   | "social"
   | "mental_health"
   | "international"
-  | "accessibility"
   | "seasonal"
   | "resources";
 
@@ -76,43 +72,6 @@ What's on your mind today?`,
         label: "Self-care tips",
         prompt: "Can you suggest some self-care activities?",
         description: "Practical wellness suggestions",
-      },
-    ],
-  },
-
-  navigator: {
-    id: "navigator",
-    label: "Campus Navigator",
-    shortLabel: "Navigator",
-    description: "Find buildings, services, and accessibility-aware routes",
-    icon: MapPin,
-    iconColor: "text-blue-500",
-    gradient: "from-blue-500/10 to-cyan-500/10",
-    greeting: `Hey! I'm your Campus Navigator. 🗺️
-
-I know every building, shortcut, and secret study spot on campus. Need directions? Looking for a quiet place? Want to know where to grab food?
-
-Where do you want to go?`,
-    quickPrompts: [
-      {
-        label: "Find a building",
-        prompt: "How do I get to the Engineering building?",
-        description: "Get directions to any campus location",
-      },
-      {
-        label: "Quiet study spots",
-        prompt: "Where are the best quiet study spots on campus?",
-        description: "Find peaceful places to focus",
-      },
-      {
-        label: "Food options",
-        prompt: "What food options are available on campus right now?",
-        description: "Cafeterias, cafés, and restaurants",
-      },
-      {
-        label: "Campus services",
-        prompt: "Where can I find student services on campus?",
-        description: "Locate key campus resources",
       },
     ],
   },
@@ -224,43 +183,6 @@ What would you like help with?`,
         label: "International services",
         prompt: "What services are available for international students?",
         description: "Find specialized support",
-      },
-    ],
-  },
-
-  accessibility: {
-    id: "accessibility",
-    label: "Accessibility First",
-    shortLabel: "Accessibility",
-    description: "Accessible routes, elevators, and mobility support",
-    icon: Accessibility,
-    iconColor: "text-cyan-500",
-    gradient: "from-cyan-500/10 to-sky-500/10",
-    greeting: `Hi! I'm here to help you navigate campus accessibly. ♿
-
-UVic's terrain can be challenging, but I know every elevator, ramp, and accessible route. I'll always give you the most accessible option first.
-
-Where do you need to go, or how can I help?`,
-    quickPrompts: [
-      {
-        label: "Accessible routes",
-        prompt: "What's the most accessible route to get around campus?",
-        description: "Find barrier-free paths",
-      },
-      {
-        label: "Elevator locations",
-        prompt: "Where are the elevators in the main buildings?",
-        description: "Locate elevators on campus",
-      },
-      {
-        label: "CAL services",
-        prompt: "How do I access services from the Centre for Accessible Learning?",
-        description: "Academic accommodations",
-      },
-      {
-        label: "Mobility support",
-        prompt: "What mobility support options are available at UVic?",
-        description: "Scooters, HandyDART, and more",
       },
     ],
   },

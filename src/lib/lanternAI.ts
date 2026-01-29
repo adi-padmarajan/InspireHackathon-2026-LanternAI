@@ -347,16 +347,7 @@ export function generateLanternResponse(input: string, mode: ChatMode): string {
     }
   }
 
-  // Mode-specific enhancements
-  if (mode === "accessibility" && lowerInput.includes("help")) {
-    const accessibilityCategory = supportCategories.find(c => 
-      c.keywords.includes("accessible")
-    );
-    if (accessibilityCategory) {
-      return accessibilityCategory.handler(input, mode);
-    }
-  }
-
+  // Mode-specific enhancements for international students
   if (mode === "international" && (lowerInput.includes("confused") || lowerInput.includes("don't understand"))) {
     const internationalCategory = supportCategories.find(c => 
       c.keywords.includes("international")

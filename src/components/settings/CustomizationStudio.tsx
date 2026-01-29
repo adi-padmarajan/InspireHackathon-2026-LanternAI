@@ -2119,7 +2119,12 @@ export function CustomizationStudio() {
         source: wallpaper.source,
         url: wallpaper.url,
         thumbnailUrl: wallpaper.thumbnailUrl,
-        attribution: wallpaper.attribution,
+        attribution: wallpaper.attribution ? {
+          photographerName: wallpaper.attribution.photographerName,
+          photographerUsername: wallpaper.attribution.photographerName.toLowerCase().replace(/\s+/g, ''),
+          photographerUrl: wallpaper.attribution.photographerUrl,
+          unsplashUrl: wallpaper.attribution.unsplashUrl,
+        } : undefined,
         width: 1920,
         height: 1080,
       };
