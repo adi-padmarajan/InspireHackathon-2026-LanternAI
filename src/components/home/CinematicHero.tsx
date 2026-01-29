@@ -8,8 +8,7 @@ import { Lamp, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { getPersonalizedGreeting } from "@/lib/greetings";
 import { useWeather } from "@/hooks/useWeather";
-import { LoginButton } from "@/components/auth";
-import { useNavigate } from "react-router-dom";
+import { SignInPrompt } from "@/components/home/SignInPrompt";
 
 interface CinematicHeroProps {
   userName?: string;
@@ -23,7 +22,6 @@ const spring = {
 };
 
 export const CinematicHero = ({ userName, isAuthenticated }: CinematicHeroProps) => {
-  const navigate = useNavigate();
   const { weather, greetingWeather, isLoading } = useWeather();
 
   const greeting = useMemo(
@@ -177,22 +175,7 @@ export const CinematicHero = ({ userName, isAuthenticated }: CinematicHeroProps)
 
       {/* Sign in prompt for guests */}
       {!isAuthenticated && (
-        <motion.div
-          className="mt-10 flex flex-col items-center gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
-        >
-          <p className="text-lg text-muted-foreground">
-            Sign in with your NetLink ID to get started
-          </p>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <LoginButton variant="lantern" onSuccess={() => navigate("/")} />
-          </motion.div>
-        </motion.div>
+        <SignInPrompt />
       )}
 
       {/* Live weather indicator */}
