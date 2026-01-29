@@ -242,11 +242,10 @@ Each chat mode has specialized system prompts and UVic-specific knowledge:
 
 ---
 
-## 🤝 Developers
+## 🤝 Developers of Lantern
 
-**Full Stack Developers:**
-- **Aditya Padmarajan** (Computer Science @ UVic)
-- **Anitta Varghese** (Software Engineering @ UVic)
+- **Aditya Padmarajan** - Full Stack Developer,  Computer Science @ UVic
+- **Anitta Varghese** - Full Stack Developer, Software Engineering @ UVic
 
 ---
 
