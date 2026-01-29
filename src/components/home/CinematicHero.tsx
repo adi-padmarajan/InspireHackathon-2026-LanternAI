@@ -1,6 +1,5 @@
 /**
- * CinematicHero - Award-Winning Hero Section
- * Stunning visual design with perfect readability and cinematic animations
+ * CinematicHero
  */
 
 import { useMemo } from "react";
