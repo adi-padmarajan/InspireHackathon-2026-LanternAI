@@ -6,24 +6,23 @@ from typing import Generic, TypeVar, Optional
 T = TypeVar("T")
 
 
-# Chat models
+# Chat models - Simplified for Mental Health & Wellness focus
 class ChatMode(str, Enum):
-    WELLNESS = "wellness"
-    NAVIGATOR = "navigator"
-    SOCIAL = "social"
-    MENTAL_HEALTH = "mental_health"
-    INTERNATIONAL = "international"
-    ACCESSIBILITY = "accessibility"
-    SEASONAL = "seasonal"
-    RESOURCES = "resources"
+    """Chat modes focused on mental health and wellness."""
+    WELLNESS = "wellness"          # General wellness support
+    MENTAL_HEALTH = "mental_health"  # Mental health conversations
+    CRISIS = "crisis"              # Crisis support mode
 
 
 class ChatMessageInput(BaseModel):
-    message: str = Field(..., min_length=1)
+    """Input model for chat messages."""
+    message: str = Field(..., min_length=1, description="The user's message")
     mode: ChatMode = ChatMode.WELLNESS
+    session_id: Optional[str] = Field(None, description="Optional session ID for conversation continuity")
 
 
 class ChatResponse(BaseModel):
+    """Response model for chat messages."""
     message: str
     timestamp: datetime
 

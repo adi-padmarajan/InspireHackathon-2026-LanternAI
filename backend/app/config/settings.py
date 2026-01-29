@@ -15,8 +15,8 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_anon_key: str = ""
 
-    # OpenRouter API
-    openrouter_api_key: str = ""
+    # Google AI (Gemini) API
+    google_ai_api_key: str = ""
 
     # Unsplash API
     unsplash_access_key: str = ""
