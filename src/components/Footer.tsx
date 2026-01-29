@@ -17,7 +17,7 @@ export const Footer = () => {
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
         >
-          © 2026 Lantern. Built for UVic students by UVic Students who understand the daily challenges of student life. Here when you need a little light.
+          © 2026 Lantern. Built for UVic Students by UVic Students who understand the daily challenges of student life. Here when you need a little light.
         </motion.p>
       </div>
     </motion.footer>
