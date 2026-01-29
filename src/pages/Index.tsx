@@ -1,10 +1,13 @@
+/**
+ * Index Page - Award-Winning Cinematic Landing Experience
+ * A visual masterpiece with stunning animations and perfect visibility
+ */
+
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { PersonalizedGreeting } from "@/components/home/PersonalizedGreeting";
-import { QuickActions } from "@/components/home/QuickActions";
-import { WarmMessage } from "@/components/home/WarmMessage";
-import { SignInPrompt } from "@/components/home/SignInPrompt";
+import { CinematicHero } from "@/components/home/CinematicHero";
+import { QuickActionsGrid } from "@/components/home/QuickActionsGrid";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -13,12 +16,9 @@ import { cn } from "@/lib/utils";
 
 const Index = () => {
   const { user, isAuthenticated } = useAuth();
-  const { currentBackground } = useTheme();
+  const { currentBackground, currentTheme } = useTheme();
 
-  // Get the user's display name when authenticated
   const userName = user?.display_name;
-
-  // Check if custom background (image or wallpaper) is active
   const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || currentBackground?.wallpaper);
 
   return (
@@ -32,38 +32,39 @@ const Index = () => {
       animate="enter"
       exit="exit"
     >
-      {/* Theme-aware ambient background - hide when custom background is active */}
+      {/* Theme-aware ambient background */}
       {!hasCustomBackground && <AmbientBackground />}
+
+      {/* Cinematic gradient overlays for depth */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Top vignette */}
+        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background/80 via-background/20 to-transparent" />
+        
+        {/* Bottom vignette */}
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        
+        {/* Side vignettes for cinematic framing */}
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background/40 to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background/40 to-transparent" />
+      </div>
 
       <Navigation />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-20 relative z-10">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 md:py-16 relative z-10">
         <motion.div
-          className="w-full max-w-4xl mx-auto space-y-12 md:space-y-16"
+          className="w-full max-w-5xl mx-auto space-y-16 md:space-y-24"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          {isAuthenticated && userName ? (
-            <>
-              {/* Personalized Greeting for signed-in users */}
-              <PersonalizedGreeting userName={userName} />
+          {/* Cinematic Hero */}
+          <CinematicHero 
+            userName={userName} 
+            isAuthenticated={isAuthenticated} 
+          />
 
-              {/* Warm companion message */}
-              <WarmMessage isAuthenticated={true} userName={userName} />
-            </>
-          ) : (
-            <>
-              {/* Sign in prompt for guests */}
-              <SignInPrompt />
-
-              {/* Welcome message for guests */}
-              <WarmMessage isAuthenticated={false} />
-            </>
-          )}
-
-          {/* Quick Actions - always visible */}
-          <QuickActions />
+          {/* Quick Actions */}
+          <QuickActionsGrid />
         </motion.div>
       </main>
 

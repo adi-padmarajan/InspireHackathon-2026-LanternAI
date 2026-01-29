@@ -32,7 +32,7 @@ const useHasCustomBackground = () => {
 // ============================================================================
 
 const CategoryIcon = ({ name, className }: { name: string; className?: string }) => {
-  const IconComponent = (LucideIcons as Record<string, React.ComponentType<{ className?: string }>>)[name] || LucideIcons.Sparkles;
+  const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[name] || LucideIcons.Sparkles;
   return <IconComponent className={className} />;
 };
 

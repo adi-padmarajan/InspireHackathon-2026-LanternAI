@@ -1,35 +1,47 @@
-import { ColorSettings } from './ColorSettings';
+/**
+ * SettingsPanel - Simple settings navigation
+ */
 
-const tabs = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'settings', label: 'Settings', icon: Settings },
-  { id: 'colors', label: 'Colors', icon: Palette },
-];
-
-const renderTabContent = (activeTab) => {
-  switch (activeTab) {
-    case 'home':
-      return <HomeScreen />;
-    case 'settings':
-      return <SettingsScreen />;
-    case 'colors':
-      return <ColorSettings />;
-    default:
-      return <HomeScreen />;
-  }
-};
+import { useState } from 'react';
+import { Home, Settings, Palette } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ColorsTab } from './ColorsTab';
+import { cn } from '@/lib/utils';
 
 export const SettingsPanel = () => {
-  const [activeTab, setActiveTab] = useState('home');
-
-  const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
-  };
-
   return (
-    <div>
-      <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange}>
-        {renderTabContent(activeTab)}
+    <div className="p-4">
+      <Tabs defaultValue="colors" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="general" className="gap-2">
+            <Home className="h-4 w-4" />
+            General
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="gap-2">
+            <Settings className="h-4 w-4" />
+            Appearance
+          </TabsTrigger>
+          <TabsTrigger value="colors" className="gap-2">
+            <Palette className="h-4 w-4" />
+            Colors
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general">
+          <div className="p-4 rounded-lg bg-card border border-border">
+            <p className="text-muted-foreground">General settings coming soon</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="appearance">
+          <div className="p-4 rounded-lg bg-card border border-border">
+            <p className="text-muted-foreground">Appearance settings coming soon</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="colors">
+          <ColorsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
