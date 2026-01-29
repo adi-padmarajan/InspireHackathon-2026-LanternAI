@@ -245,8 +245,8 @@ Each chat mode has specialized system prompts and UVic-specific knowledge:
 ## 🤝 Developers
 
 **Full Stack Developers:**
-- **Aditya Padmarajan** (Computer Science Student @ UVic)
-- **Anitta Varghese** (Software Engineering Student @ UVic)
+- **Aditya Padmarajan** (Computer Science @ UVic)
+- **Anitta Varghese** (Software Engineering @ UVic)
 
 ---
 
