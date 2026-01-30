@@ -4,9 +4,7 @@
  */
 
 import { motion } from "framer-motion";
-import { Lamp, ArrowRight, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Lamp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeroTaglineProps {
@@ -17,7 +15,7 @@ interface HeroTaglineProps {
 export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => {
   return (
     <motion.section
-      className="relative flex flex-col items-center justify-center text-center min-h-[70vh] py-16 md:py-24"
+      className="relative flex flex-col items-center justify-center text-center py-8 md:py-12"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
@@ -60,14 +58,14 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
 
       {/* Lantern Icon - Refined */}
       <motion.div
-        className="relative mb-10"
+        className="relative mb-6"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
       >
         <motion.div
           className={cn(
-            "relative p-6 rounded-full",
+            "relative p-5 rounded-full",
             "bg-gradient-to-br from-accent via-accent/80 to-accent/50",
             "shadow-2xl border border-white/10"
           )}
@@ -84,14 +82,14 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
             animate={{ y: [0, -4, 0], rotate: [0, 2, 0, -2, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Lamp className="h-12 w-12 md:h-14 md:w-14 text-primary" />
+            <Lamp className="h-10 w-10 md:h-12 md:w-12 text-primary" />
           </motion.div>
         </motion.div>
       </motion.div>
 
       {/* Main heading - Apple style large typography */}
       <motion.h1
-        className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground tracking-tight mb-6 max-w-4xl"
+        className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight mb-4 max-w-4xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.7, ease: "easeOut" }}
@@ -117,7 +115,7 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
 
       {/* Subtitle - refined spacing */}
       <motion.p
-        className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl leading-relaxed mb-12 px-4"
+        className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl leading-relaxed px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.6 }}
@@ -129,55 +127,13 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
         )}
       </motion.p>
 
-      {/* CTA Buttons - Clean and prominent */}
-      <motion.div
-        className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.6 }}
-      >
-        <Link to="/chat">
-          <Button
-            size="lg"
-            className={cn(
-              "h-14 px-8 text-base font-medium rounded-full",
-              "bg-primary hover:bg-primary/90 text-primary-foreground",
-              "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30",
-              "transition-all duration-300"
-            )}
-          >
-            <Sparkles className="mr-2 h-5 w-5" />
-            Start Conversation
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </Link>
-        
-        {!isAuthenticated && (
-          <Link to="/wellness">
-            <Button
-              size="lg"
-              variant="outline"
-              className={cn(
-                "h-14 px-8 text-base font-medium rounded-full",
-                "border-border/60 hover:border-border",
-                "bg-background/50 backdrop-blur-sm",
-                "hover:bg-accent/50",
-                "transition-all duration-300"
-              )}
-            >
-              Explore Wellness
-            </Button>
-          </Link>
-        )}
-      </motion.div>
-
       {/* Trust badge */}
       {!isAuthenticated && (
         <motion.p
-          className="mt-8 text-sm text-muted-foreground/70"
+          className="mt-6 text-sm text-muted-foreground/70"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
         >
           Designed by UVic students, for UVic students
         </motion.p>

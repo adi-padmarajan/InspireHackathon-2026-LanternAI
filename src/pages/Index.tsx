@@ -24,7 +24,7 @@ const Index = () => {
   return (
     <motion.div
       className={cn(
-        "min-h-screen flex flex-col relative overflow-hidden",
+        "h-screen flex flex-col relative overflow-hidden",
         hasCustomBackground ? "bg-transparent" : "bg-background"
       )}
       variants={pageVariants}
@@ -37,29 +37,22 @@ const Index = () => {
 
       {/* Cinematic vignettes - refined */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background/80 via-background/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        {/* Side vignettes for cinematic effect */}
-        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background/30 to-transparent" />
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background/30 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background/60 via-background/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
       </div>
 
       <Navigation />
 
-      <main className="flex-1 flex flex-col relative z-10">
-        {/* Hero Section - Full viewport centered */}
-        <section className="px-4">
-          <div className="w-full max-w-6xl mx-auto">
+      <main className="flex-1 flex flex-col relative z-10 pt-16 overflow-hidden">
+        {/* Single viewport layout */}
+        <section className="flex-1 flex flex-col px-4 py-2">
+          <div className="w-full max-w-6xl mx-auto flex flex-col flex-1">
             <HeroTagline 
               userName={userName} 
               isAuthenticated={isAuthenticated} 
             />
+            <QuickActionsGrid className="mt-6 md:mt-10 lg:mt-12 pb-20 md:pb-24" />
           </div>
-        </section>
-
-        {/* Features Section - Proper spacing from hero */}
-        <section className="px-4 py-16 md:py-24">
-          <QuickActionsGrid />
         </section>
       </main>
 
