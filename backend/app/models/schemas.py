@@ -50,6 +50,48 @@ class MoodLevel(str, Enum):
     STRUGGLING = "struggling"
 
 
+class WeatherContext(BaseModel):
+    description: Optional[str] = None
+    temperature: Optional[float] = None
+    condition: Optional[str] = None
+    location: Optional[str] = None
+
+
+class WellnessSuggestionRequest(BaseModel):
+    mood: MoodLevel
+    note: Optional[str] = None
+    weather: Optional[WeatherContext] = None
+
+
+class WellnessSuggestionResponse(BaseModel):
+    suggestions: list[str]
+    follow_up_question: str
+
+
+class WellnessChecklistRequest(BaseModel):
+    mood: MoodLevel
+    note: Optional[str] = None
+    suggestions: Optional[list[str]] = None
+    weather: Optional[WeatherContext] = None
+    max_items: int = Field(5, ge=3, le=8)
+
+
+class WellnessChecklistResponse(BaseModel):
+    title: Optional[str] = None
+    items: list[str]
+
+
+class WellnessCheckInRequest(BaseModel):
+    mood: MoodLevel
+    note: Optional[str] = None
+    weather: Optional[WeatherContext] = None
+    checklist_summary: Optional[str] = None
+
+
+class WellnessCheckInResponse(BaseModel):
+    message: str
+
+
 class MoodEntryInput(BaseModel):
     mood: MoodLevel
     note: Optional[str] = None

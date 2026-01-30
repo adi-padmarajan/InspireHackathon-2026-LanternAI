@@ -1,553 +1,455 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import RelaxationSounds from "@/components/wellness/RelaxationSounds";
-import BreathingExercise from "@/components/wellness/BreathingExercise";
-import GratitudeJar from "@/components/wellness/GratitudeJar";
-import DailyAffirmations from "@/components/wellness/DailyAffirmations";
-import { useTheme } from "@/contexts/ThemeContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   Smile,
   Meh,
   Frown,
   CloudRain,
-  Sun,
-  Moon,
-  Heart,
-  TrendingUp,
-  Sparkles,
-  Wind,
+  Check,
+  Plus,
+  X,
 } from "lucide-react";
-import { cardHover3D } from "@/lib/animations";
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
+import { AmbientBackground } from "@/components/AmbientBackground";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useWeather } from "@/hooks/useWeather";
+import { api } from "@/lib/api";
+import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
-/* -------------------------------------------------------------------------- */
-/* DATA                                                                        */
-/* -------------------------------------------------------------------------- */
-
 const moodOptions = [
-  { icon: Smile, label: "Great", value: 5, color: "text-green-600", bgColor: "bg-green-100 dark:bg-green-900/30" },
-  { icon: Smile, label: "Good", value: 4, color: "text-blue-600", bgColor: "bg-blue-100 dark:bg-blue-900/30" },
-  { icon: Meh, label: "Okay", value: 3, color: "text-yellow-600", bgColor: "bg-yellow-100 dark:bg-yellow-900/30" },
-  { icon: Frown, label: "Low", value: 2, color: "text-orange-600", bgColor: "bg-orange-100 dark:bg-orange-900/30" },
-  { icon: CloudRain, label: "Struggling", value: 1, color: "text-red-600", bgColor: "bg-red-100 dark:bg-red-900/30" },
-];
+  { value: "great", label: "Great", icon: Smile, color: "text-emerald-600", ring: "ring-emerald-200" },
+  { value: "good", label: "Good", icon: Smile, color: "text-sky-600", ring: "ring-sky-200" },
+  { value: "okay", label: "Okay", icon: Meh, color: "text-amber-600", ring: "ring-amber-200" },
+  { value: "low", label: "Low", icon: Frown, color: "text-orange-600", ring: "ring-orange-200" },
+  { value: "struggling", label: "Struggling", icon: CloudRain, color: "text-rose-600", ring: "ring-rose-200" },
+] as const;
 
-const wellnessTips = [
-  {
-    title: "Light Therapy",
-    description: "Consider using a light therapy lamp for 20 to 30 minutes each morning during dark winter months.",
-    icon: Sun,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
-  },
-  {
-    title: "Movement Break",
-    description: "Even a 10 minute walk outside during daylight can boost your mood.",
-    icon: TrendingUp,
-    color: "text-green-600",
-    bgColor: "bg-green-100 dark:bg-green-900/20",
-  },
-  {
-    title: "Sleep Hygiene",
-    description: "Maintain consistent sleep and wake times, even on weekends.",
-    icon: Moon,
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-100 dark:bg-indigo-900/20",
-  },
-  {
-    title: "Social Connection",
-    description: "Reach out to one person today. A small check in matters.",
-    icon: Heart,
-    color: "text-red-600",
-    bgColor: "bg-red-100 dark:bg-red-900/20",
-  },
-];
+type MoodValue = (typeof moodOptions)[number]["value"];
 
-const recentMoods = [
-  { date: "Today", mood: 4, note: "Had a good study session" },
-  { date: "Yesterday", mood: 3, note: "Feeling neutral" },
-  { date: "2 days ago", mood: 2, note: "Stressed about assignment" },
-];
-
-interface SavedMood {
+interface ChecklistItem {
   id: string;
-  userId: string;
-  mood: number;
-  note: string;
-  date: string;
+  text: string;
+  done: boolean;
 }
 
-interface Recommendation {
-  title: string;
-  description: string;
-  action: string;
-  icon: React.ElementType;
-}
-
-const moodRecommendations: Record<number, Recommendation[]> = {
-  5: [
-    {
-      title: "Keep the momentum",
-      description: "You're feeling great! Share this energy with others.",
-      action: "Chat with a friend",
-      icon: Heart,
-    },
-    {
-      title: "Document your wins",
-      description: "Reflect on what's making you feel good today.",
-      action: "Journal your thoughts",
-      icon: Moon,
-    },
-    {
-      title: "Help someone else",
-      description: "Spread positivity by supporting someone in need.",
-      action: "Volunteer or help a friend",
-      icon: TrendingUp,
-    },
-  ],
-  4: [
-    {
-      title: "Maintain your vibe",
-      description: "You're in a good place. Keep up healthy habits.",
-      action: "Continue what you're doing",
-      icon: Sun,
-    },
-    {
-      title: "Social time",
-      description: "Good moods are great for connecting with others.",
-      action: "Reach out to someone",
-      icon: Heart,
-    },
-    {
-      title: "Plan something fun",
-      description: "While you're feeling positive, plan something to look forward to.",
-      action: "Make plans",
-      icon: TrendingUp,
-    },
-  ],
-  3: [
-    {
-      title: "Self-care check",
-      description: "A neutral mood might mean you need a little boost.",
-      action: "Try a relaxation sound",
-      icon: Moon,
-    },
-    {
-      title: "Movement helps",
-      description: "Even light activity can shift your energy.",
-      action: "Take a short walk",
-      icon: TrendingUp,
-    },
-    {
-      title: "Connect with others",
-      description: "Sometimes a simple chat can help.",
-      action: "Text a friend",
-      icon: Heart,
-    },
-  ],
-  2: [
-    {
-      title: "Breathing exercise",
-      description: "Calm your mind with guided breathing techniques.",
-      action: "Start breathing exercise",
-      icon: Wind,
-    },
-    {
-      title: "Take a break",
-      description: "Step away and give yourself a moment to reset.",
-      action: "Rest for 10 minutes",
-      icon: Moon,
-    },
-    {
-      title: "Reach out",
-      description: "Don't isolate. Talk to someone you trust.",
-      action: "Chat with Lantern AI",
-      icon: Heart,
-    },
-  ],
-  1: [
-    {
-      title: "Crisis support",
-      description: "You might need immediate support. Please reach out.",
-      action: "Access crisis resources",
-      icon: Heart,
-    },
-    {
-      title: "Talk to someone",
-      description: "Speaking about it can help. You're not alone.",
-      action: "Chat with Lantern",
-      icon: Heart,
-    },
-    {
-      title: "Breathing exercise",
-      description: "Ground yourself with breathing techniques.",
-      action: "Start breathing exercise",
-      icon: Wind,
-    },
-  ],
-};
-
-/* -------------------------------------------------------------------------- */
-/* PAGE                                                                        */
-/* -------------------------------------------------------------------------- */
+const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const WellnessPage = () => {
-  const [selectedMood, setSelectedMood] = useState<number | null>(null);
-  const [note, setNote] = useState("");
-  const [isLogged, setIsLogged] = useState(false);
-  const [savedMoods, setSavedMoods] = useState<SavedMood[]>([]);
-  const breathingRef = useRef<HTMLDivElement>(null);
-  const relaxationRef = useRef<HTMLDivElement>(null);
   const { currentBackground } = useTheme();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const { weather } = useWeather();
 
-  // Check if custom background (image or wallpaper) is active
-  const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || (currentBackground as any)?.wallpaper);
+  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
+  const [note, setNote] = useState("");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isLoggingMood, setIsLoggingMood] = useState(false);
 
-  // Handle recommendation action clicks
-  const handleRecommendationClick = (action: string) => {
-    if (action.includes("Chat")) {
-      // Navigate to chat page
-      window.location.href = "/chat";
-    } else if (action.includes("breathing")) {
-      // Scroll to breathing exercise
-      setTimeout(() => {
-        breathingRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    } else if (action.includes("crisis")) {
-      // Open crisis resources
-      window.location.href = "/chat?mode=crisis";
-    } else if (action.includes("relaxation")) {
-      // Scroll to relaxation sounds
-      setTimeout(() => {
-        relaxationRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    } else if (action.includes("walk") || action.includes("Rest")) {
-      // Just show a notification for these
-      alert("Take care of yourself! This is a great step towards feeling better.");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
+  const [showChecklistPrompt, setShowChecklistPrompt] = useState(false);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  const [checklistTitle, setChecklistTitle] = useState<string | null>(null);
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const [isGeneratingChecklist, setIsGeneratingChecklist] = useState(false);
+  const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const [checkInMessage, setCheckInMessage] = useState<string | null>(null);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+
+  const [checklistMood, setChecklistMood] = useState<MoodValue | null>(null);
+  const [checklistNote, setChecklistNote] = useState<string | null>(null);
+
+  const hasCustomBackground =
+    currentBackground?.enabled &&
+    (currentBackground?.image || currentBackground?.wallpaper);
+
+  const greetingName = user?.display_name || "there";
+
+  const weatherPayload = useMemo(() => {
+    if (!weather) {
+      return { location: "Victoria, BC" };
     }
-  };
+    return {
+      description: weather.description,
+      temperature: weather.temperature,
+      condition: weather.condition,
+      location: "Victoria, BC",
+    };
+  }, [weather]);
 
-  // Load moods from localStorage on mount
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const storageKey = `moods_${user.id}`;
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        try {
-          setSavedMoods(JSON.parse(stored));
-        } catch {
-          setSavedMoods([]);
-        }
-      }
-    }
-  }, [isAuthenticated, user]);
+  const resetSuggestions = useCallback(() => {
+    setSuggestions([]);
+    setFollowUpQuestion(null);
+    setShowChecklistPrompt(false);
+    setChecklistItems([]);
+    setChecklistTitle(null);
+    setCheckInMessage(null);
+    setHasCheckedIn(false);
+  }, []);
 
-  const handleLogMood = async () => {
-    if (!selectedMood || !isAuthenticated || !user) {
-      alert("Please log in to save your mood");
+  const handleLogMood = useCallback(async () => {
+    if (!selectedMood) {
+      setStatusMessage("Select a mood first.");
       return;
     }
-
+    setIsLoggingMood(true);
+    setStatusMessage(null);
     try {
-      const newMood: SavedMood = {
-        id: `mood-${Date.now()}`,
-        userId: user.id,
-        mood: selectedMood,
-        note: note,
-        date: new Date().toLocaleDateString(),
-      };
-
-      // Try to save to backend first
-      try {
-        const response = await fetch("http://localhost:8000/api/moods", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("auth_token") || ""}`,
-          },
-          body: JSON.stringify({
-            mood: selectedMood,
-            note: note,
-            userId: user.id,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Backend save failed");
-        }
-      } catch (backendError) {
-        console.warn("Backend not available, saving locally:", backendError);
-        // Continue with local save
-      }
-
-      // Save to localStorage (always works)
-      const storageKey = `moods_${user.id}`;
-      const updated = [newMood, ...savedMoods];
-      localStorage.setItem(storageKey, JSON.stringify(updated));
-      setSavedMoods(updated);
-
-      // Reset form and show success
-      setSelectedMood(null);
-      setNote("");
-      setIsLogged(true);
-      setTimeout(() => setIsLogged(false), 3000);
+      await api.wellness.createMoodEntry(selectedMood, note.trim() || undefined);
+      setStatusMessage("Mood logged. Lantern is here if you want suggestions.");
     } catch (error) {
-      console.error("Error saving mood:", error);
-      alert("Failed to save mood. Please try again.");
+      setStatusMessage("Could not log mood. Please try again.");
+    } finally {
+      setIsLoggingMood(false);
     }
-  };
+  }, [note, selectedMood]);
+
+  const handleGetSuggestions = useCallback(async () => {
+    if (!selectedMood) {
+      setStatusMessage("Select a mood to get personalized suggestions.");
+      return;
+    }
+    setIsLoadingSuggestions(true);
+    setStatusMessage(null);
+    resetSuggestions();
+    try {
+      const response = await api.wellness.getSuggestions({
+        mood: selectedMood,
+        note: note.trim() || undefined,
+        weather: weatherPayload,
+      });
+      setSuggestions(response.data.suggestions || []);
+      setFollowUpQuestion(response.data.follow_up_question || "Want me to create a checklist?");
+      setShowChecklistPrompt(true);
+    } catch (error) {
+      setStatusMessage("Could not fetch suggestions. Please try again.");
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  }, [note, resetSuggestions, selectedMood, weatherPayload]);
+
+  const handleCreateChecklist = useCallback(async () => {
+    if (!selectedMood) return;
+    setIsGeneratingChecklist(true);
+    setShowChecklistPrompt(false);
+    setCheckInMessage(null);
+    setHasCheckedIn(false);
+    try {
+      const response = await api.wellness.createChecklist({
+        mood: selectedMood,
+        note: note.trim() || undefined,
+        suggestions,
+        weather: weatherPayload,
+        max_items: 6,
+      });
+      const items = (response.data.items || []).map((text) => ({
+        id: createId(),
+        text,
+        done: false,
+      }));
+      setChecklistTitle(response.data.title || "Your checklist");
+      setChecklistItems(items);
+      setChecklistMood(selectedMood);
+      setChecklistNote(note.trim() || null);
+    } catch (error) {
+      setStatusMessage("Could not create checklist. Please try again.");
+    } finally {
+      setIsGeneratingChecklist(false);
+    }
+  }, [note, selectedMood, suggestions, weatherPayload]);
+
+  const handleToggleItem = useCallback((id: string) => {
+    setChecklistItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, done: !item.done } : item))
+    );
+  }, []);
+
+  const handleUpdateItem = useCallback((id: string, value: string) => {
+    setChecklistItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, text: value } : item))
+    );
+  }, []);
+
+  const handleRemoveItem = useCallback((id: string) => {
+    setChecklistItems((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  const handleAddItem = useCallback(() => {
+    setChecklistItems((prev) => [
+      ...prev,
+      { id: createId(), text: "", done: false },
+    ]);
+  }, []);
+
+  const checklistComplete =
+    checklistItems.length > 0 && checklistItems.every((item) => item.done);
+
+  const handleCheckIn = useCallback(async () => {
+    if (!checklistComplete || hasCheckedIn || isCheckingIn) return;
+    const mood = checklistMood || selectedMood;
+    if (!mood) return;
+
+    setIsCheckingIn(true);
+    try {
+      const summary = checklistItems
+        .map((item) => item.text)
+        .filter(Boolean)
+        .join("; ");
+      const response = await api.wellness.generateCheckIn({
+        mood,
+        note: checklistNote || note.trim() || undefined,
+        weather: weatherPayload,
+        checklist_summary: summary || undefined,
+      });
+      setCheckInMessage(response.data.message);
+      setHasCheckedIn(true);
+    } catch (error) {
+      setCheckInMessage("You made it through that checklist. How are you feeling now?");
+      setHasCheckedIn(true);
+    } finally {
+      setIsCheckingIn(false);
+    }
+  }, [
+    checklistComplete,
+    checklistItems,
+    checklistMood,
+    checklistNote,
+    hasCheckedIn,
+    isCheckingIn,
+    note,
+    selectedMood,
+    weatherPayload,
+  ]);
+
+  useEffect(() => {
+    if (checklistComplete && !hasCheckedIn) {
+      handleCheckIn();
+    }
+  }, [checklistComplete, handleCheckIn, hasCheckedIn]);
 
   return (
     <motion.div
       className={cn(
-        "min-h-screen relative",
+        "min-h-screen flex flex-col relative overflow-hidden",
         hasCustomBackground ? "bg-transparent" : "bg-background"
       )}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      variants={pageVariants}
+      initial="initial"
+      animate="enter"
+      exit="exit"
     >
-      {/* Navigation always on top */}
+      {!hasCustomBackground && <AmbientBackground />}
+
+      {!hasCustomBackground && (
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background/80 via-background/20 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background/40 to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background/40 to-transparent" />
+        </div>
+      )}
+
       <Navigation />
 
-      {/* Main content */}
-      <main className="container max-w-6xl mx-auto px-4 pt-24 pb-16 relative z-10">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+      <main className="flex-1 pt-16 relative z-10">
+        <div className="max-w-5xl mx-auto w-full px-4 py-10 space-y-8">
           <motion.div
-            initial={{ scale: 0, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
-            className="inline-block mb-4 p-4 rounded-full bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 relative"
+            className="text-center space-y-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={springPresets.gentle}
           >
-            {/* Animated glow background */}
-            <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"
-              animate={{
-                opacity: [0.5, 1, 0.5],
-                scale: [1, 1.15, 1],
-              }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            />
-            
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, -8, 8, 0],
-                y: [0, -6, 0],
-              }}
-              transition={{ 
-                duration: 1.8, 
-                repeat: Infinity, 
-                repeatDelay: 2,
-                type: "spring",
-                stiffness: 200,
-                damping: 10
-              }}
-              className="relative z-10"
-            >
-              <motion.div
-                animate={{
-                  opacity: [1, 0.7, 1],
-                }}
-                transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 2 }}
-              >
-                <Heart className="h-12 w-12 text-primary mx-auto drop-shadow-lg" />
-              </motion.div>
-            </motion.div>
-
-            {/* Floating particles */}
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="absolute w-1 h-1 bg-primary rounded-full"
-                initial={{
-                  x: Math.cos((i / 3) * Math.PI * 2) * 20,
-                  y: Math.sin((i / 3) * Math.PI * 2) * 20,
-                  opacity: 0,
-                }}
-                animate={{
-                  x: Math.cos((i / 3) * Math.PI * 2) * 35,
-                  y: Math.sin((i / 3) * Math.PI * 2) * 35 - 10,
-                  opacity: [0, 0.6, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatDelay: 2,
-                  delay: i * 0.15,
-                }}
-                style={{ left: "50%", top: "50%", marginLeft: "-2px", marginTop: "-2px" }}
-              />
-            ))}
+            <h1 className="text-3xl md:text-4xl font-serif font-semibold text-foreground">
+              Wellness Check-In
+            </h1>
+            <p className="text-muted-foreground text-base md:text-lg">
+              Welcome back, {greetingName}. How are you feeling today?
+            </p>
+            {weather && (
+              <p className="text-xs text-muted-foreground/70">
+                Victoria, BC | {weather.temperature}C | {weather.description}
+              </p>
+            )}
           </motion.div>
-          <h1 className="text-4xl font-serif font-bold mb-4">
-            Wellness Check in
-          </h1>
-          <p className="text-muted-foreground">
-            Track your mood and build healthy daily habits.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main column */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="forest-card">
-              <CardHeader>
-                <CardTitle>How are you feeling?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap justify-center gap-4 mb-6">
-                  {moodOptions.map((mood) => (
+          <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">Log your mood</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {moodOptions.map((option) => {
+                  const Icon = option.icon;
+                  const isSelected = selectedMood === option.value;
+                  return (
                     <button
-                      key={mood.value}
-                      onClick={() => setSelectedMood(mood.value)}
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSelectedMood(option.value)}
                       className={cn(
-                        "p-4 rounded-xl transition",
-                        selectedMood === mood.value
-                          ? `${mood.bgColor} ring-2 ring-primary`
-                          : "bg-card hover:bg-accent"
+                        "flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition",
+                        "bg-background/60 hover:border-primary/40",
+                        isSelected && "border-primary/60 ring-2",
+                        isSelected && option.ring
                       )}
                     >
-                      <mood.icon className={`h-8 w-8 ${mood.color}`} />
-                      <p className="text-sm mt-2">{mood.label}</p>
+                      <Icon className={cn("h-5 w-5", option.color)} />
+                      <span className="font-medium text-foreground/90">{option.label}</span>
                     </button>
+                  );
+                })}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Optional note</label>
+                <Textarea
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  placeholder="Add a quick note if you would like..."
+                  className="min-h-[90px]"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={handleLogMood}
+                  disabled={!selectedMood || isLoggingMood}
+                >
+                  {isLoggingMood ? "Logging..." : "Log Mood"}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleGetSuggestions}
+                  disabled={!selectedMood || isLoadingSuggestions}
+                >
+                  {isLoadingSuggestions ? "Thinking..." : "Lantern Suggestions"}
+                </Button>
+                {statusMessage && (
+                  <span className="text-sm text-muted-foreground">{statusMessage}</span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {suggestions.length > 0 && (
+            <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg">Lantern suggestions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-2 text-sm text-foreground/90">
+                  {suggestions.map((suggestion, index) => (
+                    <li key={`${suggestion}-${index}`} className="flex gap-2">
+                      <span className="text-primary">-</span>
+                      <span>{suggestion}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {followUpQuestion && showChecklistPrompt && (
+                  <div className="rounded-xl border border-border/60 bg-background/60 p-4 space-y-3">
+                    <p className="text-sm text-foreground/90">{followUpQuestion}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleCreateChecklist}
+                        disabled={isGeneratingChecklist}
+                      >
+                        {isGeneratingChecklist ? "Creating..." : "Yes, create a checklist"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowChecklistPrompt(false)}
+                      >
+                        Not right now
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {checklistItems.length > 0 && (
+            <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  {checklistTitle || "Your checklist"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {checklistItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleToggleItem(item.id)}
+                        className={cn(
+                          "h-8 w-8 rounded-full border flex items-center justify-center",
+                          item.done
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "border-border/60"
+                        )}
+                      >
+                        {item.done && <Check className="h-4 w-4" />}
+                      </button>
+                      <Input
+                        value={item.text}
+                        onChange={(event) => handleUpdateItem(item.id, event.target.value)}
+                        placeholder="Checklist item"
+                        className={cn(
+                          "flex-1",
+                          item.done && "line-through text-muted-foreground"
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleRemoveItem(item.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   ))}
                 </div>
 
-                {/* Personalized Recommendations */}
-                {selectedMood && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-6 p-4 bg-accent/20 rounded-lg border border-accent/50"
-                  >
-                    <h3 className="font-semibold mb-4 text-foreground">Suggestions for you:</h3>
-                    <div className="space-y-3">
-                      {moodRecommendations[selectedMood]?.map((rec, i) => {
-                        const RecIcon = rec.icon;
-                        return (
-                          <div key={i} className="p-3 bg-background rounded-lg flex gap-3">
-                            <RecIcon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{rec.title}</p>
-                              <p className="text-xs text-muted-foreground">{rec.description}</p>
-                              <button 
-                                onClick={() => handleRecommendationClick(rec.action)}
-                                className="text-xs text-primary hover:underline mt-1"
-                              >
-                                → {rec.action}
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Optional note"
-                  className="w-full h-24 rounded-lg p-3 border bg-background"
-                />
-
-                <Button
-                  className="w-full mt-4"
-                  onClick={handleLogMood}
-                  disabled={!selectedMood}
-                >
-                  <AnimatePresence mode="wait">
-                    {isLogged ? (
-                      <motion.span
-                        key="logged"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        className="flex gap-2 items-center"
-                      >
-                        <Sparkles className="h-4 w-4" />
-                        Mood Logged
-                      </motion.span>
-                    ) : (
-                      <span>Log Mood</span>
-                    )}
-                  </AnimatePresence>
-                </Button>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button type="button" variant="secondary" onClick={handleAddItem}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add item
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    {checklistItems.filter((item) => item.done).length} / {checklistItems.length} done
+                  </span>
+                </div>
               </CardContent>
             </Card>
+          )}
 
-            <Card className="forest-card">
+          {(checkInMessage || isCheckingIn) && (
+            <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Recent Check ins</CardTitle>
+                <CardTitle className="text-lg">Lantern check-in</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {isAuthenticated && user ? (
-                  savedMoods.length > 0 ? (
-                    savedMoods.map((entry) => {
-                      const moodOption = moodOptions.find(m => m.value === entry.mood);
-                      const MoodIcon = moodOption?.icon || Meh;
-                      return (
-                        <div key={entry.id} className="p-3 bg-accent/30 rounded-lg flex gap-3">
-                          <MoodIcon className={`h-6 w-6 ${moodOption?.color}`} />
-                          <div className="flex-1">
-                            <p className="font-medium">{entry.date}</p>
-                            {entry.note && (
-                              <p className="text-sm text-muted-foreground">
-                                {entry.note}
-                              </p>
-                            )}
-                          </div>
-                          <span className="text-sm text-muted-foreground">{moodOption?.label}</span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-muted-foreground">No moods logged yet</p>
-                  )
-                ) : (
-                  <p className="text-muted-foreground">Please log in to view your mood history</p>
-                )}
+              <CardContent>
+                <p className="text-sm text-foreground/90">
+                  {isCheckingIn ? "Checking in..." : checkInMessage}
+                </p>
               </CardContent>
             </Card>
-
-            <div ref={relaxationRef}>
-              <RelaxationSounds />
-            </div>
-            <div ref={breathingRef}>
-              <BreathingExercise />
-            </div>
-            <GratitudeJar />
-          </div>
-
-          {/* Sidebar */}
-          <motion.div variants={cardHover3D} whileHover="hover">
-            <DailyAffirmations />
-            <Card className="forest-card mt-6">
-              <CardHeader>
-                <CardTitle>Seasonal Tips</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {wellnessTips.map((tip, i) => (
-                  <div key={i} className={`p-4 rounded-lg ${tip.bgColor}`}>
-                    <tip.icon className={`h-5 w-5 ${tip.color}`} />
-                    <h4 className="font-medium mt-2">{tip.title}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {tip.description}
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
+          )}
         </div>
       </main>
 

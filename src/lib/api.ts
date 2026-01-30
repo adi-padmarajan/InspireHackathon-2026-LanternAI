@@ -167,6 +167,63 @@ export const api = {
       apiFetch<{ success: boolean; data: Record<string, number> }>(
         "/api/wellness/stats"
       ),
+
+    getSuggestions: (payload: {
+      mood: string;
+      note?: string;
+      weather?: {
+        description?: string;
+        temperature?: number;
+        condition?: string;
+        location?: string;
+      };
+    }) =>
+      apiFetch<{
+        success: boolean;
+        data: { suggestions: string[]; follow_up_question: string };
+      }>("/api/wellness/suggestions", {
+        method: "POST",
+        body: payload,
+      }),
+
+    createChecklist: (payload: {
+      mood: string;
+      note?: string;
+      suggestions?: string[];
+      weather?: {
+        description?: string;
+        temperature?: number;
+        condition?: string;
+        location?: string;
+      };
+      max_items?: number;
+    }) =>
+      apiFetch<{
+        success: boolean;
+        data: { title?: string; items: string[] };
+      }>("/api/wellness/checklist", {
+        method: "POST",
+        body: payload,
+      }),
+
+    generateCheckIn: (payload: {
+      mood: string;
+      note?: string;
+      weather?: {
+        description?: string;
+        temperature?: number;
+        condition?: string;
+        location?: string;
+      };
+      checklist_summary?: string;
+    }) =>
+      apiFetch<{
+        success: boolean;
+        data: { message: string };
+      }>("/api/wellness/checkin", {
+        method: "POST",
+        body: payload,
+      }),
   },
 
   // Image endpoints
