@@ -96,11 +96,7 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
       >
         {isAuthenticated && userName ? (
           <>
-            Welcome back,
-            <br />
-            <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
-              {userName}
-            </span>
+            Welcome back, <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent"> {userName}</span>
           </>
         ) : (
           <>
