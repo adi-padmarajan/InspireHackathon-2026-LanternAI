@@ -51,7 +51,7 @@ const Index = () => {
               userName={userName} 
               isAuthenticated={isAuthenticated} 
             />
-            <QuickActionsGrid className="mt-6 md:mt-10 lg:mt-12 pb-20 md:pb-24" />
+            <QuickActionsGrid className="-mt-2 md:mt-0" />
           </div>
         </section>
       </main>
