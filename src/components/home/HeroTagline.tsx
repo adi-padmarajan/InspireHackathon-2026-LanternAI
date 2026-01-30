@@ -67,13 +67,9 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
     return `${description} in Victoria ${timeLabel} · ${weather.temperature}C`;
   }, [weather, isLoading, timeOfDay]);
 
-  const companionLine = isAuthenticated
-    ? "I'm here for whatever is on your mind."
-    : "Your 24/7 AI companion for holistic wellness and seasonal depression support.";
-
   return (
     <motion.section
-      className="relative flex flex-col items-center justify-center text-center py-8 md:py-12"
+      className="relative flex flex-col items-center justify-center text-center py-6 md:py-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
@@ -88,30 +84,6 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
-      </div>
-
-      {/* Floating particles effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(3)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-primary/30 rounded-full"
-            style={{
-              left: `${30 + i * 20}%`,
-              top: `${40 + i * 10}%`,
-            }}
-            animate={{
-              y: [-20, -40, -20],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3 + i,
-              repeat: Infinity,
-              delay: i * 0.5,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
       </div>
 
       {/* Lantern Icon - Refined */}
@@ -178,15 +150,12 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
 
       {/* Subtitle - refined spacing */}
       <motion.p
-        className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl leading-relaxed px-4"
+        className="text-sm md:text-base lg:text-lg text-white max-w-2xl leading-relaxed px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.6 }}
       >
         <span className="block">{greeting.sub}</span>
-        <span className="block text-base md:text-lg text-muted-foreground/80 mt-2">
-          {companionLine}
-        </span>
       </motion.p>
 
       {/* Trust badge */}

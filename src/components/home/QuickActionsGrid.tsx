@@ -5,7 +5,7 @@
 
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MessageCircle, Heart, ArrowRight, Palette, Sparkles } from "lucide-react";
+import { MessageCircle, Heart, ArrowRight, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QuickAction {
@@ -78,35 +78,6 @@ const floatingDrifts = [6, 8, 6];
 export const QuickActionsGrid = ({ className }: QuickActionsGridProps) => {
   return (
     <div className={cn("relative w-full max-w-5xl mx-auto", className)}>
-      {/* Section heading */}
-      <motion.div
-        className="text-center mb-10"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-background/70 border border-border/60 backdrop-blur-md shadow-[0_10px_28px_-18px_rgba(0,0,0,0.75)]">
-          <motion.span
-            className="text-primary/60"
-            animate={{ opacity: [0.4, 0.8, 0.4], y: [0, -2, 0] }}
-            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-          </motion.span>
-          <h2 className="text-[0.7rem] md:text-xs font-semibold uppercase tracking-[0.28em] text-foreground/75">
-            Quick Actions
-          </h2>
-          <motion.span
-            className="text-primary/50"
-            animate={{ opacity: [0.35, 0.7, 0.35], y: [0, 2, 0] }}
-            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-          >
-            <Sparkles className="h-3 w-3" />
-          </motion.span>
-        </div>
-      </motion.div>
-
       {/* Horizontal flexbox layout */}
       <motion.div
         className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"

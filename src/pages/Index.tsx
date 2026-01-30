@@ -20,6 +20,14 @@ const Index = () => {
 
   const userName = user?.display_name;
   const hasCustomBackground = currentBackground?.enabled && (currentBackground?.image || currentBackground?.wallpaper);
+  const floatingParticles = [
+    { left: "12%", top: "18%", size: "h-1.5 w-1.5", duration: 6.5, delay: 0 },
+    { left: "28%", top: "62%", size: "h-1 w-1", duration: 5.2, delay: 0.6 },
+    { left: "46%", top: "32%", size: "h-1.5 w-1.5", duration: 6.8, delay: 1.1 },
+    { left: "64%", top: "70%", size: "h-1 w-1", duration: 5.6, delay: 0.3 },
+    { left: "78%", top: "24%", size: "h-1.5 w-1.5", duration: 7.2, delay: 0.9 },
+    { left: "90%", top: "52%", size: "h-1 w-1", duration: 5.9, delay: 1.4 },
+  ];
 
   return (
     <motion.div
@@ -45,13 +53,31 @@ const Index = () => {
 
       <main className="flex-1 flex flex-col relative z-10 pt-16 overflow-hidden">
         {/* Single viewport layout */}
-        <section className="flex-1 flex flex-col px-4 py-2">
-          <div className="w-full max-w-6xl mx-auto flex flex-col flex-1">
+        <section className="relative flex-1 flex flex-col items-center justify-center px-4 py-4">
+          {/* Floating particles across the full space */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {floatingParticles.map((particle) => (
+              <motion.div
+                key={`${particle.left}-${particle.top}`}
+                className={cn("absolute rounded-full bg-primary/30", particle.size)}
+                style={{ left: particle.left, top: particle.top }}
+                animate={{ y: [-24, 12, -24], opacity: [0, 1, 0] }}
+                transition={{
+                  duration: particle.duration,
+                  repeat: Infinity,
+                  delay: particle.delay,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="w-full max-w-6xl mx-auto flex flex-col items-center gap-6">
             <HeroTagline 
               userName={userName} 
               isAuthenticated={isAuthenticated} 
             />
-            <QuickActionsGrid className="-mt-2 md:mt-0" />
+            <QuickActionsGrid />
           </div>
         </section>
       </main>
