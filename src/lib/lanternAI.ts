@@ -347,13 +347,13 @@ export function generateLanternResponse(input: string, mode: ChatMode): string {
     }
   }
 
-  // Mode-specific enhancements for international students
-  if (mode === "international" && (lowerInput.includes("confused") || lowerInput.includes("don't understand"))) {
-    const internationalCategory = supportCategories.find(c => 
-      c.keywords.includes("international")
+  // Mode-specific enhancements for social wellness (replaces old international mode)
+  if (mode === "social" && (lowerInput.includes("confused") || lowerInput.includes("don't understand"))) {
+    const socialCategory = supportCategories.find(c => 
+      c.keywords.includes("lonely") || c.keywords.includes("friends")
     );
-    if (internationalCategory) {
-      return internationalCategory.handler(input, mode);
+    if (socialCategory) {
+      return socialCategory.handler(input, mode);
     }
   }
 
@@ -361,23 +361,25 @@ export function generateLanternResponse(input: string, mode: ChatMode): string {
     return bestMatch.category.handler(input, mode);
   }
 
-  // Default response
+  // Default response - aligned with 6 wellness dimensions
   return `Thank you for sharing that with me. 🌿
 
-I'm here to help you with:
-• **Mental health** - Stress, anxiety, seasonal depression, overwhelm
-• **Social support** - Making friends, joining clubs, social anxiety
-• **Accessibility** - Campus navigation, accessible routes, mobility support
-• **International students** - Cultural adjustment, academic norms, immigration
-• **Campus resources** - Counselling, wellness, academic help
+I'm here to support your holistic wellness:
+• **Physical** - Sleep, movement, nutrition, energy
+• **Emotional** - Stress, anxiety, processing feelings
+• **Intellectual** - Study strategies, focus, academic balance
+• **Spiritual** - Purpose, mindfulness, gratitude
+• **Environmental** - Study spaces, nature connection
+• **Social** - Making friends, clubs, social confidence
+• **Seasonal** - SAD support, light therapy, winter wellness
 
 Could you tell me more about what you're experiencing? I want to give you the most helpful response.
 
 **Quick options:**
 • "I'm feeling stressed about..."
-• "I want to join clubs but..."
-• "I need help finding accessible..."
-• "As an international student, I'm confused about..."`;
+• "I want to improve my sleep..."
+• "I'm struggling to make friends..."
+• "The dark weather is affecting me..."`;
 }
 
 // Export for mood-based greetings
