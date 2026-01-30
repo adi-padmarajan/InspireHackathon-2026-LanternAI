@@ -6,7 +6,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Settings, Palette, Sliders, Accessibility, ChevronLeft } from 'lucide-react';
+import { Settings, Palette, Sliders, ChevronLeft } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -165,77 +165,6 @@ const ThemeGrid = ({ categoryFilter }: { categoryFilter: ThemeCategory | 'all' }
 };
 
 // ============================================================================
-// ACCESSIBILITY SETTINGS
-// ============================================================================
-
-const AccessibilitySettings = () => {
-  return (
-    <motion.div
-      className="space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
-    >
-      <div className="p-6 rounded-2xl bg-card border border-border">
-        <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Accessibility className="h-5 w-5 text-primary" />
-          Accessibility
-        </h3>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">Reduce Motion</p>
-              <p className="text-xs text-muted-foreground">
-                Respects your system preference for reduced motion
-              </p>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              System Controlled
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">High Contrast</p>
-              <p className="text-xs text-muted-foreground">
-                Increase color contrast for better visibility
-              </p>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Coming Soon
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">Focus Indicators</p>
-              <p className="text-xs text-muted-foreground">
-                Enhanced keyboard navigation indicators
-              </p>
-            </div>
-            <div className="text-sm text-primary">
-              Enabled
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-card border border-border">
-        <h3 className="text-lg font-semibold text-foreground mb-2">
-          About Accessibility
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Lantern is built with accessibility in mind. All themes maintain WCAG color contrast
-          ratios, and the interface is fully keyboard navigable. If you have specific
-          accessibility needs, please let us know.
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
-// ============================================================================
 // MAIN SETTINGS PAGE
 // ============================================================================
 
@@ -284,7 +213,7 @@ const SettingsPage = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="customize" className="w-full">
-          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8 h-12">
+          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-8 h-12">
             <TabsTrigger value="customize" className="gap-2 text-sm">
               <Sliders className="h-4 w-4" />
               Customize
@@ -292,10 +221,6 @@ const SettingsPage = () => {
             <TabsTrigger value="themes" className="gap-2 text-sm">
               <Palette className="h-4 w-4" />
               Themes
-            </TabsTrigger>
-            <TabsTrigger value="accessibility" className="gap-2 text-sm">
-              <Accessibility className="h-4 w-4" />
-              Accessibility
             </TabsTrigger>
           </TabsList>
 
@@ -319,11 +244,6 @@ const SettingsPage = () => {
             <ThemeGrid categoryFilter={categoryFilter} />
           </TabsContent>
 
-          <TabsContent value="accessibility" className="mt-0">
-            <div className="max-w-md mx-auto">
-              <AccessibilitySettings />
-            </div>
-          </TabsContent>
         </Tabs>
       </main>
     </motion.div>
