@@ -3,8 +3,12 @@
  * Cinematic typography with elegant animations
  */
 
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Lamp } from "lucide-react";
+import { useWeatherContext } from "@/contexts/WeatherContext";
+import { getGreeting, getTimeOfDay } from "@/lib/greetings";
+import { toGreetingWeather } from "@/lib/weather";
 import { cn } from "@/lib/utils";
 
 interface HeroTaglineProps {
@@ -12,7 +16,61 @@ interface HeroTaglineProps {
   isAuthenticated: boolean;
 }
 
+const formatWeatherDescription = (description: string) => {
+  const lower = description.toLowerCase();
+  if (lower === "clear sky" || lower === "clear night") return "clear skies";
+  if (lower === "overcast") return "overcast skies";
+  return lower;
+};
+
+const getTimeOfDayLabel = (timeOfDay: ReturnType<typeof getTimeOfDay>) => {
+  switch (timeOfDay) {
+    case "morning":
+      return "this morning";
+    case "afternoon":
+      return "this afternoon";
+    case "evening":
+      return "this evening";
+    default:
+      return "tonight";
+  }
+};
+
+const toSentenceCase = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
 export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => {
+  const { weather, isLoading } = useWeatherContext();
+  const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeOfDay(getTimeOfDay());
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const greetingWeather = weather ? toGreetingWeather(weather.condition) : "cloudy";
+  const greeting = useMemo(
+    () => getGreeting({ timeOfDay, weather: greetingWeather, userName }),
+    [timeOfDay, greetingWeather, userName]
+  );
+
+  const weatherLine = useMemo(() => {
+    if (!weather) {
+      return isLoading ? "Peeking at Victoria's skies for you..." : "Victoria skies are doing their thing today.";
+    }
+
+    const description = toSentenceCase(formatWeatherDescription(weather.description));
+    const timeLabel = getTimeOfDayLabel(timeOfDay);
+
+    return `${description} in Victoria ${timeLabel} · ${weather.temperature}C`;
+  }, [weather, isLoading, timeOfDay]);
+
+  const companionLine = isAuthenticated
+    ? "I'm here for whatever is on your mind."
+    : "Your 24/7 AI companion for holistic wellness and seasonal depression support.";
+
   return (
     <motion.section
       className="relative flex flex-col items-center justify-center text-center py-8 md:py-12"
@@ -89,25 +147,34 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
 
       {/* Main heading - Apple style large typography */}
       <motion.h1
-        className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight mb-4 max-w-4xl"
+        className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight mb-3 max-w-4xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.7, ease: "easeOut" }}
       >
-        {isAuthenticated && userName ? (
-          <>
-            Welcome back, <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent"> {userName}</span>
-          </>
-        ) : (
-          <>
-            A Light for Your
-            <br />
-            <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
-              Wellness Journey
-            </span>
-          </>
-        )}
+        <span className="block">
+          {greeting.main}
+          {isAuthenticated && userName && (
+            <>
+              ,{" "}
+              <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
+                {userName}
+              </span>
+            </>
+          )}
+          <span className="ml-2">{greeting.emoji}</span>
+        </span>
       </motion.h1>
+
+      <motion.div
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/70 border border-border/60 backdrop-blur-md shadow-[0_10px_28px_-18px_rgba(0,0,0,0.75)] mb-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.38, duration: 0.5, ease: "easeOut" }}
+      >
+        <span className="h-2 w-2 rounded-full bg-primary/70 animate-pulse" />
+        <span className="text-xs md:text-sm font-medium text-foreground/80">{weatherLine}</span>
+      </motion.div>
 
       {/* Subtitle - refined spacing */}
       <motion.p
@@ -116,11 +183,10 @@ export const HeroTagline = ({ userName, isAuthenticated }: HeroTaglineProps) => 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.6 }}
       >
-        {isAuthenticated ? (
-          "Your AI wellness companion is here. Let's explore what's on your mind."
-        ) : (
-          "Your 24/7 AI companion for holistic wellness and seasonal depression support."
-        )}
+        <span className="block">{greeting.sub}</span>
+        <span className="block text-base md:text-lg text-muted-foreground/80 mt-2">
+          {companionLine}
+        </span>
       </motion.p>
 
       {/* Trust badge */}

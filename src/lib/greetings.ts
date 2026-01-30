@@ -34,76 +34,76 @@ interface GreetingMessage {
 const greetings: Record<string, GreetingMessage[]> = {
   // Time-based greetings - friendly, companion-like
   "morning-sunny": [
-    { main: "Hey, good morning", sub: "Looks like it's gonna be a great day!", emoji: "☀️" },
-    { main: "Morning, sleepyhead", sub: "The sun's out and so am I", emoji: "🌅" },
+    { main: "Morning, sunshine", sub: "Feels like a fresh-start kind of day", emoji: "☀️" },
+    { main: "Hey, rise and glow", sub: "I saved you the first sip of coffee", emoji: "🌅" },
   ],
   "morning-cloudy": [
-    { main: "Hey, morning", sub: "Ready to tackle the day together?", emoji: "🌤️" },
-    { main: "Good morning, friend", sub: "Let's make today count", emoji: "☁️" },
+    { main: "Morning, friend", sub: "Clouds can't dim your vibe today", emoji: "☁️" },
+    { main: "Hey, good morning", sub: "Soft skies, steady heart, let's take it slow", emoji: "🌤️" },
   ],
   "morning-rainy": [
-    { main: "Rainy morning, huh?", sub: "Grab a coffee, I'll keep you company", emoji: "🌧️" },
-    { main: "Grey skies, bright vibes", sub: "I'm here to brighten things up", emoji: "☔" },
+    { main: "Rainy morning, huh", sub: "I've got you, cozy vibes and warm tea", emoji: "🌧️" },
+    { main: "Hey, it's a drizzly start", sub: "We can still make today gentle", emoji: "☔" },
   ],
   "morning-cold": [
-    { main: "Brr, it's chilly!", sub: "Stay warm out there, okay?", emoji: "🥶" },
-    { main: "Bundle up, friend", sub: "It's cold but we've got this", emoji: "❄️" },
+    { main: "Brr, chilly morning", sub: "Bundle up, I'll keep you company", emoji: "❄️" },
+    { main: "Hey, cold out there", sub: "Warm drink plus hoodie equals we've got this", emoji: "🧣" },
   ],
   "afternoon-sunny": [
-    { main: "Hey, how's your day going?", sub: "Hope you're soaking up some sun", emoji: "☀️" },
-    { main: "Afternoon!", sub: "Perfect weather for a campus stroll", emoji: "🌞" },
+    { main: "Hey, bright afternoon", sub: "If you can, steal a little sunshine", emoji: "☀️" },
+    { main: "Good afternoon, you", sub: "Golden light looks good on you", emoji: "🌞" },
   ],
   "afternoon-cloudy": [
-    { main: "Hey there", sub: "How's your day been so far?", emoji: "⛅" },
-    { main: "Good to see you", sub: "I'm always here when you need me", emoji: "🌥️" },
+    { main: "Hey there", sub: "Midday check-in, how's your heart?", emoji: "⛅" },
+    { main: "Afternoon, friend", sub: "I'm right here for a quick reset", emoji: "🌥️" },
   ],
   "afternoon-rainy": [
-    { main: "Rainy afternoon", sub: "Hope you're somewhere cozy", emoji: "🌧️" },
-    { main: "It's really coming down", sub: "Perfect excuse to take a break", emoji: "☔" },
+    { main: "Rainy afternoon", sub: "Perfect excuse for a cozy break", emoji: "🌧️" },
+    { main: "Hey, it's pouring", sub: "Let's keep it soft and slow today", emoji: "☔" },
   ],
   "afternoon-cold": [
-    { main: "Cold one today", sub: "Hope you're keeping warm", emoji: "🧣" },
-    { main: "Stay cozy", sub: "Victoria winters are no joke", emoji: "❄️" },
+    { main: "Cold afternoon", sub: "Stay warm, I'm cheering you on", emoji: "🧥" },
+    { main: "Hey, crisp out there", sub: "Maybe a warm drink and a tiny walk?", emoji: "🧣" },
   ],
   "evening-sunny": [
-    { main: "Hey, nice evening", sub: "Hope your day was a good one", emoji: "🌅" },
-    { main: "Golden hour!", sub: "What a beautiful time of day", emoji: "🌇" },
+    { main: "Hey, beautiful evening", sub: "Hope the day treated you kindly", emoji: "🌅" },
+    { main: "Golden hour hello", sub: "Want to take a slow breath together?", emoji: "🌇" },
   ],
   "evening-cloudy": [
-    { main: "Evening, friend", sub: "Time to wind down?", emoji: "🌆" },
-    { main: "Hey there", sub: "The day flew by, didn't it?", emoji: "🌃" },
+    { main: "Evening, friend", sub: "Let's unwind, I'm all ears", emoji: "🌆" },
+    { main: "Hey, soft evening", sub: "The day is done, you did enough", emoji: "🌃" },
   ],
   "evening-rainy": [
-    { main: "Rainy evening", sub: "Perfect for chilling indoors", emoji: "🌧️" },
-    { main: "Quiet night ahead", sub: "Hope you're somewhere comfortable", emoji: "☔" },
+    { main: "Rainy evening", sub: "Cozy lights, comfy socks, I'm here", emoji: "🌧️" },
+    { main: "Hey, it's a wet night", sub: "Let's settle in and breathe", emoji: "☔" },
   ],
   "evening-cold": [
-    { main: "Cold night out there", sub: "Stay warm and cozy", emoji: "🧥" },
-    { main: "Chilly evening", sub: "Hot cocoa kind of night?", emoji: "☕" },
+    { main: "Cold evening", sub: "Wrap up warm, I've got you", emoji: "🧣" },
+    { main: "Hey, chilly out", sub: "Hot cocoa energy, all the way", emoji: "☕" },
   ],
   "night-sunny": [
-    { main: "Still up?", sub: "I'm here if you need to talk", emoji: "🌙" },
-    { main: "Late night thoughts?", sub: "Let's chat about it", emoji: "✨" },
+    { main: "Still up, friend", sub: "I'm here for late-night thoughts", emoji: "🌙" },
+    { main: "Hey, night owl", sub: "Want to unload a little before sleep?", emoji: "✨" },
   ],
   "night-cloudy": [
-    { main: "Hey, night owl", sub: "Can't sleep? I'm here", emoji: "🌙" },
-    { main: "Burning the midnight oil?", sub: "Don't forget to rest, okay?", emoji: "💫" },
+    { main: "Hey, it's late", sub: "Can't sleep? Let's slow it down", emoji: "🌙" },
+    { main: "Night check-in", sub: "You don't have to hold it alone", emoji: "💫" },
   ],
   "night-rainy": [
-    { main: "Rainy night vibes", sub: "Hope the rain is soothing you", emoji: "🌧️" },
-    { main: "Night rain is peaceful", sub: "Hope you're resting well", emoji: "☔" },
+    { main: "Rainy night vibes", sub: "Let the rain do the talking, I'm here", emoji: "🌧️" },
+    { main: "Hey, rainy night", sub: "Hope you're warm and safe", emoji: "☔" },
   ],
   "night-cold": [
-    { main: "Cold night", sub: "Stay warm and get some rest", emoji: "❄️" },
-    { main: "Chilly one tonight", sub: "Hope you're tucked in somewhere cozy", emoji: "🌙" },
+    { main: "Cold night out there", sub: "Tuck in, I'll keep you company", emoji: "❄️" },
+    { main: "Hey, chilly night", sub: "Soft lights, slow breaths, you got this", emoji: "🌙" },
   ],
 };
 
 // Fallback greetings - friendly and companion-like
 const fallbackGreetings: Record<GreetingContext["timeOfDay"], GreetingMessage> = {
-  morning: { main: "Hey, good morning", sub: "Ready to start the day together?", emoji: "🌅" },
-  afternoon: { main: "Hey there", sub: "How's your day going?", emoji: "☀️" },
-  evening: { main: "Evening, friend", sub: "Hope your day was good", emoji: "🌆" },
+  morning: { main: "Morning, friend", sub: "I'm here with you for the day", emoji: "🌅" },
+  afternoon: { main: "Hey there", sub: "Quick check-in, how are you really?", emoji: "☀️" },
+  evening: { main: "Evening, friend", sub: "Let's unwind together", emoji: "🌆" },
   night: { main: "Hey, night owl", sub: "I'm here whenever you need me", emoji: "🌙" },
 };
 
