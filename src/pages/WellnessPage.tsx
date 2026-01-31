@@ -20,24 +20,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { SeasonalBanner } from "@/components/SeasonalBanner";
-import { FeedbackPrompt } from "@/components/FeedbackPrompt";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWeather } from "@/hooks/useWeather";
-import { useSeasonal } from "@/hooks/useSeasonal";
-import { usePreferences } from "@/hooks/usePreferences";
-import { useEvents } from "@/hooks/useEvents";
 import { api } from "@/lib/api";
 import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
 const moodOptions = [
-  { value: "great", label: "Great", icon: Smile, gradient: "from-emerald-500/20 to-green-500/10", iconColor: "text-emerald-500" },
-  { value: "good", label: "Good", icon: Smile, gradient: "from-sky-500/20 to-blue-500/10", iconColor: "text-sky-500" },
-  { value: "okay", label: "Okay", icon: Meh, gradient: "from-amber-500/20 to-yellow-500/10", iconColor: "text-amber-500" },
-  { value: "low", label: "Low", icon: Frown, gradient: "from-orange-500/20 to-amber-500/10", iconColor: "text-orange-500" },
-  { value: "struggling", label: "Struggling", icon: CloudRain, gradient: "from-rose-500/20 to-pink-500/10", iconColor: "text-rose-500" },
+  { value: "great", label: "Great", icon: Smile, gradient: "from-emerald-500/20 to-green-500/10" },
+  { value: "good", label: "Good", icon: Smile, gradient: "from-sky-500/20 to-blue-500/10" },
+  { value: "okay", label: "Okay", icon: Meh, gradient: "from-amber-500/20 to-yellow-500/10" },
+  { value: "low", label: "Low", icon: Frown, gradient: "from-orange-500/20 to-amber-500/10" },
+  { value: "struggling", label: "Struggling", icon: CloudRain, gradient: "from-rose-500/20 to-pink-500/10" },
 ] as const;
 
 type MoodValue = (typeof moodOptions)[number]["value"];
@@ -58,7 +53,7 @@ interface ResourceCard {
 }
 
 const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-// Normalize UVic resource URLs for external links
+
 const normalizeResourceUrl = (url: string) => {
   if (!url) return "#";
   if (url.startsWith("http")) return url;
@@ -66,117 +61,15 @@ const normalizeResourceUrl = (url: string) => {
   return `https://www.uvic.ca/${url}`;
 };
 
-// Lightweight offline fallback suggestions when backend is unavailable
-function getLocalSuggestions(
-  mood: MoodValue,
-  note: string,
-  weather?: { description?: string; condition?: string; temperature?: number; windSpeed?: number; location?: string }
-) {
-  const text = note?.toLowerCase() || "";
-  const desc = weather?.description || "";
-  const condition = (weather?.condition || "").toLowerCase();
-  const temp = typeof weather?.temperature === "number" ? weather!.temperature : undefined;
-  const wind = typeof weather?.windSpeed === "number" ? weather!.windSpeed : undefined;
-
-  const isRainy = /rain|drizzle|showers/i.test(desc) || condition.includes("rain");
-  const isSnowy = /snow/i.test(desc) || condition.includes("snow");
-  const isStormy = /thunder|storm/i.test(desc) || condition.includes("storm");
-  const isSunny = /sun|clear/i.test(desc) || condition.includes("sunny") || condition.includes("warm");
-  const isVeryCold = typeof temp === "number" ? temp <= 0 : false;
-  const isWindy = typeof wind === "number" ? wind >= 35 : false; // ~km/h threshold
-  const hasWeather = Boolean(weather && (weather.description || weather.condition));
-
-  const outdoorOK = hasWeather && !isSnowy && !isStormy && !isVeryCold && !isWindy && !isRainy;
-
-  const base: Record<MoodValue, string[]> = {
-    great: [
-      "Capture one win in a quick journal.",
-      "Share a gratitude with someone who helped you.",
-      outdoorOK ? "Do a 10‑minute outside jog or brisk walk." : (isSnowy || isVeryCold ? "Try an indoor mobility or yoga flow (10 minutes)." : "Take a short stretch break or stair walk indoors."),
-      "Plan one fun micro‑reward for later.",
-      "Help a peer or classmate with a small task.",
-    ],
-    good: [
-      "Pick one next action and start a 15‑minute focus sprint.",
-      outdoorOK ? "Walk a campus loop for 10 minutes." : (isRainy ? "Make tea and read 2 pages indoors." : "Do 3 songs of indoor dance/cardio."),
-      "Hydrate and queue an energizing playlist.",
-      "Tidy your workspace for 3 minutes.",
-      "Send one check‑in message to a friend.",
-    ],
-    okay: [
-      "Write down the smallest step that would help right now.",
-      "Do 4‑7‑8 breathing for 3 cycles.",
-      outdoorOK ? "Get fresh air for 5 minutes." : "Try an indoor stretch or mobility routine.",
-      "List two tasks and choose one to start.",
-      "Eat a light snack and sip water.",
-    ],
-    low: [
-      "Be kind to yourself—today counts even with small steps.",
-      "Text someone you trust just to say hello.",
-      outdoorOK ? "Light walk with gentle music." : "Warm drink + cozy corner for 10 minutes.",
-      "Try box breathing: 4 in, 4 hold, 4 out, 4 hold.",
-      "Pick a single easy task and complete it.",
-    ],
-    struggling: [
-      "You’re not alone—reach out to a friend or TA.",
-      "Consider UVic Counselling resources in the Resources page.",
-      "If you need immediate support, contact a crisis line in your area.",
-      outdoorOK ? "Step outside briefly and breathe slowly." : "Stay warm, breathe slowly, and reduce stimulation for a bit.",
-      "Break goals into tiny steps; start with a 2‑minute action.",
-    ],
-  };
-
-  // Gentle tailoring if the note hints at exams or deadlines
-  if (/exam|midterm|test|final|deadline|assignment/.test(text)) {
-    base.okay.unshift("Make a 30‑60‑90 minute plan with tiny breaks.");
-    base.low.unshift("Draft a micro‑plan: 20 minutes study, 5 rest.");
-    base.struggling.unshift("Email your instructor or TA about one clear question.");
-  }
-
-  const suggestions = base[mood];
-  const follow_up_question = "Want me to create a tiny checklist for today?";
-  return { suggestions, follow_up_question };
-}
-
-// Offline mood history (per user) so logging works without the backend
-const MOOD_HISTORY_KEY = "lantern_mood_history";
-type LocalMoodEntry = { id: string; userId: string; mood: MoodValue; note?: string; timestamp: number };
-
-function getLocalMoodHistory(userId: string): LocalMoodEntry[] {
-  try {
-    const raw = localStorage.getItem(MOOD_HISTORY_KEY);
-    if (!raw) return [];
-    const all: LocalMoodEntry[] = JSON.parse(raw);
-    return all.filter((e) => e.userId === userId);
-  } catch {
-    return [];
-  }
-}
-
-function appendLocalMoodEntry(entry: LocalMoodEntry) {
-  try {
-    const raw = localStorage.getItem(MOOD_HISTORY_KEY);
-    const all: LocalMoodEntry[] = raw ? JSON.parse(raw) : [];
-    all.push(entry);
-    localStorage.setItem(MOOD_HISTORY_KEY, JSON.stringify(all));
-  } catch {
-    // ignore storage errors silently
-  }
-}
-
 const WellnessPage = () => {
   const { currentBackground } = useTheme();
   const { user } = useAuth();
   const { weather } = useWeather();
-  const { preferences } = usePreferences();
-  const { seasonalContext, refreshSeasonal } = useSeasonal(preferences?.coping_style ?? null);
-  const { logRoutineUsed, logEvent } = useEvents();
 
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
   const [note, setNote] = useState("");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isLoggingMood, setIsLoggingMood] = useState(false);
-  const [retry, setRetry] = useState<null | (() => void)>(null);
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [resourceSuggestions, setResourceSuggestions] = useState<ResourceCard[]>([]);
@@ -190,11 +83,9 @@ const WellnessPage = () => {
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [checkInMessage, setCheckInMessage] = useState<string | null>(null);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
-  const [unsyncedCount, setUnsyncedCount] = useState(0);
 
   const [checklistMood, setChecklistMood] = useState<MoodValue | null>(null);
   const [checklistNote, setChecklistNote] = useState<string | null>(null);
-  const [feedbackRoutineId, setFeedbackRoutineId] = useState<string | null>(null);
 
   const hasCustomBackground =
     currentBackground?.enabled &&
@@ -211,23 +102,8 @@ const WellnessPage = () => {
       temperature: weather.temperature,
       condition: weather.condition,
       location: "Victoria, BC",
-      // include wind for better activity gating
-      windSpeed: (weather as any).windSpeed,
-    } as const;
+    };
   }, [weather]);
-
-  useEffect(() => {
-    void refreshSeasonal(
-      weather
-        ? {
-            description: weather.description,
-            temperature: weather.temperature,
-            condition: weather.condition,
-          }
-        : undefined,
-      preferences?.coping_style ?? null
-    );
-  }, [preferences?.coping_style, refreshSeasonal, weather]);
 
   const resetSuggestions = useCallback(() => {
     setSuggestions([]);
@@ -238,44 +114,7 @@ const WellnessPage = () => {
     setChecklistTitle(null);
     setCheckInMessage(null);
     setHasCheckedIn(false);
-    setFeedbackRoutineId(null);
   }, []);
-
-  const goBackToMoods = useCallback(() => {
-    resetSuggestions();
-    setSelectedMood(null);
-    setNote("");
-    setStatusMessage(null);
-  }, [resetSuggestions]);
-
-  // Outbox utilities for offline mood syncing
-  const MOOD_OUTBOX_KEY = "lantern_mood_outbox";
-  const getOutbox = useCallback(() => {
-    try {
-      const raw = localStorage.getItem(MOOD_OUTBOX_KEY);
-      return raw ? (JSON.parse(raw) as LocalMoodEntry[]) : [];
-    } catch {
-      return [];
-    }
-  }, []);
-
-  const setOutbox = useCallback((items: LocalMoodEntry[]) => {
-    try {
-      localStorage.setItem(MOOD_OUTBOX_KEY, JSON.stringify(items));
-      setUnsyncedCount(items.filter(i => i.userId === (user?.id || "demo-user")).length);
-    } catch {}
-  }, [user?.id]);
-
-  const pushOutbox = useCallback((entry: LocalMoodEntry) => {
-    const items = getOutbox();
-    items.push(entry);
-    setOutbox(items);
-  }, [getOutbox, setOutbox]);
-
-  useEffect(() => {
-    // Initialize unsynced count on mount or user change
-    setUnsyncedCount(getOutbox().filter(i => i.userId === (user?.id || "demo-user")).length);
-  }, [getOutbox, user?.id]);
 
   const handleLogMood = useCallback(async () => {
     if (!selectedMood) {
@@ -287,30 +126,12 @@ const WellnessPage = () => {
     try {
       await api.wellness.createMoodEntry(selectedMood, note.trim() || undefined);
       setStatusMessage("Mood logged. Lantern is here if you want suggestions.");
-      setRetry(null);
     } catch (error) {
-      // Fallback: log locally so the user isn't blocked
-      const uid = (user?.id || "demo-user").toString();
-      appendLocalMoodEntry({
-        id: createId(),
-        userId: uid,
-        mood: selectedMood,
-        note: note.trim() || undefined,
-        timestamp: Date.now(),
-      });
-      pushOutbox({
-        id: createId(),
-        userId: uid,
-        mood: selectedMood,
-        note: note.trim() || undefined,
-        timestamp: Date.now(),
-      });
-      setStatusMessage("Mood noted.");
-      setRetry(() => () => handleLogMood());
+      setStatusMessage("Could not log mood. Please try again.");
     } finally {
       setIsLoggingMood(false);
     }
-  }, [note, selectedMood, user?.id]);
+  }, [note, selectedMood]);
 
   const handleGetSuggestions = useCallback(async () => {
     if (!selectedMood) {
@@ -330,21 +151,8 @@ const WellnessPage = () => {
       setFollowUpQuestion(response.data.follow_up_question || "Want me to create a checklist?");
       setResourceSuggestions(response.data.resources || []);
       setShowChecklistPrompt(true);
-      setRetry(null);
     } catch (error) {
-      if (error instanceof Error && error.message === "Unauthorized") {
-        // Don't show offline wording; prompt sign-in
-        setStatusMessage("Please sign in to get suggestions.");
-        setRetry(() => () => handleGetSuggestions());
-      } else {
-        // Provide tips silently without the "offline" phrasing
-        const local = getLocalSuggestions(selectedMood, note, weatherPayload);
-        setSuggestions(local.suggestions);
-        setFollowUpQuestion(local.follow_up_question);
-        setShowChecklistPrompt(true);
-        setStatusMessage("Here are some quick tips.");
-        setRetry(() => () => handleGetSuggestions());
-      }
+      setStatusMessage("Could not fetch suggestions. Please try again.");
     } finally {
       setIsLoadingSuggestions(false);
     }
@@ -373,25 +181,12 @@ const WellnessPage = () => {
       setChecklistItems(items);
       setChecklistMood(selectedMood);
       setChecklistNote(note.trim() || null);
-      const routineId = `wellness-${selectedMood}-checklist`;
-      setFeedbackRoutineId(routineId);
-      void logRoutineUsed(routineId, "wellness", false);
-      setRetry(null);
     } catch (error) {
-      // Fallback: build a simple checklist from current suggestions
-      const fallbackItems = (suggestions.length ? suggestions : getLocalSuggestions(selectedMood, note, weatherPayload).suggestions)
-        .slice(0, 6)
-        .map((text) => ({ id: createId(), text, done: false }));
-      setChecklistTitle("Today’s Checklist");
-      setChecklistItems(fallbackItems);
-      setChecklistMood(selectedMood);
-      setChecklistNote(note.trim() || null);
-      setStatusMessage("Here’s a quick checklist to get you started.");
-      setRetry(() => () => handleCreateChecklist());
+      setStatusMessage("Could not create checklist. Please try again.");
     } finally {
       setIsGeneratingChecklist(false);
     }
-  }, [logRoutineUsed, note, selectedMood, suggestions, weatherPayload]);
+  }, [note, selectedMood, suggestions, weatherPayload]);
 
   const handleToggleItem = useCallback((id: string) => {
     setChecklistItems((prev) =>
@@ -416,16 +211,6 @@ const WellnessPage = () => {
     ]);
   }, []);
 
-  const handleSeasonalSuggestion = useCallback(
-    (suggestionId: string) => {
-      if (!seasonalContext) return;
-      const suggestion = seasonalContext.suggestions.find((item) => item.id === suggestionId);
-      if (!suggestion) return;
-      setNote(suggestion.text);
-    },
-    [seasonalContext]
-  );
-
   const checklistComplete =
     checklistItems.length > 0 && checklistItems.every((item) => item.done);
 
@@ -448,9 +233,6 @@ const WellnessPage = () => {
       });
       setCheckInMessage(response.data.message);
       setHasCheckedIn(true);
-      if (feedbackRoutineId) {
-        void logRoutineUsed(feedbackRoutineId, "wellness", true);
-      }
     } catch (error) {
       setCheckInMessage("You made it through that checklist. How are you feeling now?");
       setHasCheckedIn(true);
@@ -462,10 +244,8 @@ const WellnessPage = () => {
     checklistItems,
     checklistMood,
     checklistNote,
-    feedbackRoutineId,
     hasCheckedIn,
     isCheckingIn,
-    logRoutineUsed,
     note,
     selectedMood,
     weatherPayload,
@@ -538,16 +318,6 @@ const WellnessPage = () => {
                 Victoria, BC · {weather.temperature}°C · {weather.description}
               </p>
             )}
-            {seasonalContext && (
-              <div className="flex justify-center">
-                <SeasonalBanner
-                  context={seasonalContext}
-                  onSuggestionClick={handleSeasonalSuggestion}
-                  onSunsetClick={() => setNote("Quick loop before it gets dark.")}
-                  showSuggestions
-                />
-              </div>
-            )}
           </motion.header>
 
           {/* Mood Selection Card */}
@@ -566,106 +336,75 @@ const WellnessPage = () => {
               <CardContent className="space-y-8">
                 {/* Mood buttons - Playbook style */}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                  </Button>
-                  {unsyncedCount > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full text-muted-foreground"
-                      onClick={async () => {
-                        const uid = (user?.id || "demo-user").toString();
-                        const outboxAll = getOutbox();
-                        const mine = outboxAll.filter(i => i.userId === uid);
-                        let remaining = outboxAll.filter(i => i.userId !== uid);
-                        for (const item of mine) {
-                          try {
-                            await api.wellness.createMoodEntry(item.mood, item.note);
-                          } catch {
-                            remaining.push(item);
-                          }
-                        }
-                    {resourceSuggestions.length > 0 && (
-                      <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide">
-                          UVic Resources
-                        </h3>
-                        <div className="grid gap-3">
-                          {resourceSuggestions.map((resource, index) => (
-                            <motion.a
-                              key={resource.id}
-                              href={normalizeResourceUrl(resource.url)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={() =>
-                                logEvent("resource_clicked", {
-                                  resource_id: resource.id,
-                                  resource_type: "wellness_suggestion",
-                                })
-                              }
-                              className={cn(
-                                "block p-4 rounded-2xl",
-                                "bg-background/40 border border-border/30",
-                                "hover:bg-background/60 hover:border-border/60",
-                                "transition-all duration-300"
-                              )}
-                              initial={{ opacity: 0, y: 8 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.08 }}
-                            >
-                              <div className="flex items-start justify-between gap-4">
-                                <div>
-                                  <p className="font-medium text-foreground">{resource.name}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {resource.description}
-                                  </p>
-                                  {resource.location && (
-                                    <p className="text-[10px] text-muted-foreground/70 mt-2">
-                                      {resource.location}
-                                    </p>
-                                  )}
-                                </div>
-                                <span className="text-xs text-muted-foreground/70">↗</span>
-                              </div>
-                            </motion.a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                      }}
-                    >
-                      Sync {unsyncedCount} saved {unsyncedCount === 1 ? "mood" : "moods"}
-                    </Button>
-                  )}
-                  {statusMessage && (
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
-                      <button
+                  {moodOptions.map((option) => {
+                    const Icon = option.icon;
+                    const isSelected = selectedMood === option.value;
+                    return (
+                      <motion.button
+                        key={option.value}
                         type="button"
+                        onClick={() => setSelectedMood(option.value)}
                         className={cn(
-                          /sync/i.test(statusMessage) ? "underline decoration-dotted cursor-pointer hover:text-foreground" : ""
+                          "relative flex flex-col items-center gap-3 p-6 rounded-2xl",
+                          "border border-border/40 transition-all duration-300",
+                          "bg-background/60 hover:bg-background/80",
+                          isSelected && "border-primary/60 ring-2 ring-primary/20"
                         )}
-                        onClick={() => {
-                          if (/sync/i.test(statusMessage)) {
-                            goBackToMoods();
-                          }
-                        }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        {statusMessage}
-                      </button>
-                      {retry && (
-                        <Button
-                          variant="link"
-                          size="sm"
-                          className="px-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            retry();
-                            setRetry(null);
-                          }}
-                        >
-                          Retry
-                        </Button>
-                      )}
-                    </div>
+                        {/* Gradient overlay */}
+                        <div
+                          className={cn(
+                            "absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300",
+                            isSelected && "opacity-100",
+                            `bg-gradient-to-br ${option.gradient}`
+                          )}
+                        />
+                        <Icon className={cn("h-7 w-7 relative z-10", isSelected ? "text-foreground" : "text-muted-foreground")} />
+                        <span className={cn("text-sm font-medium relative z-10", isSelected ? "text-foreground" : "text-muted-foreground")}>
+                          {option.label}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+
+                {/* Note textarea */}
+                <div className="space-y-3">
+                  <label className="text-sm text-muted-foreground font-medium">
+                    Add a note (optional)
+                  </label>
+                  <Textarea
+                    value={note}
+                    onChange={(event) => setNote(event.target.value)}
+                    placeholder="What's on your mind today?"
+                    className="min-h-[100px] bg-background/60 border-border/40 resize-none"
+                  />
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-wrap items-center gap-4">
+                  <Button
+                    onClick={handleLogMood}
+                    disabled={!selectedMood || isLoggingMood}
+                    size="lg"
+                    className="rounded-full px-8"
+                  >
+                    {isLoggingMood ? "Logging..." : "Log Mood"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleGetSuggestions}
+                    disabled={!selectedMood || isLoadingSuggestions}
+                    size="lg"
+                    className="rounded-full px-8 gap-2"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {isLoadingSuggestions ? "Thinking..." : "Get Suggestions"}
+                  </Button>
+                  {statusMessage && (
+                    <span className="text-sm text-muted-foreground">{statusMessage}</span>
                   )}
                 </div>
               </CardContent>
@@ -687,7 +426,6 @@ const WellnessPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-<<<<<<< HEAD
                   {suggestions.length > 0 && (
                     <ul className="space-y-3">
                       {suggestions.map((suggestion, index) => (
@@ -717,12 +455,6 @@ const WellnessPage = () => {
                             href={normalizeResourceUrl(resource.url)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={() =>
-                              logEvent("resource_clicked", {
-                                resource_id: resource.id,
-                                resource_type: "wellness_suggestion",
-                              })
-                            }
                             className={cn(
                               "block p-4 rounded-2xl",
                               "bg-background/40 border border-border/30",
@@ -752,26 +484,6 @@ const WellnessPage = () => {
                       </div>
                     </div>
                   )}
-=======
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">Personalized ideas based on your mood and Victoria weather.</p>
-                    <Button variant="ghost" size="sm" className="rounded-full" onClick={goBackToMoods}>Back to moods</Button>
-                  </div>
-                  <ul className="space-y-3">
-                    {suggestions.map((suggestion, index) => (
-                      <motion.li
-                        key={`${suggestion}-${index}`}
-                        className="flex gap-3 items-start p-4 rounded-xl bg-background/40 border border-border/30"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <span className="h-2 w-2 rounded-full bg-primary mt-2 shrink-0" />
-                        <span className="text-foreground/90">{suggestion}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
->>>>>>> f4f9663 (Updated wellness router and wellness page)
 
                   {followUpQuestion && showChecklistPrompt && (
                     <div className="p-6 rounded-2xl bg-accent/30 border border-primary/20 space-y-4">
@@ -808,12 +520,9 @@ const WellnessPage = () => {
             >
               <Card className="border-border/40 bg-card/50 backdrop-blur-sm shadow-xl">
                 <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <CardTitle className="text-xl font-serif">
-                      {checklistTitle || "Your Checklist"}
-                    </CardTitle>
-                    <Button variant="ghost" size="sm" className="rounded-full" onClick={goBackToMoods}>Back to moods</Button>
-                  </div>
+                  <CardTitle className="text-xl font-serif">
+                    {checklistTitle || "Your Checklist"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
@@ -899,20 +608,6 @@ const WellnessPage = () => {
                   </p>
                 </CardContent>
               </Card>
-            </motion.div>
-          )}
-
-          {feedbackRoutineId && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FeedbackPrompt
-                routineId={feedbackRoutineId}
-                playbookId="wellness"
-                onDismiss={() => setFeedbackRoutineId(null)}
-              />
             </motion.div>
           )}
         </div>
