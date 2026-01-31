@@ -114,47 +114,47 @@ export const ChatBubble = ({ message, isLatest = false }: ChatBubbleProps) => {
 
       {/* Message Content */}
       <div className={cn(
-        "flex flex-col max-w-[80%] md:max-w-[75%]",
+        "flex flex-col max-w-[85%] md:max-w-[75%]",
         isUser ? "items-end" : "items-start"
       )}>
         {/* Name Label */}
         <motion.span
           className={cn(
-            "text-xs font-medium mb-1.5 px-1",
-            isAssistant ? "text-lantern-glow" : "text-primary"
+            "text-xs font-medium mb-2 px-1 font-mono tracking-wide",
+            isAssistant ? "text-primary/80" : "text-muted-foreground"
           )}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          {isAssistant ? "Lantern" : "You"}
+          {isAssistant ? "LANTERN" : "YOU"}
         </motion.span>
 
-        {/* Bubble */}
+        {/* Bubble - Larger, more readable */}
         <motion.div
           className={cn(
-            "relative px-4 py-3 rounded-2xl",
+            "relative px-5 py-4 rounded-2xl",
             isAssistant && [
-              "bg-card border border-border/50",
+              "bg-card/80 backdrop-blur-sm border border-border/50",
               "rounded-tl-md",
-              "shadow-sm",
+              "shadow-lg",
               isLatest && "ring-1 ring-primary/20"
             ],
             isUser && [
               "bg-gradient-to-br from-primary to-primary/90",
               "text-primary-foreground",
               "rounded-tr-md",
-              "shadow-md"
+              "shadow-xl"
             ]
           )}
           whileHover={{
-            scale: 1.01,
+            scale: 1.005,
             transition: springPresets.snappy,
           }}
         >
-          {/* Message Text */}
+          {/* Message Text - Larger for readability */}
           <div className={cn(
-            "text-sm md:text-base leading-relaxed",
+            "text-base md:text-lg leading-relaxed",
             isAssistant && "text-foreground/90",
             isUser && "text-primary-foreground"
           )}>

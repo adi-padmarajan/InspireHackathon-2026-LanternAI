@@ -5,10 +5,13 @@ import { WelcomeHero } from "@/components/chat/WelcomeHero";
 import { ChatBubble } from "@/components/chat/ChatBubble";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
+import { TrustedResources } from "@/components/chat/TrustedResources";
 import { AmbientBackground } from "@/components/AmbientBackground";
+import { FilmGrain, CinematicVignette, AmbientGradients } from "@/components/FilmGrain";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWeather } from "@/hooks/useWeather";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
@@ -424,6 +427,8 @@ const ChatPage = () => {
           ? "Coffee, tea, or naturally caffeinated?"
           : "Share what's on your mind...";
 
+  const isMobile = useIsMobile();
+
   return (
     <motion.div
       className={cn(
@@ -435,90 +440,117 @@ const ChatPage = () => {
       animate="enter"
       exit="exit"
     >
+      {/* Cinematic layers */}
       {!hasCustomBackground && <AmbientBackground />}
+      <AmbientGradients />
+      <CinematicVignette intensity={0.3} />
+      <FilmGrain opacity={0.02} />
 
+      {/* Edge gradients */}
       {!hasCustomBackground && (
         <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background/80 via-background/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/50 to-transparent" />
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background/40 to-transparent" />
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background/40 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background/90 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
         </div>
       )}
 
       <Navigation />
 
-      <main className="flex-1 pt-16 flex flex-col relative z-10">
-        <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full">
-          <div
-            ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto chat-scroll px-4 md:px-6"
-          >
-            <motion.div
-              key="chat"
-              className="py-6 space-y-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
+      <main className="flex-1 pt-16 flex relative z-10">
+        {/* Split layout container */}
+        <div className="flex-1 flex max-w-7xl mx-auto w-full">
+          {/* Chat conversation - Left side */}
+          <div className="flex-1 flex flex-col min-w-0">
+            <div
+              ref={messagesContainerRef}
+              className="flex-1 overflow-y-auto chat-scroll px-4 md:px-8 lg:px-12"
             >
-              {showWelcomeHero && <WelcomeHero />}
+              <motion.div
+                className="py-8 space-y-6 max-w-2xl mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                {showWelcomeHero && <WelcomeHero />}
 
-              <AnimatePresence>
-                {messages.map((message, index) => (
-                  <ChatBubble
-                    key={message.id}
-                    message={message}
-                    isLatest={
-                      index === messages.length - 1 &&
-                      message.role === "assistant"
-                    }
-                  />
-                ))}
-              </AnimatePresence>
-
-              <AnimatePresence>
-                {isLoading && <TypingIndicator />}
-              </AnimatePresence>
-
-              {onboardingOptions && (
-                <motion.div
-                  className="flex flex-wrap gap-2"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={springPresets.gentle}
-                >
-                  {onboardingOptions.map((option) => (
-                    <motion.button
-                      key={option.label}
-                      onClick={() => handleQuickSelect(option.value)}
-                      className="px-3 py-1.5 rounded-full text-xs md:text-sm border border-border/60 bg-card/80 text-foreground/80 hover:text-foreground transition-colors"
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      {option.label}
-                    </motion.button>
+                <AnimatePresence>
+                  {messages.map((message, index) => (
+                    <ChatBubble
+                      key={message.id}
+                      message={message}
+                      isLatest={
+                        index === messages.length - 1 &&
+                        message.role === "assistant"
+                      }
+                    />
                   ))}
-                </motion.div>
-              )}
+                </AnimatePresence>
 
-              <div ref={messagesEndRef} />
+                <AnimatePresence>
+                  {isLoading && <TypingIndicator />}
+                </AnimatePresence>
+
+                {onboardingOptions && (
+                  <motion.div
+                    className="flex flex-wrap gap-3 pt-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springPresets.gentle}
+                  >
+                    {onboardingOptions.map((option) => (
+                      <motion.button
+                        key={option.label}
+                        onClick={() => handleQuickSelect(option.value)}
+                        className={cn(
+                          "px-4 py-2 rounded-full text-sm",
+                          "border border-border/60 bg-card/60 backdrop-blur-sm",
+                          "text-foreground/80 hover:text-foreground",
+                          "hover:bg-card/80 hover:border-border",
+                          "transition-all duration-300"
+                        )}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        {option.label}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </motion.div>
+            </div>
+
+            {/* Input area */}
+            <motion.div
+              className="sticky bottom-0 px-4 md:px-8 lg:px-12 pb-6 pt-4 bg-gradient-to-t from-background via-background/95 to-transparent"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, ...springPresets.gentle }}
+            >
+              <div className="max-w-2xl mx-auto">
+                <EnhancedChatInput
+                  value={input}
+                  onChange={setInput}
+                  onSend={handleSend}
+                  isLoading={isLoading}
+                  placeholder={inputPlaceholder}
+                />
+              </div>
             </motion.div>
           </div>
 
-          <motion.div
-            className="sticky bottom-0 p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent pt-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, ...springPresets.gentle }}
-          >
-            <EnhancedChatInput
-              value={input}
-              onChange={setInput}
-              onSend={handleSend}
-              isLoading={isLoading}
-              placeholder={inputPlaceholder}
-            />
-          </motion.div>
+          {/* Resources sidebar - Right side (desktop only) */}
+          {!isMobile && (
+            <motion.aside
+              className="hidden lg:block w-80 xl:w-96 shrink-0 border-l border-border/30 p-6 overflow-y-auto"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <TrustedResources />
+            </motion.aside>
+          )}
         </div>
       </main>
     </motion.div>

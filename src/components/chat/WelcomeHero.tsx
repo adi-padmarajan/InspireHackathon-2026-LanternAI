@@ -4,7 +4,6 @@ import {
   staggerContainer,
   staggerChild,
   floatingAnimation,
-  glowPulse,
   springPresets,
   breathingAnimation,
 } from "@/lib/animations";
@@ -41,45 +40,54 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center py-8 md:py-12"
+      className="flex flex-col items-center justify-center py-12 md:py-16"
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
     >
-      {/* Lantern Icon with Glow */}
+      {/* Lantern Icon with refined glow */}
       <motion.div
-        className="relative mb-6"
+        className="relative mb-8"
         variants={staggerChild}
       >
-        {/* Animated glow behind lantern */}
+        {/* Ambient glow */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-b from-amber-400/30 to-orange-400/20 rounded-full blur-3xl scale-150"
+          className="absolute inset-0 rounded-full blur-[60px] scale-[2]"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--lantern-glow) / 0.2) 0%, transparent 70%)",
+          }}
           animate={{
-            scale: [1.5, 1.7, 1.5],
-            opacity: [0.3, 0.5, 0.3],
+            scale: [2, 2.2, 2],
+            opacity: [0.4, 0.6, 0.4],
           }}
           transition={{
-            duration: 4,
+            duration: 5,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
 
         <motion.div
-          className="relative bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 p-6 rounded-full"
-          animate={glowPulse}
-          whileHover={{ scale: 1.1 }}
-          transition={springPresets.gentle}
+          className="relative p-6 rounded-full bg-gradient-to-br from-accent/80 via-accent/60 to-accent/40 shadow-2xl"
+          animate={{
+            boxShadow: [
+              "0 0 40px hsl(var(--lantern-glow) / 0.2)",
+              "0 0 60px hsl(var(--lantern-glow) / 0.35)",
+              "0 0 40px hsl(var(--lantern-glow) / 0.2)",
+            ],
+          }}
+          transition={{ duration: 4, repeat: Infinity }}
+          whileHover={{ scale: 1.05 }}
         >
           <motion.div animate={floatingAnimation}>
-            <Lamp className="h-12 w-12 md:h-16 md:w-16 text-amber-600 dark:text-amber-400" />
+            <Lamp className="h-12 w-12 md:h-14 md:w-14 text-primary drop-shadow-lg" />
           </motion.div>
         </motion.div>
       </motion.div>
 
-      {/* Greeting with Time Icon */}
+      {/* Greeting badge */}
       <motion.div
-        className="flex items-center gap-2 mb-2"
+        className="flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-card/60 border border-border/40 backdrop-blur-sm"
         variants={staggerChild}
       >
         <motion.div
@@ -93,22 +101,22 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
             ease: "easeInOut",
           }}
         >
-          <TimeIcon className="h-5 w-5 text-primary" />
+          <TimeIcon className="h-4 w-4 text-primary" />
         </motion.div>
-        <span className="text-sm font-medium text-primary">{greeting.text}</span>
+        <span className="text-sm font-medium text-foreground/80">{greeting.text}</span>
       </motion.div>
 
       {/* Main Title */}
       <motion.h1
-        className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-center mb-3"
+        className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-center mb-4 tracking-tight"
         variants={staggerChild}
       >
         I'm{" "}
         <motion.span
           className="text-primary"
           whileHover={{
-            scale: 1.05,
-            textShadow: "0 0 20px hsl(38 95% 55% / 0.5)",
+            scale: 1.02,
+            textShadow: "0 0 30px hsl(var(--primary) / 0.4)",
           }}
           transition={springPresets.snappy}
         >
@@ -121,55 +129,55 @@ export const WelcomeHero = ({ onGetStarted }: WelcomeHeroProps) => {
         className="text-lg md:text-xl text-muted-foreground text-center max-w-md mb-2"
         variants={staggerChild}
       >
-        Your UVic companion
+        Your UVic wellness companion
       </motion.p>
 
       {/* Subtext */}
       <motion.p
-        className="text-sm text-muted-foreground/70 text-center"
+        className="text-sm text-muted-foreground/60 text-center"
         variants={staggerChild}
       >
         {greeting.subtext}
       </motion.p>
 
-      {/* Warm Message */}
+      {/* Warm Message Card */}
       <motion.div
-        className="mt-8 p-4 md:p-6 bg-gradient-to-br from-accent/50 to-accent/30 dark:from-accent/30 dark:to-accent/10 rounded-2xl max-w-lg border border-primary/10"
+        className="mt-10 p-6 md:p-8 bg-card/50 backdrop-blur-sm rounded-3xl max-w-lg border border-border/40 shadow-xl"
         variants={staggerChild}
         whileHover={{
-          scale: 1.02,
-          boxShadow: "0 0 30px hsl(var(--primary) / 0.1)",
+          scale: 1.01,
+          boxShadow: "0 0 40px hsl(var(--primary) / 0.1)",
         }}
         transition={springPresets.gentle}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-4">
           <motion.div
-            className="flex-shrink-0 p-2 bg-primary/10 rounded-full"
+            className="flex-shrink-0 p-3 bg-accent/50 rounded-full"
             animate={breathingAnimation}
           >
             <Heart className="h-5 w-5 text-primary" />
           </motion.div>
           <div>
-            <p className="text-sm md:text-base text-foreground/90 leading-relaxed">
+            <p className="text-base md:text-lg text-foreground/90 leading-relaxed">
               I'm here to listen, help you sort through thoughts, and offer steady support. No judgment, just understanding.
             </p>
           </div>
         </div>
       </motion.div>
 
-      {/* Scroll indicator */}
+      {/* Scroll hint */}
       <motion.div
-        className="mt-8 flex flex-col items-center gap-2"
+        className="mt-10 flex flex-col items-center gap-3"
         variants={staggerChild}
       >
-        <p className="text-xs text-muted-foreground">Start by telling me what you'd like to be called</p>
+        <p className="text-sm text-muted-foreground/50">Start by telling me what you'd like to be called</p>
         <motion.div
-          className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2"
-          animate={{ opacity: [0.5, 1, 0.5] }}
+          className="w-6 h-10 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-2"
+          animate={{ opacity: [0.4, 0.8, 0.4] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <motion.div
-            className="w-1.5 h-3 bg-muted-foreground/50 rounded-full"
+            className="w-1.5 h-2.5 bg-muted-foreground/40 rounded-full"
             animate={{ y: [0, 8, 0] }}
             transition={{
               duration: 1.5,
