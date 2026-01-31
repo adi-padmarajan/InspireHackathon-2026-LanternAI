@@ -180,7 +180,18 @@ export const api = {
     }) =>
       apiFetch<{
         success: boolean;
-        data: { suggestions: string[]; follow_up_question: string };
+        data: {
+          suggestions: string[];
+          follow_up_question: string;
+          resources?: Array<{
+            id: string;
+            name: string;
+            description: string;
+            categories: string[];
+            url: string;
+            location?: string | null;
+          }>;
+        };
       }>("/api/wellness/suggestions", {
         method: "POST",
         body: payload,

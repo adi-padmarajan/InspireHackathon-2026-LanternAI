@@ -11,6 +11,7 @@ from ..models.schemas import (
     WellnessSuggestionResponse,
     WellnessChecklistResponse,
     WellnessCheckInResponse,
+    ResourceCardOut,
 )
 from .safety import (
     detect_crisis,
@@ -19,6 +20,8 @@ from .safety import (
     build_crisis_follow_up_question,
     build_crisis_checkin_message,
 )
+from .resource_service import get_resource_service, build_resource_id
+from .seasonal_service import seasonal_service
 
 # Configure Google Gemini (safe to call multiple times)
 genai.configure(api_key=settings.google_ai_api_key)
@@ -82,6 +85,88 @@ def _weather_line(weather: Optional[WeatherContext]) -> str:
     return f"Weather in Victoria: {', '.join(parts)}."
 
 
+def _dedupe(items: list[str]) -> list[str]:
+    seen = set()
+    unique = []
+    for item in items:
+        key = item.strip().lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        unique.append(item)
+    return unique
+
+
+def _is_academic_note(note: Optional[str]) -> bool:
+    if not note:
+        return False
+    lowered = note.lower()
+    return any(term in lowered for term in ["exam", "midterm", "assignment", "paper", "deadline", "grade", "class"])
+
+
+def _is_lonely_note(note: Optional[str]) -> bool:
+    if not note:
+        return False
+    lowered = note.lower()
+    return any(term in lowered for term in ["lonely", "alone", "isolated", "homesick", "no friends", "friendless"])
+
+
+def _is_anxious_note(note: Optional[str]) -> bool:
+    if not note:
+        return False
+    lowered = note.lower()
+    return any(term in lowered for term in ["anxious", "anxiety", "panic", "worried", "nervous", "on edge"])
+
+
+def _seasonal_suggestions(weather: Optional[WeatherContext]) -> list[str]:
+    if not weather:
+        return []
+    context = seasonal_service.get_seasonal_context(
+        weather_description=weather.description,
+        temperature=weather.temperature,
+        condition=weather.condition,
+        location=weather.location or "Victoria, BC",
+    )
+    return context.get("suggestions", [])[:1]
+
+
+def _deterministic_suggestions(
+    mood: MoodLevel,
+    note: Optional[str],
+    weather: Optional[WeatherContext],
+) -> list[str]:
+    suggestions: list[str] = []
+    suggestions.extend(_seasonal_suggestions(weather))
+
+    if mood in {MoodLevel.GREAT, MoodLevel.GOOD}:
+        suggestions.extend([
+            "Keep the momentum: take a short loop around Ring Road or Mystic Vale.",
+            "Block one focused study session at McPherson Library or your favorite spot.",
+            "Try one low-pressure campus activity or club this week.",
+        ])
+    elif mood == MoodLevel.OKAY:
+        suggestions.extend([
+            "Do a quick reset: water, a stretch, and three slow breaths.",
+            "Pick one small task you can finish in 15 minutes.",
+            "Give yourself a short break at the SUB or a quiet corner.",
+        ])
+    else:
+        suggestions.extend([
+            "Start tiny: 3 deep breaths, shoulders down, feet grounded.",
+            "If you can, take a 5-minute walk inside or outside to reset.",
+            "Consider reaching out to Student Wellness or UVic Counselling.",
+        ])
+
+    if _is_academic_note(note):
+        suggestions.append("If academics are heavy, the Academic Skills Centre can help you plan.")
+    if _is_lonely_note(note):
+        suggestions.append("Low-pressure connection idea: drop into UVic Global Community or a club page.")
+    if _is_anxious_note(note):
+        suggestions.append("Try a 2-minute box breath: 4 in, 4 hold, 4 out, 4 hold.")
+
+    return _dedupe(suggestions)[:5]
+
+
 def _fallback_suggestions(mood: MoodLevel, weather: Optional[WeatherContext]) -> WellnessSuggestionResponse:
     weather_hint = (weather.description or "").lower() if weather else ""
     if "rain" in weather_hint or "overcast" in weather_hint:
@@ -100,6 +185,7 @@ def _fallback_suggestions(mood: MoodLevel, weather: Optional[WeatherContext]) ->
     return WellnessSuggestionResponse(
         suggestions=suggestions,
         follow_up_question="Want me to turn these into a quick checklist?",
+        resources=[],
     )
 
 
@@ -108,6 +194,7 @@ def _crisis_suggestions() -> WellnessSuggestionResponse:
     return WellnessSuggestionResponse(
         suggestions=suggestions[:5],
         follow_up_question=build_crisis_follow_up_question(),
+        resources=[],
     )
 
 
@@ -152,6 +239,7 @@ class WellnessService:
     def __init__(self, supabase: Client):
         self.supabase = supabase
         self.table_name = "mood_entries"
+        self.resource_service = get_resource_service()
 
     async def create_mood_entry(
         self,
@@ -227,50 +315,58 @@ class WellnessService:
         note: Optional[str] = None,
         weather: Optional[WeatherContext] = None,
     ) -> WellnessSuggestionResponse:
-        """Generate weather-aware suggestions via Gemini Flash."""
+        """Generate weather-aware, UVic-specific suggestions."""
         if _contains_crisis(note):
             return _crisis_suggestions()
 
-        if not settings.google_ai_api_key:
-            return _fallback_suggestions(mood, weather)
-
-        prompt = "\n".join(
-            [
-                f"Mood: {mood.value}",
-                f"Note: {note or 'n/a'}",
-                _weather_line(weather),
-            ]
+        suggestions = _deterministic_suggestions(mood, note, weather)
+        follow_up = (
+            "Want me to create a gentle checklist for the next few hours?"
+            if mood in {MoodLevel.LOW, MoodLevel.STRUGGLING}
+            else "Want me to turn these into a quick checklist?"
         )
 
-        try:
-            model = genai.GenerativeModel(
-                model_name=GEMINI_MODEL_NAME,
-                system_instruction=SUGGESTIONS_SYSTEM_PROMPT,
-            )
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    max_output_tokens=512,
-                    temperature=0.7,
-                    top_p=0.9,
-                    top_k=40,
-                ),
-            )
-            payload = _extract_json(response.text or "")
-            if not payload:
-                return _fallback_suggestions(mood, weather)
+        resources = self._select_resources(mood, note)
+        return WellnessSuggestionResponse(
+            suggestions=suggestions,
+            follow_up_question=follow_up,
+            resources=resources,
+        )
 
-            suggestions = _normalize_list(payload.get("suggestions"))
-            follow_up = str(payload.get("follow_up_question") or "").strip()
-            if not suggestions or not follow_up:
-                return _fallback_suggestions(mood, weather)
+    def _select_resources(self, mood: MoodLevel, note: Optional[str]) -> list[ResourceCardOut]:
+        if not self.resource_service.is_loaded:
+            return []
 
-            return WellnessSuggestionResponse(
-                suggestions=suggestions[:5],
-                follow_up_question=follow_up,
-            )
-        except Exception:
-            return _fallback_suggestions(mood, weather)
+        queries: list[str] = []
+        if mood in {MoodLevel.LOW, MoodLevel.STRUGGLING}:
+            queries.extend(["Student Wellness Centre", "UVic Counselling"])
+        if mood == MoodLevel.OKAY:
+            queries.append("Student Wellness Centre")
+
+        if _is_academic_note(note):
+            queries.append("Academic Skills Centre")
+        if _is_lonely_note(note):
+            queries.extend(["UVic Global Community", "clubs", "UVSS"])
+        if _is_anxious_note(note):
+            queries.append("Multifaith Centre")
+        if mood in {MoodLevel.GREAT, MoodLevel.GOOD}:
+            queries.extend(["CARSA", "Vikes Sport Clubs"])
+
+        if not queries:
+            queries = ["Student Wellness Centre", "UVic Counselling"]
+
+        results: list[ResourceCardOut] = []
+        seen_ids: set[str] = set()
+        for query in queries:
+            for item in self.resource_service.search(query, limit=2):
+                resource_id = item.get("id") or build_resource_id(item.get("name", ""))
+                if resource_id in seen_ids:
+                    continue
+                seen_ids.add(resource_id)
+                results.append(ResourceCardOut(**{**item, "id": resource_id}))
+                if len(results) >= 4:
+                    return results
+        return results
 
     async def generate_checklist(
         self,

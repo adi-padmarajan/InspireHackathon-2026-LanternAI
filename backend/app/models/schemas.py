@@ -57,6 +57,16 @@ class WeatherContext(BaseModel):
     location: Optional[str] = None
 
 
+# Resource models
+class ResourceCardOut(BaseModel):
+    id: str
+    name: str
+    description: str
+    categories: list[str]
+    url: str
+    location: Optional[str] = None
+
+
 class WellnessSuggestionRequest(BaseModel):
     mood: MoodLevel
     note: Optional[str] = None
@@ -66,6 +76,7 @@ class WellnessSuggestionRequest(BaseModel):
 class WellnessSuggestionResponse(BaseModel):
     suggestions: list[str]
     follow_up_question: str
+    resources: list[ResourceCardOut] = Field(default_factory=list)
 
 
 class WellnessChecklistRequest(BaseModel):
@@ -109,17 +120,6 @@ class ApiResponse(BaseModel, Generic[T]):
     success: bool
     data: Optional[T] = None
     error: Optional[str] = None
-
-
-# Resource models
-class ResourceCardOut(BaseModel):
-    id: str
-    name: str
-    description: str
-    categories: list[str]
-    url: str
-    location: Optional[str] = None
-
 
 # Playbook models
 class PlaybookStage(str, Enum):

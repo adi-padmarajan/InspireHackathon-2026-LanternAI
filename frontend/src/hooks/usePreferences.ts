@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-interface UserPreferences {
-  vibe: 'jokester' | 'cozy' | 'balanced' | null;
-  coping_style: 'talking' | 'planning' | 'grounding' | null;
-  routines: string[];
-}
+import type { UserPreferences, PersonalizationContext } from '../lib/api';
 
 interface UsePreferencesReturn {
   preferences: UserPreferences | null;
@@ -13,6 +8,7 @@ interface UsePreferencesReturn {
   error: string | null;
   updatePreferences: (updates: Partial<UserPreferences>) => Promise<boolean>;
   clearPreferences: () => Promise<boolean>;
+  getPersonalization: (playbookId: string) => Promise<PersonalizationContext | null>;
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -36,11 +32,7 @@ export function usePreferences(): UsePreferencesReturn {
 
       const data = await response.json();
       if (data.success && data.data) {
-        setPreferences({
-          vibe: data.data.vibe || null,
-          coping_style: data.data.coping_style || null,
-          routines: data.data.routines || [],
-        });
+        setPreferences(data.data);
       }
     } catch (err) {
       setError('Failed to fetch preferences');
@@ -97,11 +89,33 @@ export function usePreferences(): UsePreferencesReturn {
     }
   }, [session]);
 
+  const getPersonalization = useCallback(async (playbookId: string): Promise<PersonalizationContext | null> => {
+    try {
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
+      const response = await fetch(
+        `${API_BASE}/api/profile/personalization?playbook_id=${encodeURIComponent(playbookId)}`,
+        { headers }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        return data.data;
+      }
+      return null;
+    } catch (err) {
+      return null;
+    }
+  }, [session]);
+
   useEffect(() => {
     if (session?.access_token) {
       fetchPreferences();
     }
   }, [session, fetchPreferences]);
 
-  return { preferences, loading, error, updatePreferences, clearPreferences };
+  return { preferences, loading, error, updatePreferences, clearPreferences, getPersonalization };
 }

@@ -1,11 +1,12 @@
 import React from 'react';
-import { Cloud, Sun, Umbrella, Snowflake, Wind } from 'lucide-react';
+import { Cloud, Sun, Umbrella, Snowflake, Wind, Sunset } from 'lucide-react';
+import type { SeasonalContext } from '../lib/api';
 
 interface SeasonalBannerProps {
-  tone: 'cozy' | 'uplifting' | 'gentle';
-  tags: string[];
-  sunsetAlert?: boolean;
+  context: SeasonalContext;
   onSunsetClick?: () => void;
+  onSuggestionClick?: (suggestionId: string) => void;
+  showSuggestions?: boolean;
 }
 
 const toneConfig = {
@@ -15,13 +16,13 @@ const toneConfig = {
     text: 'text-amber-200',
     label: 'Cozy mode',
   },
-  uplifting: {
+  bright: {
     bg: 'bg-emerald-500/10',
     border: 'border-emerald-500/20',
     text: 'text-emerald-200',
-    label: 'Uplifting mode',
+    label: 'Bright mode',
   },
-  gentle: {
+  neutral: {
     bg: 'bg-sky-500/10',
     border: 'border-sky-500/20',
     text: 'text-sky-200',
@@ -29,42 +30,76 @@ const toneConfig = {
   },
 };
 
-function getWeatherIcon(tags: string[]) {
-  if (tags.includes('rainy_day')) return <Umbrella className="w-4 h-4" />;
-  if (tags.includes('snowy_day')) return <Snowflake className="w-4 h-4" />;
-  if (tags.includes('sunny')) return <Sun className="w-4 h-4" />;
-  if (tags.includes('windy')) return <Wind className="w-4 h-4" />;
+function getWeatherIcon(context: SeasonalContext) {
+  if (context.is_rainy) return <Umbrella className="w-4 h-4" />;
+  if (context.tags.includes('snowy_day')) return <Snowflake className="w-4 h-4" />;
+  if (context.is_clear) return <Sun className="w-4 h-4" />;
+  if (context.tags.includes('windy')) return <Wind className="w-4 h-4" />;
   return <Cloud className="w-4 h-4" />;
 }
 
+function getWeatherLabel(context: SeasonalContext): string {
+  if (context.is_rainy) return 'Rainy day';
+  if (context.is_clear) return 'Clear day';
+  if (context.tags.includes('snowy_day')) return 'Snowy day';
+  if (context.tags.includes('overcast')) return 'Overcast';
+  return 'Today';
+}
+
 export const SeasonalBanner: React.FC<SeasonalBannerProps> = ({
-  tone,
-  tags,
-  sunsetAlert,
+  context,
   onSunsetClick,
+  onSuggestionClick,
+  showSuggestions = false,
 }) => {
-  const config = toneConfig[tone];
-  const weatherLabel = tags.find(t => t.includes('day') || t === 'sunny' || t === 'overcast') || 'today';
+  const config = toneConfig[context.tone];
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <div
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.border} border ${config.text}`}
-      >
-        {getWeatherIcon(tags)}
-        <span className="capitalize">{weatherLabel.replace('_', ' ')}</span>
-        <span className="opacity-60">•</span>
-        <span>{config.label}</span>
-      </div>
-      
-      {sunsetAlert && (
-        <button
-          onClick={onSunsetClick}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-500/10 border border-orange-500/20 text-orange-200 hover:bg-orange-500/20 transition-colors"
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        {/* Weather/Tone Badge */}
+        <div
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.border} border ${config.text}`}
         >
-          <Sun className="w-3 h-3" />
-          Quick outside loop before sunset?
-        </button>
+          {getWeatherIcon(context)}
+          <span>{getWeatherLabel(context)}</span>
+          {context.temperature_c !== null && (
+            <>
+              <span className="opacity-60">•</span>
+              <span>{Math.round(context.temperature_c)}°C</span>
+            </>
+          )}
+          <span className="opacity-60">•</span>
+          <span>{config.label}</span>
+        </div>
+        
+        {/* Sunset Alert */}
+        {context.sunset_alert && (
+          <button
+            onClick={onSunsetClick}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-500/10 border border-orange-500/20 text-orange-200 hover:bg-orange-500/20 transition-colors"
+          >
+            <Sunset className="w-3 h-3" />
+            {context.minutes_to_sunset
+              ? `${context.minutes_to_sunset}min to sunset`
+              : 'Quick loop before dark?'}
+          </button>
+        )}
+      </div>
+
+      {/* Suggestions */}
+      {showSuggestions && context.suggestions.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {context.suggestions.slice(0, 3).map((suggestion) => (
+            <button
+              key={suggestion.id}
+              onClick={() => onSuggestionClick?.(suggestion.id)}
+              className="text-xs px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 transition-colors"
+            >
+              {suggestion.text}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );

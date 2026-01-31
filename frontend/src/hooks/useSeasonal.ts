@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { SeasonalContext } from '../lib/api';
 
 interface WeatherData {
   description?: string;
@@ -6,28 +7,21 @@ interface WeatherData {
   condition?: string;
 }
 
-interface SeasonalContext {
-  tone: 'cozy' | 'uplifting' | 'gentle';
-  suggestions: string[];
-  sunset_alert: boolean;
-  tags: string[];
-}
-
 interface UseSeasonalReturn {
   seasonalContext: SeasonalContext | null;
   loading: boolean;
   error: string | null;
-  refreshSeasonal: (weather?: WeatherData) => Promise<void>;
+  refreshSeasonal: (weather?: WeatherData, copingStyle?: string) => Promise<void>;
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-export function useSeasonal(weather?: WeatherData): UseSeasonalReturn {
+export function useSeasonal(initialCopingStyle?: string): UseSeasonalReturn {
   const [seasonalContext, setSeasonalContext] = useState<SeasonalContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshSeasonal = useCallback(async (weatherData?: WeatherData) => {
+  const refreshSeasonal = useCallback(async (weatherData?: WeatherData, copingStyle?: string) => {
     setLoading(true);
     setError(null);
 
@@ -36,8 +30,9 @@ export function useSeasonal(weather?: WeatherData): UseSeasonalReturn {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weather: weatherData || weather || null,
+          weather: weatherData || null,
           location: 'Victoria, BC',
+          coping_style: copingStyle || initialCopingStyle,
         }),
       });
 
@@ -53,7 +48,7 @@ export function useSeasonal(weather?: WeatherData): UseSeasonalReturn {
     } finally {
       setLoading(false);
     }
-  }, [weather]);
+  }, [initialCopingStyle]);
 
   useEffect(() => {
     refreshSeasonal();

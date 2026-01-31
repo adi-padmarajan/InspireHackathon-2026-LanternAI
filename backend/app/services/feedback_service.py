@@ -21,6 +21,9 @@ class FeedbackService:
         rating: int,
         note: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None,
+        routine_id: Optional[str] = None,
+        playbook_id: Optional[str] = None,
+        action_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Submit user feedback."""
         feedback_data = {
@@ -28,18 +31,32 @@ class FeedbackService:
             "rating": rating,
             "note": note,
             "context": context or {},
+            "routine_id": routine_id,
+            "playbook_id": playbook_id,
+            "action_id": action_id,
             "created_at": datetime.utcnow().isoformat(),
         }
         
         if self.supabase:
             try:
                 result = self.supabase.table("user_feedback").insert(feedback_data).execute()
+                
+                # Update user preferences with last helpful routine if rating is good
+                if user_id and rating >= 4 and (routine_id or playbook_id):
+                    from app.services.profile_service import profile_service
+                    await profile_service.update_last_helpful(
+                        user_id=user_id,
+                        routine_id=routine_id or "",
+                        playbook_id=playbook_id or "",
+                        rating=rating,
+                    )
+                
                 return result.data[0] if result.data else feedback_data
             except Exception as e:
                 logger.error(f"Failed to save feedback: {e}")
         
         # Log even if DB save fails
-        logger.info(f"Feedback received: rating={rating}, context={context}")
+        logger.info(f"Feedback received: rating={rating}, routine={routine_id}, playbook={playbook_id}")
         return feedback_data
     
     async def log_event(
@@ -67,6 +84,40 @@ class FeedbackService:
         logger.info(f"Event: {event_type} | payload={payload} | user={user_id}")
         return event_data
     
+    async def log_routine_used(
+        self,
+        routine_id: str,
+        playbook_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+        completed: bool = False,
+    ) -> Dict[str, Any]:
+        """Log when a routine is used."""
+        return await self.log_event(
+            event_type="routine_used",
+            payload={
+                "routine_id": routine_id,
+                "playbook_id": playbook_id,
+                "completed": completed,
+            },
+            user_id=user_id,
+        )
+    
+    async def log_routine_repeated(
+        self,
+        routine_id: str,
+        playbook_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Log when a routine is repeated (user clicked 'repeat')."""
+        return await self.log_event(
+            event_type="routine_repeated",
+            payload={
+                "routine_id": routine_id,
+                "playbook_id": playbook_id,
+            },
+            user_id=user_id,
+        )
+    
     async def get_feedback_stats(
         self,
         days: int = 7,
@@ -76,20 +127,60 @@ class FeedbackService:
             return {"average_rating": None, "count": 0}
         
         try:
-            result = self.supabase.table("user_feedback").select("rating").execute()
+            result = self.supabase.table("user_feedback").select("rating, routine_id, playbook_id").execute()
             if result.data:
                 ratings = [r["rating"] for r in result.data]
+                
+                # Group by routine
+                routine_stats = {}
+                for r in result.data:
+                    rid = r.get("routine_id")
+                    if rid:
+                        if rid not in routine_stats:
+                            routine_stats[rid] = {"ratings": [], "count": 0}
+                        routine_stats[rid]["ratings"].append(r["rating"])
+                        routine_stats[rid]["count"] += 1
+                
+                # Calculate averages
+                for rid, stats in routine_stats.items():
+                    stats["average"] = sum(stats["ratings"]) / len(stats["ratings"])
+                    del stats["ratings"]
+                
                 return {
                     "average_rating": sum(ratings) / len(ratings),
                     "count": len(ratings),
                     "distribution": {
                         i: ratings.count(i) for i in range(1, 6)
-                    }
+                    },
+                    "routine_stats": routine_stats,
                 }
         except Exception as e:
             logger.error(f"Failed to get feedback stats: {e}")
         
         return {"average_rating": None, "count": 0}
+    
+    async def get_user_feedback_history(
+        self,
+        user_id: str,
+        limit: int = 10,
+    ) -> List[Dict[str, Any]]:
+        """Get user's feedback history."""
+        if not self.supabase:
+            return []
+        
+        try:
+            result = (
+                self.supabase.table("user_feedback")
+                .select("*")
+                .eq("user_id", user_id)
+                .order("created_at", desc=True)
+                .limit(limit)
+                .execute()
+            )
+            return result.data or []
+        except Exception as e:
+            logger.error(f"Failed to get user feedback: {e}")
+            return []
 
 
 class ObservabilityService:

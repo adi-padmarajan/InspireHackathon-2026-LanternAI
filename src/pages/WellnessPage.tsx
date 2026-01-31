@@ -43,7 +43,23 @@ interface ChecklistItem {
   done: boolean;
 }
 
+interface ResourceCard {
+  id: string;
+  name: string;
+  description: string;
+  categories: string[];
+  url: string;
+  location?: string | null;
+}
+
 const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const normalizeResourceUrl = (url: string) => {
+  if (!url) return "#";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `https://www.uvic.ca${url}`;
+  return `https://www.uvic.ca/${url}`;
+};
 
 const WellnessPage = () => {
   const { currentBackground } = useTheme();
@@ -56,6 +72,7 @@ const WellnessPage = () => {
   const [isLoggingMood, setIsLoggingMood] = useState(false);
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [resourceSuggestions, setResourceSuggestions] = useState<ResourceCard[]>([]);
   const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
   const [showChecklistPrompt, setShowChecklistPrompt] = useState(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -90,6 +107,7 @@ const WellnessPage = () => {
 
   const resetSuggestions = useCallback(() => {
     setSuggestions([]);
+    setResourceSuggestions([]);
     setFollowUpQuestion(null);
     setShowChecklistPrompt(false);
     setChecklistItems([]);
@@ -131,6 +149,7 @@ const WellnessPage = () => {
       });
       setSuggestions(response.data.suggestions || []);
       setFollowUpQuestion(response.data.follow_up_question || "Want me to create a checklist?");
+      setResourceSuggestions(response.data.resources || []);
       setShowChecklistPrompt(true);
     } catch (error) {
       setStatusMessage("Could not fetch suggestions. Please try again.");
@@ -393,7 +412,7 @@ const WellnessPage = () => {
           </motion.div>
 
           {/* Suggestions Card */}
-          {suggestions.length > 0 && (
+          {(suggestions.length > 0 || resourceSuggestions.length > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -407,20 +426,64 @@ const WellnessPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <ul className="space-y-3">
-                    {suggestions.map((suggestion, index) => (
-                      <motion.li
-                        key={`${suggestion}-${index}`}
-                        className="flex gap-3 items-start p-4 rounded-xl bg-background/40 border border-border/30"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <span className="h-2 w-2 rounded-full bg-primary mt-2 shrink-0" />
-                        <span className="text-foreground/90">{suggestion}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
+                  {suggestions.length > 0 && (
+                    <ul className="space-y-3">
+                      {suggestions.map((suggestion, index) => (
+                        <motion.li
+                          key={`${suggestion}-${index}`}
+                          className="flex gap-3 items-start p-4 rounded-xl bg-background/40 border border-border/30"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <span className="h-2 w-2 rounded-full bg-primary mt-2 shrink-0" />
+                          <span className="text-foreground/90">{suggestion}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {resourceSuggestions.length > 0 && (
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-semibold text-foreground/80 uppercase tracking-wide">
+                        UVic Resources
+                      </h3>
+                      <div className="grid gap-3">
+                        {resourceSuggestions.map((resource, index) => (
+                          <motion.a
+                            key={resource.id}
+                            href={normalizeResourceUrl(resource.url)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              "block p-4 rounded-2xl",
+                              "bg-background/40 border border-border/30",
+                              "hover:bg-background/60 hover:border-border/60",
+                              "transition-all duration-300"
+                            )}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.08 }}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <p className="font-medium text-foreground">{resource.name}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {resource.description}
+                                </p>
+                                {resource.location && (
+                                  <p className="text-[10px] text-muted-foreground/70 mt-2">
+                                    {resource.location}
+                                  </p>
+                                )}
+                              </div>
+                              <span className="text-xs text-muted-foreground/70">↗</span>
+                            </div>
+                          </motion.a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {followUpQuestion && showChecklistPrompt && (
                     <div className="p-6 rounded-2xl bg-accent/30 border border-primary/20 space-y-4">

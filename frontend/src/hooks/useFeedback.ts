@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import type { FeedbackRequest } from '../lib/api';
 
 interface FeedbackContext {
   playbook_id?: string;
@@ -11,7 +12,7 @@ interface UseFeedbackReturn {
   submitting: boolean;
   submitted: boolean;
   error: string | null;
-  submitFeedback: (rating: number, note?: string, context?: FeedbackContext) => Promise<boolean>;
+  submitFeedback: (request: FeedbackRequest) => Promise<boolean>;
   reset: () => void;
 }
 
@@ -23,11 +24,7 @@ export function useFeedback(): UseFeedbackReturn {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submitFeedback = useCallback(async (
-    rating: number,
-    note?: string,
-    context?: FeedbackContext
-  ): Promise<boolean> => {
+  const submitFeedback = useCallback(async (request: FeedbackRequest): Promise<boolean> => {
     setSubmitting(true);
     setError(null);
 
@@ -43,13 +40,19 @@ export function useFeedback(): UseFeedbackReturn {
       const response = await fetch(`${API_BASE}/api/feedback`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ rating, note, context }),
+        body: JSON.stringify(request),
       });
 
       const data = await response.json();
       
       if (data.success) {
         setSubmitted(true);
+        
+        // Store last feedback rating locally
+        if (request.rating) {
+          localStorage.setItem('lastFeedbackRating', String(request.rating));
+        }
+        
         return true;
       } else {
         setError('Failed to submit feedback');

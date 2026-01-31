@@ -5,6 +5,9 @@ from supabase import Client
 class ProfileService:
     """Service for user preferences and memory management."""
     
+    VALID_COPING_STYLES = ["talking", "planning", "grounding"]
+    VALID_VIBES = ["jokester", "cozy", "balanced"]
+    
     def __init__(self):
         self.supabase: Optional[Client] = None
     
@@ -28,6 +31,9 @@ class ProfileService:
         vibe: Optional[str] = None,
         coping_style: Optional[str] = None,
         routines: Optional[List[str]] = None,
+        last_helpful_routine_id: Optional[str] = None,
+        last_helpful_playbook_id: Optional[str] = None,
+        last_feedback_rating: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Upsert user preferences."""
         if not self.supabase:
@@ -38,12 +44,45 @@ class ProfileService:
             "updated_at": datetime.utcnow().isoformat(),
         }
         
-        if vibe is not None:
+        if vibe is not None and vibe in self.VALID_VIBES:
             data["vibe"] = vibe
-        if coping_style is not None:
+        if coping_style is not None and coping_style in self.VALID_COPING_STYLES:
             data["coping_style"] = coping_style
         if routines is not None:
             data["routines"] = routines
+        if last_helpful_routine_id is not None:
+            data["last_helpful_routine_id"] = last_helpful_routine_id
+        if last_helpful_playbook_id is not None:
+            data["last_helpful_playbook_id"] = last_helpful_playbook_id
+        if last_feedback_rating is not None and 1 <= last_feedback_rating <= 5:
+            data["last_feedback_rating"] = last_feedback_rating
+        
+        result = self.supabase.table("user_preferences").upsert(data, on_conflict="user_id").execute()
+        return result.data[0] if result.data else data
+    
+    async def update_last_helpful(
+        self,
+        user_id: str,
+        routine_id: str,
+        playbook_id: str,
+        rating: int,
+    ) -> Dict[str, Any]:
+        """Update last helpful routine after positive feedback."""
+        if not self.supabase:
+            raise Exception("Database not configured")
+        
+        # Only store if rating is 4 or 5 (helpful)
+        if rating < 4:
+            return {}
+        
+        data = {
+            "user_id": user_id,
+            "last_helpful_routine_id": routine_id,
+            "last_helpful_playbook_id": playbook_id,
+            "last_feedback_rating": rating,
+            "last_check_in_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat(),
+        }
         
         result = self.supabase.table("user_preferences").upsert(data, on_conflict="user_id").execute()
         return result.data[0] if result.data else data
@@ -94,6 +133,34 @@ class ProfileService:
             "preferences": preferences,
             "memory": memory,
         }
+    
+    async def get_personalization_context(self, user_id: str, playbook_id: str) -> Dict[str, Any]:
+        """Get personalization context for playbook integration."""
+        preferences = await self.get_preferences(user_id)
+        
+        if not preferences:
+            return {
+                "coping_style": None,
+                "suggested_routine_id": None,
+                "repeat_suggestion": None,
+            }
+        
+        context = {
+            "coping_style": preferences.get("coping_style"),
+            "suggested_routine_id": None,
+            "repeat_suggestion": None,
+        }
+        
+        # Check if last helpful routine matches current playbook
+        if (
+            preferences.get("last_helpful_playbook_id") == playbook_id
+            and preferences.get("last_helpful_routine_id")
+            and preferences.get("last_feedback_rating", 0) >= 4
+        ):
+            context["suggested_routine_id"] = preferences.get("last_helpful_routine_id")
+            context["repeat_suggestion"] = "This helped you last time. Want to try it again?"
+        
+        return context
     
     async def clear_profile(self, user_id: str) -> bool:
         """Clear all user data (for opt-out)."""
