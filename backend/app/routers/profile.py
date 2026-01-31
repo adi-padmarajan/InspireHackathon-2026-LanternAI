@@ -2,8 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-from app.services.profile_service import profile_service
-from app.dependencies import get_current_user
+from ..services.profile_service import profile_service
+from ..auth.dependencies import get_current_user, TokenData
+from ..models.schemas import ApiResponse
 
 router = APIRouter(prefix="/api", tags=["profile"])
 
@@ -25,19 +26,11 @@ class ProfileUpdate(BaseModel):
     memory: Optional[MemoryUpdate] = None
 
 
-class ApiResponse(BaseModel):
-    success: bool
-    data: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-
-
-@router.get("/preferences", response_model=ApiResponse)
-async def get_preferences(user: dict = Depends(get_current_user)):
+@router.get("/preferences", response_model=ApiResponse[Dict[str, Any]])
+async def get_preferences(current_user: TokenData = Depends(get_current_user)):
     """Get user preferences."""
     try:
-        user_id = user.get("id") or user.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="User ID not found")
+        user_id = current_user.user_id
         
         data = await profile_service.get_preferences(user_id)
         return ApiResponse(success=True, data=data)
@@ -45,16 +38,14 @@ async def get_preferences(user: dict = Depends(get_current_user)):
         return ApiResponse(success=False, error=str(e))
 
 
-@router.post("/preferences", response_model=ApiResponse)
+@router.post("/preferences", response_model=ApiResponse[Dict[str, Any]])
 async def update_preferences(
     update: PreferencesUpdate,
-    user: dict = Depends(get_current_user)
+    current_user: TokenData = Depends(get_current_user)
 ):
     """Update user preferences."""
     try:
-        user_id = user.get("id") or user.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="User ID not found")
+        user_id = current_user.user_id
         
         data = await profile_service.upsert_preferences(
             user_id=user_id,
@@ -67,13 +58,11 @@ async def update_preferences(
         return ApiResponse(success=False, error=str(e))
 
 
-@router.get("/profile", response_model=ApiResponse)
-async def get_profile(user: dict = Depends(get_current_user)):
+@router.get("/profile", response_model=ApiResponse[Dict[str, Any]])
+async def get_profile(current_user: TokenData = Depends(get_current_user)):
     """Get full user profile (preferences + memory)."""
     try:
-        user_id = user.get("id") or user.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="User ID not found")
+        user_id = current_user.user_id
         
         data = await profile_service.get_profile(user_id)
         return ApiResponse(success=True, data=data)
@@ -81,16 +70,14 @@ async def get_profile(user: dict = Depends(get_current_user)):
         return ApiResponse(success=False, error=str(e))
 
 
-@router.post("/profile", response_model=ApiResponse)
+@router.post("/profile", response_model=ApiResponse[Dict[str, Any]])
 async def update_profile(
     update: ProfileUpdate,
-    user: dict = Depends(get_current_user)
+    current_user: TokenData = Depends(get_current_user)
 ):
     """Update full user profile."""
     try:
-        user_id = user.get("id") or user.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="User ID not found")
+        user_id = current_user.user_id
         
         result = {}
         
@@ -117,15 +104,13 @@ async def update_profile(
         return ApiResponse(success=False, error=str(e))
 
 
-@router.delete("/profile", response_model=ApiResponse)
-async def clear_profile(user: dict = Depends(get_current_user)):
+@router.delete("/profile", response_model=ApiResponse[Dict[str, Any]])
+async def clear_profile(current_user: TokenData = Depends(get_current_user)):
     """Clear all user data (opt-out)."""
     try:
-        user_id = user.get("id") or user.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="User ID not found")
+        user_id = current_user.user_id
         
         success = await profile_service.clear_profile(user_id)
-        return ApiResponse(success=success)
+        return ApiResponse(success=success, data={"cleared": success})
     except Exception as e:
         return ApiResponse(success=False, error=str(e))

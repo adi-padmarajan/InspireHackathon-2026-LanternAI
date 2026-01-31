@@ -169,6 +169,21 @@ class ChatService:
             f"{base_prompt}\n\nUSER CONTEXT (private, factual):\n{context_block}\n\n"
             "Use this context naturally. Do not list it back to the user. Weave it in with warmth."
         )
+
+    @staticmethod
+    def _fallback_message(is_casual: bool) -> str:
+        if is_casual:
+            return (
+                "Hey! I'm having a quick connection hiccup on my end, but I'm still here. "
+                "Want to share what's on your mind?"
+            )
+        return (
+            "I'm here for you 💚 I'm experiencing a brief connection issue, "
+            "but I want you to know that your feelings matter and you're not alone. "
+            "If you're in crisis, please reach out:\n"
+            f"{build_crisis_resources_block()}\n\n"
+            "Let's try again in a moment."
+        )
     
     @classmethod
     def get_contextual_response(
@@ -207,6 +222,13 @@ class ChatService:
                 preferred_name = merged_profile.get("preferred_name") if merged_profile else None
                 return ChatResponse(
                     message=build_crisis_response(preferred_name),
+                    timestamp=datetime.utcnow(),
+                )
+
+            is_casual_prompt = system_prompt_override == CASUAL_SYSTEM_PROMPT
+            if not settings.google_ai_api_key:
+                return ChatResponse(
+                    message=cls._fallback_message(is_casual_prompt),
                     timestamp=datetime.utcnow(),
                 )
             
@@ -255,13 +277,7 @@ class ChatService:
         except Exception as e:
             # Fallback response if API fails
             print(f"Gemini API error: {e}")
-            response_text = (
-                "I'm here for you 💚 I'm experiencing a brief connection issue, "
-                "but I want you to know that your feelings matter and you're not alone. "
-                "If you're in crisis, please reach out:\n"
-                f"{build_crisis_resources_block()}\n\n"
-                "Let's try again in a moment."
-            )
+            response_text = cls._fallback_message(system_prompt_override == CASUAL_SYSTEM_PROMPT)
         
         return ChatResponse(
             message=response_text,

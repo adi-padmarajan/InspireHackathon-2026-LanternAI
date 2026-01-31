@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
 
-from app.services.seasonal_service import seasonal_service
+from ..services.seasonal_service import seasonal_service
+from ..models.schemas import ApiResponse
 
 router = APIRouter(prefix="/api/context", tags=["context"])
 
@@ -25,12 +26,7 @@ class SeasonalData(BaseModel):
     tags: List[str]
 
 
-class SeasonalResponse(BaseModel):
-    success: bool
-    data: SeasonalData
-
-
-@router.post("/seasonal", response_model=SeasonalResponse)
+@router.post("/seasonal", response_model=ApiResponse[SeasonalData])
 async def get_seasonal_context(request: SeasonalRequest):
     """Get seasonal and weather-aware context for Victoria."""
     try:
@@ -41,6 +37,6 @@ async def get_seasonal_context(request: SeasonalRequest):
             condition=weather.condition if weather else None,
             location=request.location,
         )
-        return SeasonalResponse(success=True, data=SeasonalData(**context))
+        return ApiResponse(success=True, data=SeasonalData(**context))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -2,7 +2,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-from app.services.action_service import action_service
+from ..services.action_service import action_service
+from ..models.schemas import ApiResponse
 
 router = APIRouter(prefix="/api/actions", tags=["actions"])
 
@@ -27,17 +28,7 @@ class ScriptData(BaseModel):
     suggested_next_steps: List[str]
 
 
-class ScriptResponse(BaseModel):
-    success: bool
-    data: ScriptData
-
-
-class ScenariosResponse(BaseModel):
-    success: bool
-    data: Dict[str, List[str]]
-
-
-@router.post("/script", response_model=ScriptResponse)
+@router.post("/script", response_model=ApiResponse[ScriptData])
 async def generate_script(request: ScriptRequest):
     """Generate an action script for a given scenario."""
     context_dict = request.context.model_dump() if request.context else None
@@ -48,13 +39,12 @@ async def generate_script(request: ScriptRequest):
         context=context_dict,
     )
     
-    return ScriptResponse(success=True, data=ScriptData(**result))
+    return ApiResponse(success=True, data=ScriptData(**result))
 
-
-@router.get("/scenarios", response_model=ScenariosResponse)
+@router.get("/scenarios", response_model=ApiResponse[Dict[str, List[str]]])
 async def get_scenarios():
     """Get available scenarios and tones."""
-    return ScenariosResponse(
+    return ApiResponse(
         success=True,
         data={
             "scenarios": action_service.get_available_scenarios(),

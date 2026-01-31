@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 
-from app.services.feedback_service import feedback_service
-from app.dependencies import get_optional_user
+from ..services.feedback_service import feedback_service
+from ..auth.dependencies import get_optional_user, TokenData
+from ..models.schemas import ApiResponse
 
 router = APIRouter(prefix="/api", tags=["feedback"])
 
@@ -33,22 +34,16 @@ class EventRequest(BaseModel):
     payload: Optional[EventPayload] = None
 
 
-class ApiResponse(BaseModel):
-    success: bool
-    data: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-
-
-@router.post("/feedback", response_model=ApiResponse)
+@router.post("/feedback", response_model=ApiResponse[Dict[str, Any]])
 async def submit_feedback(
     request: FeedbackRequest,
-    user: Optional[dict] = Depends(get_optional_user)
+    user: Optional[TokenData] = Depends(get_optional_user)
 ):
     """Submit user feedback."""
     try:
         user_id = None
         if user:
-            user_id = user.get("id") or user.get("sub")
+            user_id = user.user_id
         
         context_dict = request.context.model_dump() if request.context else None
         
@@ -63,16 +58,16 @@ async def submit_feedback(
         return ApiResponse(success=False, error=str(e))
 
 
-@router.post("/events", response_model=ApiResponse)
+@router.post("/events", response_model=ApiResponse[Dict[str, Any]])
 async def log_event(
     request: EventRequest,
-    user: Optional[dict] = Depends(get_optional_user)
+    user: Optional[TokenData] = Depends(get_optional_user)
 ):
     """Log an application event."""
     try:
         user_id = None
         if user:
-            user_id = user.get("id") or user.get("sub")
+            user_id = user.user_id
         
         payload_dict = request.payload.model_dump() if request.payload else None
         
@@ -86,7 +81,7 @@ async def log_event(
         return ApiResponse(success=False, error=str(e))
 
 
-@router.get("/feedback/stats", response_model=ApiResponse)
+@router.get("/feedback/stats", response_model=ApiResponse[Dict[str, Any]])
 async def get_feedback_stats():
     """Get feedback statistics (admin)."""
     try:
