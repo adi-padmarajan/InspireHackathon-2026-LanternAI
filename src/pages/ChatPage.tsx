@@ -341,7 +341,9 @@ const ChatPage = () => {
   }, [playbookState]);
 
   useEffect(() => {
-    if (isAuthenticated && user?.display_name && !profile.name) {
+    // Always sync profile name with authenticated user's display_name
+    // This ensures the chat refers to the user by their current login name
+    if (isAuthenticated && user?.display_name && profile.name !== user.display_name) {
       setProfile((prev) => ({ ...prev, name: user.display_name }));
     }
   }, [isAuthenticated, user?.display_name, profile.name]);
