@@ -109,3 +109,43 @@ class ApiResponse(BaseModel, Generic[T]):
     success: bool
     data: Optional[T] = None
     error: Optional[str] = None
+
+
+# Resource models
+class ResourceCardOut(BaseModel):
+    id: str
+    name: str
+    description: str
+    categories: list[str]
+    url: str
+    location: Optional[str] = None
+
+
+# Playbook models
+class PlaybookStage(str, Enum):
+    VENT = "vent"
+    TRIAGE = "triage"
+    PLAN = "plan"
+
+
+class PlaybookState(BaseModel):
+    playbook_id: Optional[str] = None
+    stage: PlaybookStage = PlaybookStage.VENT
+    context: Optional[dict] = None
+
+
+class PlaybookRunRequest(BaseModel):
+    message: str = Field(..., min_length=1, description="User message to route into a playbook")
+    state: Optional[PlaybookState] = None
+
+
+class PlaybookRunResponse(BaseModel):
+    playbook_id: str
+    stage: PlaybookStage
+    validation: str
+    triage_question: Optional[str] = None
+    action_title: str
+    actions: list[str]
+    resource_ids: list[str]
+    resources: list[ResourceCardOut] = Field(default_factory=list)
+    next_state: PlaybookState

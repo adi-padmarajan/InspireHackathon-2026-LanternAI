@@ -4,7 +4,7 @@
  */
 
 import { motion } from "framer-motion";
-import { ExternalLink, Phone, MapPin, Clock, Heart, Users, Brain, Leaf } from "lucide-react";
+import { ExternalLink, Phone, MapPin, Clock, Heart, Users, Brain, Leaf, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Resource {
@@ -15,6 +15,19 @@ interface Resource {
   phone?: string;
   hours?: string;
   location?: string;
+}
+
+interface SuggestedResource {
+  id?: string;
+  name: string;
+  description: string;
+  categories: string[];
+  url?: string;
+  location?: string | null;
+}
+
+interface TrustedResourcesProps {
+  suggestedResources?: SuggestedResource[];
 }
 
 const uvicResources: Resource[] = [
@@ -62,10 +75,80 @@ const cardVariants = {
   }),
 };
 
-export const TrustedResources = () => {
+const normalizeUrl = (url?: string) => {
+  if (!url) return undefined;
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `https://www.uvic.ca${url}`;
+  return `https://www.uvic.ca/${url}`;
+};
+
+export const TrustedResources = ({ suggestedResources = [] }: TrustedResourcesProps) => {
+  const cleanedSuggested = suggestedResources.filter((resource) => resource?.name && resource?.description);
+
   return (
     <aside className="space-y-4">
-      <div className="flex items-center gap-2 mb-6">
+      {cleanedSuggested.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground tracking-wide uppercase">
+              Suggested For You
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {cleanedSuggested.map((resource, index) => {
+              const href = normalizeUrl(resource.url);
+              return (
+                <motion.a
+                  key={resource.id ?? resource.name}
+                  href={href}
+                  target={href ? "_blank" : undefined}
+                  rel={href ? "noopener noreferrer" : undefined}
+                  className={cn(
+                    "block p-4 rounded-2xl",
+                    "bg-card/70 backdrop-blur-sm border border-border/40",
+                    "hover:bg-card/90 hover:border-border/70",
+                    "transition-all duration-300 group"
+                  )}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  custom={index}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-primary/15 text-primary shrink-0">
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-medium text-foreground truncate">
+                          {resource.name}
+                        </h3>
+                        {href && (
+                          <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {resource.description}
+                      </p>
+                      {resource.location && (
+                        <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground/70 font-mono">
+                          <MapPin className="h-2.5 w-2.5" />
+                          <span>{resource.location}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 mb-6 pt-2">
         <Leaf className="h-4 w-4 text-primary" />
         <h2 className="text-sm font-semibold text-foreground tracking-wide uppercase">
           Trusted UVic Resources

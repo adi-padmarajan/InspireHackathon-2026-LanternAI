@@ -17,6 +17,7 @@ router = APIRouter(prefix="/resources", tags=["resources"])
 
 class ResourceCard(BaseModel):
     """Resource card response model."""
+    id: Optional[str] = None
     name: str
     description: str
     categories: list[str]

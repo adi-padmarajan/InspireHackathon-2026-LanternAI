@@ -16,13 +16,14 @@ import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
 const API_BASE_URL = "http://localhost:8000";
-const DEFAULT_MODE = "wellness";
 
 const PROFILE_KEY = "lantern_companion_profile";
 const MEMORY_KEY = "lantern_companion_memory";
 const FOLLOWUP_KEY = "lantern_companion_followup";
 const SESSION_ID_KEY = "lantern_session_id";
+const PLAYBOOK_STATE_KEY = "lantern_playbook_state";
 const FOLLOW_UP_DELAY_MS = 4 * 60 * 60 * 1000;
+const RESPONSE_DELAY_MS = 1000;
 
 type OnboardingStep = "name" | "vibe" | "handshake" | "ready";
 
@@ -50,6 +51,90 @@ interface FollowUpPayload {
   dueAt: number;
   message: string;
 }
+
+type PlaybookStage = "vent" | "triage" | "plan";
+
+interface PlaybookState {
+  playbook_id?: string;
+  stage?: PlaybookStage;
+  context?: Record<string, unknown> | null;
+}
+
+interface ResourceCard {
+  id: string;
+  name: string;
+  description: string;
+  categories: string[];
+  url?: string;
+  location?: string | null;
+}
+
+interface PlaybookResponse {
+  playbook_id: string;
+  stage: PlaybookStage;
+  validation: string;
+  triage_question?: string | null;
+  action_title: string;
+  actions: string[];
+  resource_ids: string[];
+  resources: ResourceCard[];
+  next_state: PlaybookState;
+}
+
+const PLAYBOOK_CHIPS = [
+  { id: "overwhelmed", label: "Overwhelmed", prompt: "I'm feeling overwhelmed with school right now." },
+  { id: "anxious", label: "Anxious", prompt: "I'm feeling anxious and on edge." },
+  { id: "lonely", label: "Lonely", prompt: "I'm feeling lonely and disconnected." },
+  { id: "burnout", label: "Burnout", prompt: "I'm burned out and exhausted." },
+] as const;
+
+const CRISIS_PATTERNS: RegExp[] = [
+  /\bsuicide\b/i,
+  /\bsuicidal\b/i,
+  /\bkill myself\b/i,
+  /\bend my life\b/i,
+  /\bwant to die\b/i,
+  /\bdon't want to live\b/i,
+  /\bdo not want to live\b/i,
+  /\bdont want to live\b/i,
+  /\bself[- ]?harm\b/i,
+  /\bhurt myself\b/i,
+  /\bcut myself\b/i,
+  /\boverdose\b/i,
+  /\bend it all\b/i,
+  /\bending it all\b/i,
+  /\btake my life\b/i,
+  /\bwish i was dead\b/i,
+  /\bcan't go on\b/i,
+  /\bcant go on\b/i,
+  /\bno reason to live\b/i,
+];
+
+const isCrisisText = (text: string) => {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  return CRISIS_PATTERNS.some((pattern) => pattern.test(trimmed));
+};
+
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const NEXT_STEP_CHIPS: Record<PlaybookStage, Array<{ id: string; label: string; prompt?: string }>> = {
+  vent: [
+    { id: "academics", label: "Academics", prompt: "It's mostly academics." },
+    { id: "personal", label: "Personal", prompt: "It's mostly personal stuff." },
+    { id: "everything", label: "Everything", prompt: "It feels like everything at once." },
+  ],
+  triage: [
+    { id: "today", label: "Mini plan today", prompt: "A mini plan for today would help." },
+    { id: "week", label: "Mini plan week", prompt: "A mini plan for this week would help." },
+    { id: "onestep", label: "Just one step", prompt: "Just one small next step please." },
+  ],
+  plan: [
+    { id: "another", label: "Another step", prompt: "Can you give me one more small step?" },
+    { id: "resources", label: "Resources", prompt: "Any campus resources for this?" },
+    { id: "reset", label: "Reset", prompt: undefined },
+  ],
+};
 
 const ONBOARDING_PROMPTS = {
   name: "Hey! I'm Lantern. I've been looking forward to meeting you. What should I call you?",
@@ -101,6 +186,9 @@ const detectDrink = (text: string) => {
 const extractMemoryUpdate = (text: string): Partial<CompanionMemory> => {
   const trimmed = text.trim();
   if (trimmed.length < 6) return {};
+  if (isCrisisText(trimmed)) {
+    return { lastInteractionAt: Date.now() };
+  }
 
   const goalMatch = trimmed.match(/(?:i need to|i want to|i'm trying to|i have to|i'm nervous about|i'm excited about)\s+(.+)/i);
   const lastGoal = goalMatch?.[1]?.slice(0, 120);
@@ -122,10 +210,12 @@ const buildFollowUpMessage = ({
   weather: { description: string } | null;
 }) => {
   const name = profile.name ? `, ${profile.name}` : "";
-  if (memory.lastGoal) {
-    return `Hey${name}. I was just thinking about ${memory.lastGoal}. How did it go?`;
+  const safeGoal = memory.lastGoal && !isCrisisText(memory.lastGoal) ? memory.lastGoal : null;
+  const safeTopic = memory.lastTopic && !isCrisisText(memory.lastTopic) ? memory.lastTopic : null;
+  if (safeGoal) {
+    return `Hey${name}. I was just thinking about ${safeGoal}. How did it go?`;
   }
-  if (memory.lastTopic) {
+  if (safeTopic) {
     return `Hey${name}. I was thinking about what you shared earlier. Want to pick it up from there?`;
   }
   if (weather?.description) {
@@ -157,6 +247,12 @@ const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const initialPlaybookState = parseStored<PlaybookState | null>(
+    typeof window === "undefined" ? null : localStorage.getItem(PLAYBOOK_STATE_KEY),
+    null
+  );
+  const [playbookState, setPlaybookState] = useState<PlaybookState | null>(initialPlaybookState);
+  const [suggestedResources, setSuggestedResources] = useState<ResourceCard[]>([]);
   const [profile, setProfile] = useState<CompanionProfile>(initialProfile);
   const [memory, setMemory] = useState<CompanionMemory>(
     parseStored<CompanionMemory>(
@@ -202,6 +298,15 @@ const ChatPage = () => {
   }, [memory]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (playbookState) {
+      localStorage.setItem(PLAYBOOK_STATE_KEY, JSON.stringify(playbookState));
+    } else {
+      localStorage.removeItem(PLAYBOOK_STATE_KEY);
+    }
+  }, [playbookState]);
+
+  useEffect(() => {
     if (isAuthenticated && user?.display_name && !profile.name) {
       setProfile((prev) => ({ ...prev, name: user.display_name }));
     }
@@ -213,10 +318,16 @@ const ChatPage = () => {
       null
     );
     if (!stored) return;
+    if (isCrisisText(stored.message)) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(FOLLOWUP_KEY);
+      }
+      return;
+    }
 
     const remaining = stored.dueAt - Date.now();
     if (remaining <= 0) {
-      setMessages((prev) => [...prev, createMessage("assistant", stored.message)]);
+      void addAssistantMessageWithDelay(stored.message);
       if (typeof window !== "undefined") {
         localStorage.removeItem(FOLLOWUP_KEY);
       }
@@ -224,7 +335,7 @@ const ChatPage = () => {
     }
 
     followUpTimeoutRef.current = window.setTimeout(() => {
-      setMessages((prev) => [...prev, createMessage("assistant", stored.message)]);
+      void addAssistantMessageWithDelay(stored.message);
       localStorage.removeItem(FOLLOWUP_KEY);
     }, remaining);
 
@@ -252,14 +363,57 @@ const ChatPage = () => {
     [appendMessage]
   );
 
+  const addAssistantMessageWithDelay = useCallback(
+    async (content: string) => {
+      await wait(RESPONSE_DELAY_MS);
+      addAssistantMessage(content);
+    },
+    [addAssistantMessage]
+  );
+
   const addUserMessage = useCallback(
     (content: string) => appendMessage(createMessage("user", content)),
     [appendMessage]
   );
 
+  const resetPlaybook = useCallback(() => {
+    setPlaybookState(null);
+    setSuggestedResources([]);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(PLAYBOOK_STATE_KEY);
+    }
+  }, []);
+
+  const formatPlaybookMessage = useCallback((payload: PlaybookResponse) => {
+    const lines: string[] = [];
+    if (payload.validation) {
+      lines.push(payload.validation.trim());
+    }
+    if (payload.triage_question) {
+      lines.push("", payload.triage_question.trim());
+    }
+    if (payload.action_title) {
+      lines.push("", `**${payload.action_title}**`);
+    }
+    if (payload.actions?.length) {
+      payload.actions.forEach((action) => {
+        if (action) {
+          lines.push(`• ${action}`);
+        }
+      });
+    }
+    return lines.join("\n");
+  }, []);
+
   const scheduleFollowUp = useCallback(
     (nextMemory: CompanionMemory) => {
       if (typeof window === "undefined") return;
+      if (
+        (nextMemory.lastGoal && isCrisisText(nextMemory.lastGoal)) ||
+        (nextMemory.lastTopic && isCrisisText(nextMemory.lastTopic))
+      ) {
+        return;
+      }
       const message = buildFollowUpMessage({ profile, memory: nextMemory, weather });
       const payload: FollowUpPayload = {
         dueAt: Date.now() + FOLLOW_UP_DELAY_MS,
@@ -271,59 +425,76 @@ const ChatPage = () => {
         window.clearTimeout(followUpTimeoutRef.current);
       }
       followUpTimeoutRef.current = window.setTimeout(() => {
-        addAssistantMessage(message);
+        void addAssistantMessageWithDelay(message);
         localStorage.removeItem(FOLLOWUP_KEY);
       }, FOLLOW_UP_DELAY_MS);
     },
-    [addAssistantMessage, profile, weather]
+    [addAssistantMessageWithDelay, profile, weather]
   );
 
-  const sendMessageToAI = useCallback(
-    async (text: string, memorySnapshot?: CompanionMemory) => {
+  const clearFollowUp = useCallback(() => {
+    if (followUpTimeoutRef.current) {
+      window.clearTimeout(followUpTimeoutRef.current);
+      followUpTimeoutRef.current = null;
+    }
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(FOLLOWUP_KEY);
+    }
+  }, []);
+
+  const sendMessageToPlaybook = useCallback(
+    async (
+      text: string,
+      memorySnapshot?: CompanionMemory,
+      stateOverride?: PlaybookState
+    ) => {
       setIsLoading(true);
-
-      const profilePayload = {
-        preferred_name: profile.name,
-        vibe: profile.vibe,
-        drink: profile.drink,
-      };
-
-      const memoryPayload = memorySnapshot ?? memory;
-
       try {
-        const response = await fetch(`${API_BASE_URL}/api/chat`, {
+        const response = await fetch(`${API_BASE_URL}/api/playbooks/run`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             message: text.trim(),
-            mode: DEFAULT_MODE,
-            session_id: sessionId,
-            profile: profilePayload,
-            memory: {
-              last_topic: memoryPayload.lastTopic,
-              last_goal: memoryPayload.lastGoal,
-              last_interaction_at: memoryPayload.lastInteractionAt,
-            },
+            state: stateOverride ?? playbookState ?? undefined,
           }),
         });
 
         const data = await response.json();
+        if (!response.ok || !data?.data) {
+          throw new Error(data?.error || "Playbook request failed");
+        }
 
-        addAssistantMessage(
-          data.data?.message || "I'm here with you. Want to try saying that another way?"
-        );
+        const payload = data.data as PlaybookResponse;
+        await wait(RESPONSE_DELAY_MS);
+        if (payload.playbook_id === "crisis") {
+          clearFollowUp();
+        }
+        if (payload.playbook_id === "gemini") {
+          setPlaybookState(null);
+          setSuggestedResources([]);
+        } else {
+          setPlaybookState(payload.next_state ?? null);
+          setSuggestedResources(payload.resources ?? []);
+        }
+        addAssistantMessage(formatPlaybookMessage(payload));
       } catch (error) {
-        console.error("Error calling chat API:", error);
-        addAssistantMessage(
-          "I'm having trouble connecting right now. Please make sure the backend server is running on localhost:8000."
+        console.error("Error calling playbook API:", error);
+        await addAssistantMessageWithDelay(
+          "I'm having trouble reaching the playbook engine right now. Please try again in a moment."
         );
       } finally {
         setIsLoading(false);
       }
     },
-    [memory, profile, sessionId, addAssistantMessage]
+    [
+      addAssistantMessage,
+      addAssistantMessageWithDelay,
+      clearFollowUp,
+      formatPlaybookMessage,
+      playbookState,
+    ]
   );
 
   const handleOnboardingResponse = useCallback(
@@ -336,7 +507,7 @@ const ChatPage = () => {
       if (onboardingStep === "name") {
         const name = normalizeName(trimmed);
         setProfile((prev) => ({ ...prev, name }));
-        addAssistantMessage(ONBOARDING_PROMPTS.vibe(name));
+        void addAssistantMessageWithDelay(ONBOARDING_PROMPTS.vibe(name));
         setOnboardingStep("vibe");
         return;
       }
@@ -344,7 +515,7 @@ const ChatPage = () => {
       if (onboardingStep === "vibe") {
         const vibe = detectVibe(trimmed);
         setProfile((prev) => ({ ...prev, vibe }));
-        addAssistantMessage(ONBOARDING_PROMPTS.handshake);
+        void addAssistantMessageWithDelay(ONBOARDING_PROMPTS.handshake);
         setOnboardingStep("handshake");
         return;
       }
@@ -366,13 +537,22 @@ const ChatPage = () => {
           drink,
           onboardingComplete: true,
         }));
-        addAssistantMessage(
+        resetPlaybook();
+        void addAssistantMessageWithDelay(
           `Love it, ${name}. ${vibeLine} ${drinkLine} What's on your mind today?`
         );
         setOnboardingStep("ready");
       }
     },
-    [addAssistantMessage, addUserMessage, onboardingStep, profile.name, profile.vibe, user?.display_name]
+    [
+      addAssistantMessageWithDelay,
+      addUserMessage,
+      onboardingStep,
+      profile.name,
+      profile.vibe,
+      resetPlaybook,
+      user?.display_name,
+    ]
   );
 
   const handleSend = useCallback(() => {
@@ -389,10 +569,103 @@ const ChatPage = () => {
     const memoryUpdate = extractMemoryUpdate(text);
     const nextMemory = { ...memory, ...memoryUpdate };
     setMemory(nextMemory);
-    scheduleFollowUp(nextMemory);
-    sendMessageToAI(text, nextMemory);
+    if (isCrisisText(text)) {
+      clearFollowUp();
+    } else {
+      scheduleFollowUp(nextMemory);
+    }
+    sendMessageToPlaybook(text, nextMemory);
     setInput("");
-  }, [input, isLoading, onboardingStep, handleOnboardingResponse, addUserMessage, memory, scheduleFollowUp, sendMessageToAI]);
+  }, [
+    input,
+    isLoading,
+    onboardingStep,
+    handleOnboardingResponse,
+    addUserMessage,
+    clearFollowUp,
+    memory,
+    scheduleFollowUp,
+    sendMessageToPlaybook,
+  ]);
+
+  const handlePlaybookChip = useCallback(
+    (chip: (typeof PLAYBOOK_CHIPS)[number]) => {
+      if (isLoading || onboardingStep !== "ready") return;
+      const message = chip.prompt;
+      const overrideState: PlaybookState = {
+        playbook_id: chip.id,
+        stage: "vent",
+        context: null,
+      };
+      addUserMessage(message);
+      const memoryUpdate = extractMemoryUpdate(message);
+      const nextMemory = { ...memory, ...memoryUpdate };
+      setMemory(nextMemory);
+      if (isCrisisText(message)) {
+        clearFollowUp();
+      } else {
+        scheduleFollowUp(nextMemory);
+      }
+      sendMessageToPlaybook(message, nextMemory, overrideState);
+    },
+    [
+      addUserMessage,
+      clearFollowUp,
+      isLoading,
+      memory,
+      onboardingStep,
+      scheduleFollowUp,
+      sendMessageToPlaybook,
+    ]
+  );
+
+  const handleNextStepChip = useCallback(
+    (chip: { id: string; label: string; prompt?: string }) => {
+      if (isLoading || onboardingStep !== "ready") return;
+      if (chip.id === "reset") {
+        resetPlaybook();
+        return;
+      }
+      if (!chip.prompt) return;
+      addUserMessage(chip.prompt);
+      const memoryUpdate = extractMemoryUpdate(chip.prompt);
+      const nextMemory = { ...memory, ...memoryUpdate };
+      setMemory(nextMemory);
+      if (isCrisisText(chip.prompt)) {
+        clearFollowUp();
+      } else {
+        scheduleFollowUp(nextMemory);
+      }
+      sendMessageToPlaybook(chip.prompt, nextMemory);
+    },
+    [
+      addUserMessage,
+      clearFollowUp,
+      isLoading,
+      memory,
+      onboardingStep,
+      resetPlaybook,
+      scheduleFollowUp,
+      sendMessageToPlaybook,
+    ]
+  );
+
+  const playbookIndicator = useMemo(() => {
+    if (!playbookState?.playbook_id) return null;
+    const name = playbookState.playbook_id
+      .split("-")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+    const stageLabel = playbookState.stage
+      ? playbookState.stage.charAt(0).toUpperCase() + playbookState.stage.slice(1)
+      : "Vent";
+    return { name, stageLabel };
+  }, [playbookState?.playbook_id, playbookState?.stage]);
+
+  const nextStepChips = useMemo(() => {
+    if (!playbookState?.stage || playbookState.playbook_id === "crisis") return [];
+    return NEXT_STEP_CHIPS[playbookState.stage] || [];
+  }, [playbookState?.playbook_id, playbookState?.stage]);
 
   const handleQuickSelect = useCallback(
     (value: string) => {
@@ -517,6 +790,34 @@ const ChatPage = () => {
                   </motion.div>
                 )}
 
+                {onboardingStep === "ready" && playbookState?.playbook_id && nextStepChips.length > 0 && (
+                  <motion.div
+                    className="flex flex-wrap gap-2 pt-2"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springPresets.gentle}
+                  >
+                    {nextStepChips.map((chip) => (
+                      <motion.button
+                        key={chip.id}
+                        onClick={() => handleNextStepChip(chip)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-xs md:text-sm",
+                          "border border-border/60 bg-card/70 backdrop-blur-sm",
+                          "text-foreground/80 hover:text-foreground",
+                          "hover:bg-card/90 hover:border-border",
+                          "transition-all duration-300"
+                        )}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        disabled={isLoading}
+                      >
+                        {chip.label}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+
                 <div ref={messagesEndRef} />
               </motion.div>
             </div>
@@ -536,6 +837,61 @@ const ChatPage = () => {
                   isLoading={isLoading}
                   placeholder={inputPlaceholder}
                 />
+
+                {onboardingStep === "ready" && (
+                  <motion.div
+                    className="mt-4 flex flex-wrap gap-2"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springPresets.gentle}
+                  >
+                    {PLAYBOOK_CHIPS.map((chip) => (
+                      <motion.button
+                        key={chip.id}
+                        onClick={() => handlePlaybookChip(chip)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-xs md:text-sm",
+                          "border border-border/60 bg-card/70 backdrop-blur-sm",
+                          "text-foreground/80 hover:text-foreground",
+                          "hover:bg-card/90 hover:border-border",
+                          "transition-all duration-300"
+                        )}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        disabled={isLoading}
+                      >
+                        {chip.label}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+
+                {playbookIndicator && (
+                  <motion.div
+                    className="mt-3 flex items-center justify-between text-xs text-muted-foreground/70"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                  >
+                    <span className="uppercase tracking-wide">Playbook</span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 rounded-full border border-border/40 bg-card/60 text-foreground/80">
+                        {playbookIndicator.name} · {playbookIndicator.stageLabel}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={resetPlaybook}
+                        className={cn(
+                          "px-2 py-1 rounded-full border border-border/40 bg-card/40",
+                          "text-muted-foreground/80 hover:text-foreground",
+                          "hover:bg-card/70 transition-colors"
+                        )}
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -548,7 +904,7 @@ const ChatPage = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <TrustedResources />
+              <TrustedResources suggestedResources={suggestedResources} />
             </motion.aside>
           )}
         </div>

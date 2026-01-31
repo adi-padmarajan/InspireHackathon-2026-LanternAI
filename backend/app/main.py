@@ -5,7 +5,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 from .config import settings
-from .routers import chat_router, wellness_router, auth_router, images_router, resources_router
+from .routers import (
+    chat_router,
+    wellness_router,
+    auth_router,
+    images_router,
+    resources_router,
+    playbooks_router,
+    seasonal,
+    profile,
+    actions,
+    feedback,
+)
 from .services.resource_service import init_resource_service
 
 # Configure logging
@@ -31,12 +42,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# Include existing routers
 app.include_router(auth_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(wellness_router, prefix="/api")
 app.include_router(images_router, prefix="/api")
 app.include_router(resources_router, prefix="/api")
+app.include_router(playbooks_router, prefix="/api")
+
+# Include new routers (Phases 3-6)
+app.include_router(seasonal.router)
+app.include_router(profile.router)
+app.include_router(actions.router)
+app.include_router(feedback.router)
 
 # Initialize resource service at startup
 @app.on_event("startup")

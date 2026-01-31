@@ -78,6 +78,40 @@ PROHIBITED ACTIONS (“THE SHADOW ZONE”)
 - No shaming, no cold clinical tone.
 """
 
+CASUAL_SYSTEM_PROMPT = f"""You are Lantern 🏮 — a warm, best-friend companion for UVic students.
+
+ROLE & TONE (CASUAL MODE)
+- Sound like a close, supportive friend: warm, lightly playful, and human.
+- Keep replies short, easy to read, and grounded in everyday life.
+- Avoid overly formal or clinical language; no therapist-y framing.
+
+CONVERSATION STYLE
+- If the user says "hi/hello/hey", respond with a friendly greeting and one simple question.
+- If the user is small‑talking, match their energy and keep it light.
+- Ask at most one question per reply.
+- Use natural language, contractions, and a gentle vibe.
+
+LANTERN PERSONALITY
+- Caring, present, non‑judgmental.
+- Warmth first, then curiosity.
+- Offer a small, optional next step only if it feels helpful.
+
+CRISIS & SAFETY (IRONCLAD RULE)
+Trigger: Any mention of self-harm, suicide, or immediate danger.
+Immediate pivot: Drop the companion persona briefly and become a Safety Anchor.
+Say (or closely follow):
+“I can hear how much pain you’re in, and I want to make sure you’re safe. I’m an AI, and I can’t provide the level of care you deserve right now.”
+Mandatory resources (include these):
+{_CRISIS_RESOURCES_BLOCK}
+Then stay present:
+“I am still here. Would you like to stay with me while you reach out to one of these services?”
+
+PROHIBITED ACTIONS (“THE SHADOW ZONE”)
+- No diagnosing.
+- No medical advice (no medication/supplement dosages).
+- No shaming, no cold clinical tone.
+"""
+
 
 class ChatService:
     """Service for handling companion chat interactions using Gemini 3.0 Flash."""
@@ -112,7 +146,7 @@ class ChatService:
         return existing
 
     @classmethod
-    def _build_system_prompt(cls, profile: dict, memory: dict) -> str:
+    def _build_system_prompt(cls, profile: dict, memory: dict, base_prompt: Optional[str] = None) -> str:
         context_lines = []
         if profile.get("preferred_name"):
             context_lines.append(f"Preferred name: {profile['preferred_name']}")
@@ -125,12 +159,14 @@ class ChatService:
         if memory.get("last_topic"):
             context_lines.append(f"Recent topic: {memory['last_topic']}")
 
+        base_prompt = base_prompt or SYSTEM_PROMPT
+
         if not context_lines:
-            return SYSTEM_PROMPT
+            return base_prompt
 
         context_block = "\n".join([f"- {line}" for line in context_lines])
         return (
-            f"{SYSTEM_PROMPT}\n\nUSER CONTEXT (private, factual):\n{context_block}\n\n"
+            f"{base_prompt}\n\nUSER CONTEXT (private, factual):\n{context_block}\n\n"
             "Use this context naturally. Do not list it back to the user. Weave it in with warmth."
         )
     
@@ -141,7 +177,8 @@ class ChatService:
         mode: ChatMode,
         session_id: Optional[str] = None,
         profile: Optional[CompanionProfile] = None,
-        memory: Optional[CompanionMemory] = None
+        memory: Optional[CompanionMemory] = None,
+        system_prompt_override: Optional[str] = None,
     ) -> ChatResponse:
         """
         Generate a companion-focused response using Google Gemini 3.0 Flash.
@@ -176,7 +213,11 @@ class ChatService:
             # Create the model with system instruction
             chat_model = genai.GenerativeModel(
                 model_name=GEMINI_MODEL_NAME,
-                system_instruction=cls._build_system_prompt(merged_profile, merged_memory)
+                system_instruction=cls._build_system_prompt(
+                    merged_profile,
+                    merged_memory,
+                    base_prompt=system_prompt_override,
+                ),
             )
             
             # Start or continue chat

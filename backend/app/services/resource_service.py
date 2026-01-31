@@ -5,10 +5,17 @@ Loads resources from JSON at startup and provides search functionality.
 
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+
+def build_resource_id(name: str) -> str:
+    """Create a stable ID from a resource name."""
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    return slug or "resource"
 
 
 class ResourceCard:
@@ -21,7 +28,9 @@ class ResourceCard:
         categories: list[str],
         url: str,
         location: Optional[str] = None,
+        resource_id: Optional[str] = None,
     ):
+        self.id = resource_id or build_resource_id(name)
         self.name = name
         self.description = description
         self.categories = categories
@@ -31,6 +40,7 @@ class ResourceCard:
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         result = {
+            "id": self.id,
             "name": self.name,
             "description": self.description,
             "categories": self.categories,
@@ -74,6 +84,7 @@ class ResourceService:
                     categories=item.get("categories", []),
                     url=item.get("url", ""),
                     location=item.get("location"),
+                    resource_id=item.get("id"),
                 )
                 self._resources.append(resource)
 
