@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Star, X, Check, RefreshCw } from 'lucide-react';
-import { useFeedback } from '../hooks/useFeedback';
-import { useEvents } from '../hooks/useEvents';
+import { useState } from "react";
+import { Star, X, Check, RefreshCw } from "lucide-react";
+import { useFeedback } from "@/hooks/useFeedback";
+import { useEvents } from "@/hooks/useEvents";
+import { cn } from "@/lib/utils";
 
 interface FeedbackPromptProps {
   routineId?: string;
@@ -13,15 +14,15 @@ interface FeedbackPromptProps {
   label?: string;
 }
 
-export const FeedbackPrompt: React.FC<FeedbackPromptProps> = ({
+export const FeedbackPrompt = ({
   routineId,
   playbookId,
   actionId,
   onDismiss,
   onRepeat,
   showRepeat = false,
-  label = 'Did this help?',
-}) => {
+  label = "Did this help?",
+}: FeedbackPromptProps) => {
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const { submitting, submitted, submitFeedback } = useFeedback();
@@ -46,13 +47,13 @@ export const FeedbackPrompt: React.FC<FeedbackPromptProps> = ({
 
   if (submitted) {
     return (
-      <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-        <Check className="w-4 h-4 text-emerald-400" />
-        <span className="text-sm text-emerald-200">Thanks for your feedback!</span>
+      <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+        <Check className="w-4 h-4 text-emerald-500" />
+        <span className="text-sm text-foreground">Thanks for your feedback!</span>
         {showRepeat && onRepeat && (
           <button
             onClick={handleRepeat}
-            className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-xs text-slate-300 transition-colors"
+            className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs text-foreground transition-colors"
           >
             <RefreshCw className="w-3 h-3" />
             Repeat this
@@ -63,8 +64,8 @@ export const FeedbackPrompt: React.FC<FeedbackPromptProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5 border border-white/10">
-      <span className="text-sm text-slate-300">{label}</span>
+    <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-card/60 border border-border/60">
+      <span className="text-sm text-foreground/80">{label}</span>
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((rating) => (
           <button
@@ -77,12 +78,13 @@ export const FeedbackPrompt: React.FC<FeedbackPromptProps> = ({
             aria-label={`Rate ${rating} out of 5`}
           >
             <Star
-              className={`w-5 h-5 transition-colors ${
+              className={cn(
+                "w-5 h-5 transition-colors",
                 (hoveredRating && rating <= hoveredRating) ||
-                (selectedRating && rating <= selectedRating)
-                  ? 'fill-amber-400 text-amber-400'
-                  : 'text-slate-500'
-              }`}
+                  (selectedRating && rating <= selectedRating)
+                  ? "fill-amber-400 text-amber-400"
+                  : "text-muted-foreground"
+              )}
             />
           </button>
         ))}
@@ -90,7 +92,7 @@ export const FeedbackPrompt: React.FC<FeedbackPromptProps> = ({
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="ml-auto p-1 text-slate-400 hover:text-slate-200"
+          className="ml-auto p-1 text-muted-foreground hover:text-foreground"
           aria-label="Dismiss"
         >
           <X className="w-4 h-4" />

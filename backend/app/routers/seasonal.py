@@ -34,6 +34,7 @@ class SeasonalData(BaseModel):
     is_clear: bool
     temperature_c: Optional[float]
     suggestions: List[Dict[str, str]]
+    personalized_suggestions: Optional[List[Dict[str, str]]] = None
     sunset_alert: bool
     minutes_to_sunset: Optional[int]
     tags: List[str]

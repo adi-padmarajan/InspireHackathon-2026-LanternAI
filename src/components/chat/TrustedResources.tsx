@@ -5,6 +5,7 @@
 
 import { motion } from "framer-motion";
 import { ExternalLink, Phone, MapPin, Clock, Heart, Users, Brain, Leaf, Sparkles } from "lucide-react";
+import { useEvents } from "@/hooks/useEvents";
 import { cn } from "@/lib/utils";
 
 interface Resource {
@@ -84,6 +85,7 @@ const normalizeUrl = (url?: string) => {
 
 export const TrustedResources = ({ suggestedResources = [] }: TrustedResourcesProps) => {
   const cleanedSuggested = suggestedResources.filter((resource) => resource?.name && resource?.description);
+  const { logEvent } = useEvents();
 
   return (
     <aside className="space-y-4">
@@ -105,6 +107,12 @@ export const TrustedResources = ({ suggestedResources = [] }: TrustedResourcesPr
                   href={href}
                   target={href ? "_blank" : undefined}
                   rel={href ? "noopener noreferrer" : undefined}
+                  onClick={() =>
+                    logEvent("resource_clicked", {
+                      resource_id: resource.id ?? resource.name,
+                      resource_type: "suggested",
+                    })
+                  }
                   className={cn(
                     "block p-4 rounded-2xl",
                     "bg-card/70 backdrop-blur-sm border border-border/40",
@@ -162,6 +170,12 @@ export const TrustedResources = ({ suggestedResources = [] }: TrustedResourcesPr
             href={resource.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              logEvent("resource_clicked", {
+                resource_id: resource.title,
+                resource_type: "trusted",
+              })
+            }
             className={cn(
               "block p-4 rounded-2xl",
               "bg-card/60 backdrop-blur-sm border border-border/40",

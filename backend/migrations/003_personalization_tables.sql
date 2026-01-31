@@ -1,7 +1,7 @@
 -- User Preferences Table (with personalization fields)
 CREATE TABLE IF NOT EXISTS user_preferences (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     vibe TEXT CHECK (vibe IN ('jokester', 'cozy', 'balanced')),
     coping_style TEXT CHECK (coping_style IN ('talking', 'planning', 'grounding')),
     routines TEXT[] DEFAULT '{}',
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 -- User Memory Table
 CREATE TABLE IF NOT EXISTS user_memory (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     last_goal TEXT,
     last_checkin TIMESTAMPTZ,
     playbook_state JSONB DEFAULT '{}',
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS user_memory (
 -- User Feedback Table (with routine tracking)
 CREATE TABLE IF NOT EXISTS user_feedback (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     note TEXT,
     context JSONB DEFAULT '{}',
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS app_events (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     event_type TEXT NOT NULL,
     payload JSONB DEFAULT '{}',
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -64,49 +64,19 @@ ALTER TABLE user_memory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE app_events ENABLE ROW LEVEL SECURITY;
 
--- Policies for user_preferences
-DROP POLICY IF EXISTS "Users can view own preferences" ON user_preferences;
-DROP POLICY IF EXISTS "Users can insert own preferences" ON user_preferences;
-DROP POLICY IF EXISTS "Users can update own preferences" ON user_preferences;
-DROP POLICY IF EXISTS "Users can delete own preferences" ON user_preferences;
+-- Policies for demo mode (allow all operations)
+DROP POLICY IF EXISTS "Allow all operations on user_preferences" ON user_preferences;
+CREATE POLICY "Allow all operations on user_preferences" ON user_preferences
+    FOR ALL USING (true) WITH CHECK (true);
 
-CREATE POLICY "Users can view own preferences" ON user_preferences
-    FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own preferences" ON user_preferences
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own preferences" ON user_preferences
-    FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own preferences" ON user_preferences
-    FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Allow all operations on user_memory" ON user_memory;
+CREATE POLICY "Allow all operations on user_memory" ON user_memory
+    FOR ALL USING (true) WITH CHECK (true);
 
--- Policies for user_memory
-DROP POLICY IF EXISTS "Users can view own memory" ON user_memory;
-DROP POLICY IF EXISTS "Users can insert own memory" ON user_memory;
-DROP POLICY IF EXISTS "Users can update own memory" ON user_memory;
-DROP POLICY IF EXISTS "Users can delete own memory" ON user_memory;
+DROP POLICY IF EXISTS "Allow all operations on user_feedback" ON user_feedback;
+CREATE POLICY "Allow all operations on user_feedback" ON user_feedback
+    FOR ALL USING (true) WITH CHECK (true);
 
-CREATE POLICY "Users can view own memory" ON user_memory
-    FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own memory" ON user_memory
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own memory" ON user_memory
-    FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own memory" ON user_memory
-    FOR DELETE USING (auth.uid() = user_id);
-
--- Policies for user_feedback
-DROP POLICY IF EXISTS "Users can insert feedback" ON user_feedback;
-DROP POLICY IF EXISTS "Users can view own feedback" ON user_feedback;
-DROP POLICY IF EXISTS "Anyone can insert feedback" ON user_feedback;
-
-CREATE POLICY "Anyone can insert feedback" ON user_feedback
-    FOR INSERT WITH CHECK (true);
-CREATE POLICY "Users can view own feedback" ON user_feedback
-    FOR SELECT USING (auth.uid() = user_id OR user_id IS NULL);
-
--- Policies for app_events
-DROP POLICY IF EXISTS "Users can insert events" ON app_events;
-DROP POLICY IF EXISTS "Anyone can insert events" ON app_events;
-
-CREATE POLICY "Anyone can insert events" ON app_events
-    FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all operations on app_events" ON app_events;
+CREATE POLICY "Allow all operations on app_events" ON app_events
+    FOR ALL USING (true) WITH CHECK (true);

@@ -1,65 +1,43 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
-import os
+
+from app.auth.jwt_handler import verify_token, TokenData
 
 security = HTTPBearer()
 optional_security = HTTPBearer(auto_error=False)
 
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    """Verify JWT token and return user info."""
-    from app.config import get_supabase_client
-    
-    try:
-        supabase = get_supabase_client()
-        token = credentials.credentials
-        
-        # Verify the JWT with Supabase
-        user_response = supabase.auth.get_user(token)
-        
-        if user_response and user_response.user:
-            return {
-                "id": user_response.user.id,
-                "email": user_response.user.email,
-                "sub": user_response.user.id,
-            }
-        
+def _token_to_user(token_data: TokenData) -> dict:
+    return {
+        "id": token_data.user_id,
+        "sub": token_data.user_id,
+        "netlink_id": token_data.netlink_id,
+    }
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
+    """Verify Lantern JWT token and return user info."""
+    token_data = verify_token(credentials.credentials)
+    if not token_data:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
         )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Authentication failed: {str(e)}",
-        )
+    return _token_to_user(token_data)
 
 
 async def get_optional_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
 ) -> Optional[dict]:
-    """Optionally verify JWT token - returns None if not authenticated."""
+    """Optionally verify Lantern JWT token - returns None if not authenticated."""
     if not credentials:
         return None
-    
-    try:
-        from app.config import get_supabase_client
-        
-        supabase = get_supabase_client()
-        token = credentials.credentials
-        
-        user_response = supabase.auth.get_user(token)
-        
-        if user_response and user_response.user:
-            return {
-                "id": user_response.user.id,
-                "email": user_response.user.email,
-                "sub": user_response.user.id,
-            }
-    except Exception:
-        pass
-    
-    return None
+
+    token_data = verify_token(credentials.credentials)
+    if not token_data:
+        return None
+
+    return _token_to_user(token_data)

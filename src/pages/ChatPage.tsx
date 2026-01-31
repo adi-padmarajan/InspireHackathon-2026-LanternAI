@@ -6,11 +6,19 @@ import { ChatBubble } from "@/components/chat/ChatBubble";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { EnhancedChatInput } from "@/components/chat/EnhancedChatInput";
 import { TrustedResources } from "@/components/chat/TrustedResources";
+import { SeasonalBanner } from "@/components/SeasonalBanner";
+import { PersonalizationPill } from "@/components/PersonalizationPill";
+import { RepeatRoutineChip } from "@/components/RepeatRoutineChip";
+import { FeedbackPrompt } from "@/components/FeedbackPrompt";
+import { ActionScriptPanel } from "@/components/ActionScriptPanel";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { FilmGrain, CinematicVignette, AmbientGradients } from "@/components/FilmGrain";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWeather } from "@/hooks/useWeather";
+import { usePreferences } from "@/hooks/usePreferences";
+import { useSeasonal } from "@/hooks/useSeasonal";
+import { useEvents } from "@/hooks/useEvents";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
@@ -239,6 +247,9 @@ const ChatPage = () => {
   const { currentBackground } = useTheme();
   const { user, isAuthenticated } = useAuth();
   const { weather } = useWeather();
+  const { preferences, getPersonalization } = usePreferences();
+  const { seasonalContext, refreshSeasonal } = useSeasonal(preferences?.coping_style ?? null);
+  const { logRoutineUsed, logRoutineRepeated } = useEvents();
   const initialProfile = parseStored<CompanionProfile>(
     typeof window === "undefined" ? null : localStorage.getItem(PROFILE_KEY),
     {}
@@ -253,6 +264,16 @@ const ChatPage = () => {
   );
   const [playbookState, setPlaybookState] = useState<PlaybookState | null>(initialPlaybookState);
   const [suggestedResources, setSuggestedResources] = useState<ResourceCard[]>([]);
+  const [repeatSuggestion, setRepeatSuggestion] = useState<{
+    routineId: string;
+    message?: string | null;
+    playbookId: string;
+  } | null>(null);
+  const [feedbackTarget, setFeedbackTarget] = useState<{
+    routineId: string;
+    playbookId?: string;
+    actionId?: string;
+  } | null>(null);
   const [profile, setProfile] = useState<CompanionProfile>(initialProfile);
   const [memory, setMemory] = useState<CompanionMemory>(
     parseStored<CompanionMemory>(
@@ -280,6 +301,19 @@ const ChatPage = () => {
     }
     return ONBOARDING_PROMPTS.name;
   }, [initialProfile.onboardingComplete, initialProfile.name, user?.display_name]);
+
+  const seasonalWeatherPayload = useMemo(() => {
+    if (!weather) return undefined;
+    return {
+      description: weather.description,
+      temperature: weather.temperature,
+      condition: weather.condition,
+    };
+  }, [weather]);
+
+  useEffect(() => {
+    void refreshSeasonal(seasonalWeatherPayload, preferences?.coping_style ?? null);
+  }, [preferences?.coping_style, refreshSeasonal, seasonalWeatherPayload]);
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -379,6 +413,8 @@ const ChatPage = () => {
   const resetPlaybook = useCallback(() => {
     setPlaybookState(null);
     setSuggestedResources([]);
+    setRepeatSuggestion(null);
+    setFeedbackTarget(null);
     if (typeof window !== "undefined") {
       localStorage.removeItem(PLAYBOOK_STATE_KEY);
     }
@@ -474,9 +510,35 @@ const ChatPage = () => {
         if (payload.playbook_id === "gemini") {
           setPlaybookState(null);
           setSuggestedResources([]);
+          setRepeatSuggestion(null);
+          setFeedbackTarget(null);
+        } else if (payload.playbook_id === "crisis") {
+          setPlaybookState(payload.next_state ?? null);
+          setSuggestedResources(payload.resources ?? []);
+          setRepeatSuggestion(null);
+          setFeedbackTarget(null);
         } else {
           setPlaybookState(payload.next_state ?? null);
           setSuggestedResources(payload.resources ?? []);
+
+          if (payload.stage === "plan") {
+            const routineId = `${payload.playbook_id}-plan`;
+            setFeedbackTarget({ routineId, playbookId: payload.playbook_id });
+            void logRoutineUsed(routineId, payload.playbook_id, false);
+          } else {
+            setFeedbackTarget(null);
+          }
+
+          const personalization = await getPersonalization(payload.playbook_id);
+          if (personalization?.suggested_routine_id) {
+            setRepeatSuggestion({
+              routineId: personalization.suggested_routine_id,
+              message: personalization.repeat_suggestion,
+              playbookId: payload.playbook_id,
+            });
+          } else {
+            setRepeatSuggestion(null);
+          }
         }
         addAssistantMessage(formatPlaybookMessage(payload));
       } catch (error) {
@@ -493,6 +555,8 @@ const ChatPage = () => {
       addAssistantMessageWithDelay,
       clearFollowUp,
       formatPlaybookMessage,
+      getPersonalization,
+      logRoutineUsed,
       playbookState,
     ]
   );
@@ -650,6 +714,37 @@ const ChatPage = () => {
     ]
   );
 
+  const handleRepeatRoutine = useCallback(() => {
+    if (!repeatSuggestion || isLoading || onboardingStep !== "ready") return;
+    const message = "Let's repeat that routine.";
+    addUserMessage(message);
+    const memoryUpdate = extractMemoryUpdate(message);
+    const nextMemory = { ...memory, ...memoryUpdate };
+    setMemory(nextMemory);
+    if (isCrisisText(message)) {
+      clearFollowUp();
+    } else {
+      scheduleFollowUp(nextMemory);
+    }
+    void logRoutineRepeated(repeatSuggestion.routineId, repeatSuggestion.playbookId);
+    sendMessageToPlaybook(message, nextMemory, {
+      playbook_id: repeatSuggestion.playbookId,
+      stage: "plan",
+      context: playbookState?.context ?? null,
+    });
+  }, [
+    addUserMessage,
+    clearFollowUp,
+    isLoading,
+    logRoutineRepeated,
+    memory,
+    onboardingStep,
+    playbookState?.context,
+    repeatSuggestion,
+    scheduleFollowUp,
+    sendMessageToPlaybook,
+  ]);
+
   const playbookIndicator = useMemo(() => {
     if (!playbookState?.playbook_id) return null;
     const name = playbookState.playbook_id
@@ -673,6 +768,16 @@ const ChatPage = () => {
       handleOnboardingResponse(value);
     },
     [handleOnboardingResponse, isLoading]
+  );
+
+  const handleSeasonalSuggestion = useCallback(
+    (suggestionId: string) => {
+      if (!seasonalContext) return;
+      const suggestion = seasonalContext.suggestions.find((item) => item.id === suggestionId);
+      if (!suggestion) return;
+      setInput(suggestion.text);
+    },
+    [seasonalContext]
   );
 
   const onboardingOptions =
@@ -744,6 +849,22 @@ const ChatPage = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4 }}
               >
+                {seasonalContext && (
+                  <motion.div
+                    className="rounded-2xl bg-card/60 border border-border/40 p-4 backdrop-blur-sm"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springPresets.gentle}
+                  >
+                    <SeasonalBanner
+                      context={seasonalContext}
+                      onSunsetClick={() => setInput("Quick loop before it gets dark.")}
+                      onSuggestionClick={handleSeasonalSuggestion}
+                      showSuggestions
+                    />
+                  </motion.div>
+                )}
+
                 {showWelcomeHero && <WelcomeHero />}
 
                 <AnimatePresence>
@@ -818,6 +939,21 @@ const ChatPage = () => {
                   </motion.div>
                 )}
 
+                {repeatSuggestion && onboardingStep === "ready" && (
+                  <motion.div
+                    className="pt-2"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springPresets.gentle}
+                  >
+                    <RepeatRoutineChip
+                      routineId={repeatSuggestion.routineId}
+                      message={repeatSuggestion.message ?? undefined}
+                      onRepeat={handleRepeatRoutine}
+                    />
+                  </motion.div>
+                )}
+
                 <div ref={messagesEndRef} />
               </motion.div>
             </div>
@@ -866,6 +1002,23 @@ const ChatPage = () => {
                   </motion.div>
                 )}
 
+                {feedbackTarget && playbookState?.playbook_id && playbookState.stage === "plan" && (
+                  <motion.div
+                    className="mt-4"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springPresets.gentle}
+                  >
+                    <FeedbackPrompt
+                      routineId={feedbackTarget.routineId}
+                      playbookId={feedbackTarget.playbookId}
+                      actionId={feedbackTarget.actionId}
+                      onDismiss={() => setFeedbackTarget(null)}
+                      showRepeat={false}
+                    />
+                  </motion.div>
+                )}
+
                 {playbookIndicator && (
                   <motion.div
                     className="mt-3 flex items-center justify-between text-xs text-muted-foreground/70"
@@ -875,6 +1028,7 @@ const ChatPage = () => {
                   >
                     <span className="uppercase tracking-wide">Playbook</span>
                     <div className="flex items-center gap-2">
+                      <PersonalizationPill copingStyle={preferences?.coping_style ?? null} />
                       <span className="px-2 py-1 rounded-full border border-border/40 bg-card/60 text-foreground/80">
                         {playbookIndicator.name} · {playbookIndicator.stageLabel}
                       </span>
@@ -905,6 +1059,9 @@ const ChatPage = () => {
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <TrustedResources suggestedResources={suggestedResources} />
+              <div className="mt-6">
+                <ActionScriptPanel />
+              </div>
             </motion.aside>
           )}
         </div>

@@ -15,6 +15,7 @@ import { ThemeTransitionOverlay } from '@/components/AmbientBackground';
 import { ThemePreviewCard } from '@/components/settings/ThemePreviewCard';
 import { CustomizationStudio } from '@/components/settings/CustomizationStudio';
 import { SettingsBackground } from '@/components/settings/SettingsBackground';
+import { PreferencesSettings } from '@/components/PreferencesSettings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -213,7 +214,7 @@ const SettingsPage = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="customize" className="w-full">
-          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-8 h-12">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8 h-12">
             <TabsTrigger value="customize" className="gap-2 text-sm">
               <Sliders className="h-4 w-4" />
               Customize
@@ -221,6 +222,10 @@ const SettingsPage = () => {
             <TabsTrigger value="themes" className="gap-2 text-sm">
               <Palette className="h-4 w-4" />
               Themes
+            </TabsTrigger>
+            <TabsTrigger value="personalize" className="gap-2 text-sm">
+              <Settings className="h-4 w-4" />
+              Companion
             </TabsTrigger>
           </TabsList>
 
@@ -242,6 +247,18 @@ const SettingsPage = () => {
               onSelect={setCategoryFilter}
             />
             <ThemeGrid categoryFilter={categoryFilter} />
+          </TabsContent>
+
+          <TabsContent value="personalize" className="mt-0">
+            <div className="max-w-2xl mx-auto">
+              <motion.div
+                className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border shadow-xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <PreferencesSettings />
+              </motion.div>
+            </div>
           </TabsContent>
 
         </Tabs>

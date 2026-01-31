@@ -10,6 +10,97 @@ interface FetchOptions extends Omit<RequestInit, "body"> {
   requireAuth?: boolean;
 }
 
+export interface UserPreferences {
+  vibe: "jokester" | "cozy" | "balanced" | null;
+  coping_style: "talking" | "planning" | "grounding" | null;
+  routines: string[];
+  last_helpful_routine_id: string | null;
+  last_helpful_playbook_id: string | null;
+  last_feedback_rating: number | null;
+  last_check_in_at: string | null;
+}
+
+export interface UserMemory {
+  last_goal: string | null;
+  last_checkin: string | null;
+  playbook_state: Record<string, unknown> | null;
+}
+
+export interface UserProfile {
+  preferences: UserPreferences | null;
+  memory: UserMemory | null;
+}
+
+export interface PersonalizationContext {
+  coping_style: "talking" | "planning" | "grounding" | null;
+  suggested_routine_id: string | null;
+  repeat_suggestion: string | null;
+}
+
+export interface SeasonalSuggestion {
+  id: string;
+  text: string;
+}
+
+export interface SeasonalContext {
+  tone: "cozy" | "bright" | "neutral";
+  seasonal_tone: "cozy" | "bright" | "neutral";
+  is_rainy: boolean;
+  is_clear: boolean;
+  temperature_c: number | null;
+  suggestions: SeasonalSuggestion[];
+  sunset_alert: boolean;
+  minutes_to_sunset: number | null;
+  tags: string[];
+  routine_tags: string[];
+  personalized_suggestions?: SeasonalSuggestion[];
+}
+
+export interface FeedbackRequest {
+  rating: number;
+  note?: string;
+  routine_id?: string;
+  playbook_id?: string;
+  action_id?: string;
+  context?: {
+    playbook_id?: string;
+    stage?: string;
+    session_id?: string;
+  };
+}
+
+export interface EventRequest {
+  event_type:
+    | "playbook_started"
+    | "resource_clicked"
+    | "script_used"
+    | "routine_used"
+    | "routine_repeated";
+  payload?: {
+    playbook_id?: string;
+    resource_id?: string;
+    resource_type?: string;
+    script_scenario?: string;
+    routine_id?: string;
+    completed?: boolean;
+    extra?: Record<string, unknown>;
+  };
+}
+
+export interface ActionScriptContext {
+  course?: string;
+  deadline?: string;
+  name?: string;
+  topic?: string;
+}
+
+export interface ActionScriptResult {
+  title: string;
+  script: string;
+  checklist: string[];
+  suggested_next_steps: string[];
+}
+
 /**
  * Get the stored auth token
  */
@@ -232,6 +323,107 @@ export const api = {
         success: boolean;
         data: { message: string };
       }>("/api/wellness/checkin", {
+        method: "POST",
+        body: payload,
+      }),
+  },
+
+  // Personalization/profile endpoints
+  preferences: {
+    get: () =>
+      apiFetch<{
+        success: boolean;
+        data: UserPreferences | null;
+      }>("/api/preferences"),
+    update: (payload: Partial<UserPreferences>) =>
+      apiFetch<{
+        success: boolean;
+        data: UserPreferences | null;
+      }>("/api/preferences", {
+        method: "POST",
+        body: payload,
+      }),
+    clear: () =>
+      apiFetch<{ success: boolean }>("/api/profile", {
+        method: "DELETE",
+      }),
+    personalization: (playbookId: string) =>
+      apiFetch<{
+        success: boolean;
+        data: PersonalizationContext | null;
+      }>(`/api/profile/personalization?playbook_id=${encodeURIComponent(playbookId)}`),
+  },
+
+  seasonal: {
+    context: (payload: {
+      weather?: {
+        description?: string;
+        temperature?: number;
+        condition?: string;
+      } | null;
+      location?: string;
+      lat?: number;
+      lon?: number;
+      coping_style?: string | null;
+    }) =>
+      apiFetch<{
+        success: boolean;
+        data: SeasonalContext;
+      }>("/api/context/seasonal", {
+        method: "POST",
+        body: payload,
+        requireAuth: false,
+      }),
+    live: () =>
+      apiFetch<{
+        success: boolean;
+        data: SeasonalContext;
+      }>("/api/context/seasonal/live", {
+        requireAuth: false,
+      }),
+  },
+
+  actions: {
+    script: (payload: {
+      scenario: "extension_request" | "text_friend" | "self_advocacy";
+      tone?: "gentle" | "direct" | "warm";
+      context?: ActionScriptContext;
+    }) =>
+      apiFetch<{
+        success: boolean;
+        data: ActionScriptResult;
+      }>("/api/actions/script", {
+        method: "POST",
+        body: payload,
+        requireAuth: false,
+      }),
+    scenarios: () =>
+      apiFetch<{
+        success: boolean;
+        data: { scenarios: string[]; tones: string[] };
+      }>("/api/actions/scenarios", {
+        requireAuth: false,
+      }),
+  },
+
+  feedback: {
+    submit: (payload: FeedbackRequest) =>
+      apiFetch<{ success: boolean; data?: { submitted: boolean; id?: string } }>(
+        "/api/feedback",
+        {
+          method: "POST",
+          body: payload,
+        }
+      ),
+    history: (limit = 10) =>
+      apiFetch<{ success: boolean; data?: { history: unknown[] } }>(
+        `/api/feedback/history?limit=${limit}`
+      ),
+  },
+
+  events: {
+    log: (payload: EventRequest) =>
+      apiFetch<{ success: boolean; data?: { logged: boolean } }>("/api/events", {
         method: "POST",
         body: payload,
       }),

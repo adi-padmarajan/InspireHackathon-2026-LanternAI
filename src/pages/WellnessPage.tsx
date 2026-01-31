@@ -20,9 +20,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { SeasonalBanner } from "@/components/SeasonalBanner";
+import { FeedbackPrompt } from "@/components/FeedbackPrompt";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWeather } from "@/hooks/useWeather";
+import { useSeasonal } from "@/hooks/useSeasonal";
+import { usePreferences } from "@/hooks/usePreferences";
+import { useEvents } from "@/hooks/useEvents";
 import { api } from "@/lib/api";
 import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
@@ -65,6 +70,9 @@ const WellnessPage = () => {
   const { currentBackground } = useTheme();
   const { user } = useAuth();
   const { weather } = useWeather();
+  const { preferences } = usePreferences();
+  const { seasonalContext, refreshSeasonal } = useSeasonal(preferences?.coping_style ?? null);
+  const { logRoutineUsed, logEvent } = useEvents();
 
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
   const [note, setNote] = useState("");
@@ -86,6 +94,7 @@ const WellnessPage = () => {
 
   const [checklistMood, setChecklistMood] = useState<MoodValue | null>(null);
   const [checklistNote, setChecklistNote] = useState<string | null>(null);
+  const [feedbackRoutineId, setFeedbackRoutineId] = useState<string | null>(null);
 
   const hasCustomBackground =
     currentBackground?.enabled &&
@@ -105,6 +114,19 @@ const WellnessPage = () => {
     };
   }, [weather]);
 
+  useEffect(() => {
+    void refreshSeasonal(
+      weather
+        ? {
+            description: weather.description,
+            temperature: weather.temperature,
+            condition: weather.condition,
+          }
+        : undefined,
+      preferences?.coping_style ?? null
+    );
+  }, [preferences?.coping_style, refreshSeasonal, weather]);
+
   const resetSuggestions = useCallback(() => {
     setSuggestions([]);
     setResourceSuggestions([]);
@@ -114,6 +136,7 @@ const WellnessPage = () => {
     setChecklistTitle(null);
     setCheckInMessage(null);
     setHasCheckedIn(false);
+    setFeedbackRoutineId(null);
   }, []);
 
   const handleLogMood = useCallback(async () => {
@@ -181,12 +204,15 @@ const WellnessPage = () => {
       setChecklistItems(items);
       setChecklistMood(selectedMood);
       setChecklistNote(note.trim() || null);
+      const routineId = `wellness-${selectedMood}-checklist`;
+      setFeedbackRoutineId(routineId);
+      void logRoutineUsed(routineId, "wellness", false);
     } catch (error) {
       setStatusMessage("Could not create checklist. Please try again.");
     } finally {
       setIsGeneratingChecklist(false);
     }
-  }, [note, selectedMood, suggestions, weatherPayload]);
+  }, [logRoutineUsed, note, selectedMood, suggestions, weatherPayload]);
 
   const handleToggleItem = useCallback((id: string) => {
     setChecklistItems((prev) =>
@@ -211,6 +237,16 @@ const WellnessPage = () => {
     ]);
   }, []);
 
+  const handleSeasonalSuggestion = useCallback(
+    (suggestionId: string) => {
+      if (!seasonalContext) return;
+      const suggestion = seasonalContext.suggestions.find((item) => item.id === suggestionId);
+      if (!suggestion) return;
+      setNote(suggestion.text);
+    },
+    [seasonalContext]
+  );
+
   const checklistComplete =
     checklistItems.length > 0 && checklistItems.every((item) => item.done);
 
@@ -233,6 +269,9 @@ const WellnessPage = () => {
       });
       setCheckInMessage(response.data.message);
       setHasCheckedIn(true);
+      if (feedbackRoutineId) {
+        void logRoutineUsed(feedbackRoutineId, "wellness", true);
+      }
     } catch (error) {
       setCheckInMessage("You made it through that checklist. How are you feeling now?");
       setHasCheckedIn(true);
@@ -244,8 +283,10 @@ const WellnessPage = () => {
     checklistItems,
     checklistMood,
     checklistNote,
+    feedbackRoutineId,
     hasCheckedIn,
     isCheckingIn,
+    logRoutineUsed,
     note,
     selectedMood,
     weatherPayload,
@@ -317,6 +358,16 @@ const WellnessPage = () => {
               <p className="text-sm text-muted-foreground/60 font-mono">
                 Victoria, BC · {weather.temperature}°C · {weather.description}
               </p>
+            )}
+            {seasonalContext && (
+              <div className="flex justify-center">
+                <SeasonalBanner
+                  context={seasonalContext}
+                  onSuggestionClick={handleSeasonalSuggestion}
+                  onSunsetClick={() => setNote("Quick loop before it gets dark.")}
+                  showSuggestions
+                />
+              </div>
             )}
           </motion.header>
 
@@ -455,6 +506,12 @@ const WellnessPage = () => {
                             href={normalizeResourceUrl(resource.url)}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() =>
+                              logEvent("resource_clicked", {
+                                resource_id: resource.id,
+                                resource_type: "wellness_suggestion",
+                              })
+                            }
                             className={cn(
                               "block p-4 rounded-2xl",
                               "bg-background/40 border border-border/30",
@@ -608,6 +665,20 @@ const WellnessPage = () => {
                   </p>
                 </CardContent>
               </Card>
+            </motion.div>
+          )}
+
+          {feedbackRoutineId && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <FeedbackPrompt
+                routineId={feedbackRoutineId}
+                playbookId="wellness"
+                onDismiss={() => setFeedbackRoutineId(null)}
+              />
             </motion.div>
           )}
         </div>
