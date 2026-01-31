@@ -286,6 +286,7 @@ export const api = {
       }>("/api/wellness/suggestions", {
         method: "POST",
         body: payload,
+        requireAuth: false,
       }),
 
     createChecklist: (payload: {
@@ -306,6 +307,7 @@ export const api = {
       }>("/api/wellness/checklist", {
         method: "POST",
         body: payload,
+        requireAuth: false,
       }),
 
     generateCheckIn: (payload: {
@@ -325,6 +327,7 @@ export const api = {
       }>("/api/wellness/checkin", {
         method: "POST",
         body: payload,
+        requireAuth: false,
       }),
   },
 

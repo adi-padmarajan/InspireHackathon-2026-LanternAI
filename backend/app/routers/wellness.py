@@ -84,7 +84,6 @@ async def get_mood_stats(
 @router.post("/suggestions", response_model=ApiResponse[WellnessSuggestionResponse])
 async def get_suggestions(
     body: WellnessSuggestionRequest,
-    current_user: TokenData = Depends(get_current_user),
     service: WellnessService = Depends(get_wellness_service),
 ) -> ApiResponse[WellnessSuggestionResponse]:
     """Generate Lantern suggestions based on mood, note, and weather."""
@@ -103,7 +102,6 @@ async def get_suggestions(
 @router.post("/checklist", response_model=ApiResponse[WellnessChecklistResponse])
 async def create_checklist(
     body: WellnessChecklistRequest,
-    current_user: TokenData = Depends(get_current_user),
     service: WellnessService = Depends(get_wellness_service),
 ) -> ApiResponse[WellnessChecklistResponse]:
     """Generate a checklist based on mood, note, suggestions, and weather."""
@@ -124,7 +122,6 @@ async def create_checklist(
 @router.post("/checkin", response_model=ApiResponse[WellnessCheckInResponse])
 async def generate_checkin(
     body: WellnessCheckInRequest,
-    current_user: TokenData = Depends(get_current_user),
     service: WellnessService = Depends(get_wellness_service),
 ) -> ApiResponse[WellnessCheckInResponse]:
     """Generate a follow-up check-in after checklist completion."""
