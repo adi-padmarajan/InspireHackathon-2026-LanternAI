@@ -8,10 +8,14 @@ import {
   Check,
   Plus,
   X,
+  Sparkles,
+  Heart,
+  Sun,
 } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { AmbientBackground } from "@/components/AmbientBackground";
+import { FilmGrain, CinematicVignette, AmbientGradients } from "@/components/FilmGrain";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,11 +28,11 @@ import { pageVariants, springPresets } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
 const moodOptions = [
-  { value: "great", label: "Great", icon: Smile, color: "text-emerald-600", ring: "ring-emerald-200" },
-  { value: "good", label: "Good", icon: Smile, color: "text-sky-600", ring: "ring-sky-200" },
-  { value: "okay", label: "Okay", icon: Meh, color: "text-amber-600", ring: "ring-amber-200" },
-  { value: "low", label: "Low", icon: Frown, color: "text-orange-600", ring: "ring-orange-200" },
-  { value: "struggling", label: "Struggling", icon: CloudRain, color: "text-rose-600", ring: "ring-rose-200" },
+  { value: "great", label: "Great", icon: Smile, gradient: "from-emerald-500/20 to-green-500/10" },
+  { value: "good", label: "Good", icon: Smile, gradient: "from-sky-500/20 to-blue-500/10" },
+  { value: "okay", label: "Okay", icon: Meh, gradient: "from-amber-500/20 to-yellow-500/10" },
+  { value: "low", label: "Low", icon: Frown, gradient: "from-orange-500/20 to-amber-500/10" },
+  { value: "struggling", label: "Struggling", icon: CloudRain, gradient: "from-rose-500/20 to-pink-500/10" },
 ] as const;
 
 type MoodValue = (typeof moodOptions)[number]["value"];
@@ -245,210 +249,303 @@ const WellnessPage = () => {
       animate="enter"
       exit="exit"
     >
+      {/* Cinematic layers */}
       {!hasCustomBackground && <AmbientBackground />}
+      <AmbientGradients />
+      <CinematicVignette intensity={0.3} />
+      <FilmGrain opacity={0.02} />
 
+      {/* Edge gradients */}
       {!hasCustomBackground && (
         <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background/80 via-background/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/50 to-transparent" />
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background/40 to-transparent" />
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background/40 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background/90 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
         </div>
       )}
 
       <Navigation />
 
       <main className="flex-1 pt-16 relative z-10">
-        <div className="max-w-5xl mx-auto w-full px-4 py-10 space-y-8">
-          <motion.div
-            className="text-center space-y-3"
-            initial={{ opacity: 0, y: 10 }}
+        <div className="max-w-4xl mx-auto w-full px-4 md:px-8 py-12 md:py-16 space-y-12">
+          {/* Hero section */}
+          <motion.header
+            className="text-center space-y-4"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={springPresets.gentle}
+            transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <h1 className="text-3xl md:text-4xl font-serif font-semibold text-foreground">
+            <motion.div
+              className="inline-flex p-4 rounded-full bg-accent/50 mb-4"
+              animate={{
+                boxShadow: [
+                  "0 0 30px hsl(var(--primary) / 0.1)",
+                  "0 0 50px hsl(var(--primary) / 0.2)",
+                  "0 0 30px hsl(var(--primary) / 0.1)",
+                ],
+              }}
+              transition={{ duration: 4, repeat: Infinity }}
+            >
+              <Heart className="h-8 w-8 text-primary" />
+            </motion.div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-foreground tracking-tight">
               Wellness Check-In
             </h1>
-            <p className="text-muted-foreground text-base md:text-lg">
-              Welcome back, {greetingName}. How are you feeling today?
+            <p className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto">
+              Welcome back, {greetingName}. Take a moment to check in with yourself.
             </p>
             {weather && (
-              <p className="text-xs text-muted-foreground/70">
-                Victoria, BC | {weather.temperature}C | {weather.description}
+              <p className="text-sm text-muted-foreground/60 font-mono">
+                Victoria, BC · {weather.temperature}°C · {weather.description}
               </p>
             )}
-          </motion.div>
+          </motion.header>
 
-          <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Log your mood</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {moodOptions.map((option) => {
-                  const Icon = option.icon;
-                  const isSelected = selectedMood === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setSelectedMood(option.value)}
-                      className={cn(
-                        "flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm transition",
-                        "bg-background/60 hover:border-primary/40",
-                        isSelected && "border-primary/60 ring-2",
-                        isSelected && option.ring
-                      )}
-                    >
-                      <Icon className={cn("h-5 w-5", option.color)} />
-                      <span className="font-medium text-foreground/90">{option.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Optional note</label>
-                <Textarea
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                  placeholder="Add a quick note if you would like..."
-                  className="min-h-[90px]"
-                />
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <Button
-                  onClick={handleLogMood}
-                  disabled={!selectedMood || isLoggingMood}
-                >
-                  {isLoggingMood ? "Logging..." : "Log Mood"}
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleGetSuggestions}
-                  disabled={!selectedMood || isLoadingSuggestions}
-                >
-                  {isLoadingSuggestions ? "Thinking..." : "Lantern Suggestions"}
-                </Button>
-                {statusMessage && (
-                  <span className="text-sm text-muted-foreground">{statusMessage}</span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {suggestions.length > 0 && (
-            <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Lantern suggestions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2 text-sm text-foreground/90">
-                  {suggestions.map((suggestion, index) => (
-                    <li key={`${suggestion}-${index}`} className="flex gap-2">
-                      <span className="text-primary">-</span>
-                      <span>{suggestion}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {followUpQuestion && showChecklistPrompt && (
-                  <div className="rounded-xl border border-border/60 bg-background/60 p-4 space-y-3">
-                    <p className="text-sm text-foreground/90">{followUpQuestion}</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        onClick={handleCreateChecklist}
-                        disabled={isGeneratingChecklist}
-                      >
-                        {isGeneratingChecklist ? "Creating..." : "Yes, create a checklist"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setShowChecklistPrompt(false)}
-                      >
-                        Not right now
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {checklistItems.length > 0 && (
-            <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {checklistTitle || "Your checklist"}
+          {/* Mood Selection Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            <Card className="border-border/40 bg-card/50 backdrop-blur-sm shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-serif flex items-center gap-2">
+                  <Sun className="h-5 w-5 text-primary" />
+                  How are you feeling?
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  {checklistItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-3"
-                    >
-                      <button
+              <CardContent className="space-y-8">
+                {/* Mood buttons - Playbook style */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                  {moodOptions.map((option) => {
+                    const Icon = option.icon;
+                    const isSelected = selectedMood === option.value;
+                    return (
+                      <motion.button
+                        key={option.value}
                         type="button"
-                        onClick={() => handleToggleItem(item.id)}
+                        onClick={() => setSelectedMood(option.value)}
                         className={cn(
-                          "h-8 w-8 rounded-full border flex items-center justify-center",
-                          item.done
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "border-border/60"
+                          "relative flex flex-col items-center gap-3 p-6 rounded-2xl",
+                          "border border-border/40 transition-all duration-300",
+                          "bg-background/60 hover:bg-background/80",
+                          isSelected && "border-primary/60 ring-2 ring-primary/20"
                         )}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        {item.done && <Check className="h-4 w-4" />}
-                      </button>
-                      <Input
-                        value={item.text}
-                        onChange={(event) => handleUpdateItem(item.id, event.target.value)}
-                        placeholder="Checklist item"
-                        className={cn(
-                          "flex-1",
-                          item.done && "line-through text-muted-foreground"
-                        )}
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                        {/* Gradient overlay */}
+                        <div
+                          className={cn(
+                            "absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300",
+                            isSelected && "opacity-100",
+                            `bg-gradient-to-br ${option.gradient}`
+                          )}
+                        />
+                        <Icon className={cn("h-7 w-7 relative z-10", isSelected ? "text-foreground" : "text-muted-foreground")} />
+                        <span className={cn("text-sm font-medium relative z-10", isSelected ? "text-foreground" : "text-muted-foreground")}>
+                          {option.label}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button type="button" variant="secondary" onClick={handleAddItem}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add item
+                {/* Note textarea */}
+                <div className="space-y-3">
+                  <label className="text-sm text-muted-foreground font-medium">
+                    Add a note (optional)
+                  </label>
+                  <Textarea
+                    value={note}
+                    onChange={(event) => setNote(event.target.value)}
+                    placeholder="What's on your mind today?"
+                    className="min-h-[100px] bg-background/60 border-border/40 resize-none"
+                  />
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-wrap items-center gap-4">
+                  <Button
+                    onClick={handleLogMood}
+                    disabled={!selectedMood || isLoggingMood}
+                    size="lg"
+                    className="rounded-full px-8"
+                  >
+                    {isLoggingMood ? "Logging..." : "Log Mood"}
                   </Button>
-                  <span className="text-xs text-muted-foreground">
-                    {checklistItems.filter((item) => item.done).length} / {checklistItems.length} done
-                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={handleGetSuggestions}
+                    disabled={!selectedMood || isLoadingSuggestions}
+                    size="lg"
+                    className="rounded-full px-8 gap-2"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {isLoadingSuggestions ? "Thinking..." : "Get Suggestions"}
+                  </Button>
+                  {statusMessage && (
+                    <span className="text-sm text-muted-foreground">{statusMessage}</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
+
+          {/* Suggestions Card */}
+          {suggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="border-border/40 bg-card/50 backdrop-blur-sm shadow-xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl font-serif flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Lantern Suggestions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <ul className="space-y-3">
+                    {suggestions.map((suggestion, index) => (
+                      <motion.li
+                        key={`${suggestion}-${index}`}
+                        className="flex gap-3 items-start p-4 rounded-xl bg-background/40 border border-border/30"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <span className="h-2 w-2 rounded-full bg-primary mt-2 shrink-0" />
+                        <span className="text-foreground/90">{suggestion}</span>
+                      </motion.li>
+                    ))}
+                  </ul>
+
+                  {followUpQuestion && showChecklistPrompt && (
+                    <div className="p-6 rounded-2xl bg-accent/30 border border-primary/20 space-y-4">
+                      <p className="text-foreground/90 font-medium">{followUpQuestion}</p>
+                      <div className="flex flex-wrap gap-3">
+                        <Button
+                          onClick={handleCreateChecklist}
+                          disabled={isGeneratingChecklist}
+                          className="rounded-full"
+                        >
+                          {isGeneratingChecklist ? "Creating..." : "Yes, create a checklist"}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() => setShowChecklistPrompt(false)}
+                          className="rounded-full"
+                        >
+                          Not right now
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
 
+          {/* Checklist Card */}
+          {checklistItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="border-border/40 bg-card/50 backdrop-blur-sm shadow-xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl font-serif">
+                    {checklistTitle || "Your Checklist"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    {checklistItems.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        className="flex items-center gap-4 p-4 rounded-xl bg-background/40 border border-border/30"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <motion.button
+                          type="button"
+                          onClick={() => handleToggleItem(item.id)}
+                          className={cn(
+                            "h-8 w-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
+                            item.done
+                              ? "bg-primary border-primary text-primary-foreground"
+                              : "border-border/60 hover:border-primary/50"
+                          )}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          {item.done && <Check className="h-4 w-4" />}
+                        </motion.button>
+                        <Input
+                          value={item.text}
+                          onChange={(event) => handleUpdateItem(item.id, event.target.value)}
+                          placeholder="Checklist item"
+                          className={cn(
+                            "flex-1 bg-transparent border-0 focus-visible:ring-0 px-0",
+                            item.done && "line-through text-muted-foreground"
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleRemoveItem(item.id)}
+                          className="shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddItem}
+                      className="rounded-full gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add item
+                    </Button>
+                    <span className="text-sm text-muted-foreground font-mono">
+                      {checklistItems.filter((item) => item.done).length} / {checklistItems.length} complete
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Check-in Message Card */}
           {(checkInMessage || isCheckingIn) && (
-            <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Lantern check-in</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-foreground/90">
-                  {isCheckingIn ? "Checking in..." : checkInMessage}
-                </p>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="border-primary/30 bg-gradient-to-br from-accent/40 to-accent/20 backdrop-blur-sm shadow-xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl font-serif flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-primary" />
+                    Lantern Check-In
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-lg text-foreground/90 leading-relaxed">
+                    {isCheckingIn ? "Checking in..." : checkInMessage}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
         </div>
       </main>
