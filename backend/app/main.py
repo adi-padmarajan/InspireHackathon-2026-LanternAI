@@ -5,7 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 from .config import settings
-from .routers import chat_router, wellness_router, auth_router, images_router
+from .routers import chat_router, wellness_router, auth_router, images_router, resources_router
+from .services.resource_service import init_resource_service
 
 # Configure logging
 logging.basicConfig(
@@ -35,6 +36,18 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(wellness_router, prefix="/api")
 app.include_router(images_router, prefix="/api")
+app.include_router(resources_router, prefix="/api")
+
+# Initialize resource service at startup
+@app.on_event("startup")
+async def startup_event():
+    """Load resources on application startup."""
+    import os
+    # Resolve path relative to project root
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    json_path = os.path.join(project_root, "data", "uvic_student_resources.json")
+    init_resource_service(json_path)
+    logger.info("Resource service initialized")
 
 
 @app.get("/api/health")

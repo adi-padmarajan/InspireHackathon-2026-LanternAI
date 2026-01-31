@@ -8,6 +8,11 @@ from typing import Optional, List
 import google.generativeai as genai
 from ..config import settings
 from ..models.schemas import ChatMode, ChatResponse, CompanionProfile, CompanionMemory
+from .safety import (
+    detect_crisis,
+    build_crisis_response,
+    build_crisis_resources_block,
+)
 
 # Configure Google Gemini
 genai.configure(api_key=settings.google_ai_api_key)
@@ -15,7 +20,9 @@ genai.configure(api_key=settings.google_ai_api_key)
 # Model name for Gemini 3 Flash Preview
 GEMINI_MODEL_NAME = "gemini-3-flash-preview"
 
-SYSTEM_PROMPT = """You are Lantern 🏮 — a warm, best-friend companion for UVic students.
+_CRISIS_RESOURCES_BLOCK = build_crisis_resources_block()
+
+SYSTEM_PROMPT = f"""You are Lantern 🏮 — a warm, best-friend companion for UVic students.
 
 CORE IDENTITY
 - You are not a doctor or therapist.
@@ -56,14 +63,12 @@ COMMUNICATION GUIDELINES
 - Use whitespace and bullets for any exercise or steps.
 
 CRISIS & SAFETY (IRONCLAD RULE)
-Trigger: Any mention of self-harm, suicide, or violence.
+Trigger: Any mention of self-harm, suicide, or immediate danger.
 Immediate pivot: Drop the companion persona briefly and become a Safety Anchor.
 Say (or closely follow):
 “I can hear how much pain you’re in, and I want to make sure you’re safe. I’m an AI, and I can’t provide the level of care you deserve right now.”
 Mandatory resources (include these):
-- 988 (US)
-- Crisis Text Line: Text 741741
-- International directory link for crisis resources
+{_CRISIS_RESOURCES_BLOCK}
 Then stay present:
 “I am still here. Would you like to stay with me while you reach out to one of these services?”
 
@@ -160,6 +165,13 @@ class ChatService:
             memory_data = memory.dict(exclude_none=True) if memory else None
             merged_profile = cls._merge_profile(session_id, profile_data)
             merged_memory = cls._merge_memory(session_id, memory_data)
+
+            if detect_crisis(message):
+                preferred_name = merged_profile.get("preferred_name") if merged_profile else None
+                return ChatResponse(
+                    message=build_crisis_response(preferred_name),
+                    timestamp=datetime.utcnow(),
+                )
             
             # Create the model with system instruction
             chat_model = genai.GenerativeModel(
@@ -205,8 +217,8 @@ class ChatService:
             response_text = (
                 "I'm here for you 💚 I'm experiencing a brief connection issue, "
                 "but I want you to know that your feelings matter and you're not alone. "
-                "If you're in crisis, please reach out to a crisis helpline: "
-                "**988** (Suicide & Crisis Lifeline) or text **HOME to 741741**. "
+                "If you're in crisis, please reach out:\n"
+                f"{build_crisis_resources_block()}\n\n"
                 "Let's try again in a moment."
             )
         

@@ -12,6 +12,13 @@ from ..models.schemas import (
     WellnessChecklistResponse,
     WellnessCheckInResponse,
 )
+from .safety import (
+    detect_crisis,
+    get_crisis_action_steps,
+    get_crisis_resource_lines,
+    build_crisis_follow_up_question,
+    build_crisis_checkin_message,
+)
 
 # Configure Google Gemini (safe to call multiple times)
 genai.configure(api_key=settings.google_ai_api_key)
@@ -96,6 +103,14 @@ def _fallback_suggestions(mood: MoodLevel, weather: Optional[WeatherContext]) ->
     )
 
 
+def _crisis_suggestions() -> WellnessSuggestionResponse:
+    suggestions = get_crisis_action_steps() + get_crisis_resource_lines()
+    return WellnessSuggestionResponse(
+        suggestions=suggestions[:5],
+        follow_up_question=build_crisis_follow_up_question(),
+    )
+
+
 def _fallback_checklist(weather: Optional[WeatherContext]) -> WellnessChecklistResponse:
     weather_hint = (weather.description or "").lower() if weather else ""
     if "rain" in weather_hint:
@@ -113,10 +128,24 @@ def _fallback_checklist(weather: Optional[WeatherContext]) -> WellnessChecklistR
     return WellnessChecklistResponse(title="A small reset", items=items)
 
 
+def _crisis_checklist() -> WellnessChecklistResponse:
+    items = get_crisis_action_steps() + get_crisis_resource_lines()
+    return WellnessChecklistResponse(title="Immediate support steps", items=items[:6])
+
+
 def _fallback_checkin() -> WellnessCheckInResponse:
     return WellnessCheckInResponse(
         message="You made it through that checklist. How are you feeling now?"
     )
+
+
+def _crisis_checkin() -> WellnessCheckInResponse:
+    return WellnessCheckInResponse(message=build_crisis_checkin_message())
+
+
+def _contains_crisis(*values: Optional[str]) -> bool:
+    combined = " ".join([value for value in values if value])
+    return detect_crisis(combined)
 
 
 class WellnessService:
@@ -199,6 +228,9 @@ class WellnessService:
         weather: Optional[WeatherContext] = None,
     ) -> WellnessSuggestionResponse:
         """Generate weather-aware suggestions via Gemini Flash."""
+        if _contains_crisis(note):
+            return _crisis_suggestions()
+
         if not settings.google_ai_api_key:
             return _fallback_suggestions(mood, weather)
 
@@ -249,6 +281,9 @@ class WellnessService:
         max_items: int = 5,
     ) -> WellnessChecklistResponse:
         """Generate a checklist via Gemini Flash."""
+        if _contains_crisis(note, " ".join(suggestions or [])):
+            return _crisis_checklist()
+
         if not settings.google_ai_api_key:
             return _fallback_checklist(weather)
 
@@ -301,6 +336,9 @@ class WellnessService:
         checklist_summary: Optional[str] = None,
     ) -> WellnessCheckInResponse:
         """Generate a follow-up check-in after checklist completion."""
+        if _contains_crisis(note, checklist_summary):
+            return _crisis_checkin()
+
         if not settings.google_ai_api_key:
             return _fallback_checkin()
 
