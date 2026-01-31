@@ -30,6 +30,18 @@ def get_wellness_service() -> WellnessService:
         raise HTTPException(status_code=500, detail="Service temporarily unavailable")
 
 
+def get_wellness_service_relaxed() -> WellnessService:
+    """
+    Return a WellnessService even if Supabase is not configured.
+    Useful for suggestion/checklist/checkin endpoints that don't need DB.
+    """
+    try:
+        client = get_supabase_client()
+    except ValueError:
+        client = None  # type: ignore
+    return WellnessService(client)  # type: ignore
+
+
 @router.post("/mood", response_model=ApiResponse[MoodEntry])
 async def create_mood_entry(
     body: MoodEntryInput,
@@ -84,7 +96,7 @@ async def get_mood_stats(
 @router.post("/suggestions", response_model=ApiResponse[WellnessSuggestionResponse])
 async def get_suggestions(
     body: WellnessSuggestionRequest,
-    service: WellnessService = Depends(get_wellness_service),
+    service: WellnessService = Depends(get_wellness_service_relaxed),
 ) -> ApiResponse[WellnessSuggestionResponse]:
     """Generate Lantern suggestions based on mood, note, and weather."""
     try:
@@ -102,7 +114,7 @@ async def get_suggestions(
 @router.post("/checklist", response_model=ApiResponse[WellnessChecklistResponse])
 async def create_checklist(
     body: WellnessChecklistRequest,
-    service: WellnessService = Depends(get_wellness_service),
+    service: WellnessService = Depends(get_wellness_service_relaxed),
 ) -> ApiResponse[WellnessChecklistResponse]:
     """Generate a checklist based on mood, note, suggestions, and weather."""
     try:
@@ -122,7 +134,7 @@ async def create_checklist(
 @router.post("/checkin", response_model=ApiResponse[WellnessCheckInResponse])
 async def generate_checkin(
     body: WellnessCheckInRequest,
-    service: WellnessService = Depends(get_wellness_service),
+    service: WellnessService = Depends(get_wellness_service_relaxed),
 ) -> ApiResponse[WellnessCheckInResponse]:
     """Generate a follow-up check-in after checklist completion."""
     try:
