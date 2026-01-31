@@ -288,19 +288,22 @@ const ChatPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const followUpTimeoutRef = useRef<number | null>(null);
+  const prevUserIdRef = useRef<string | null>(null);
   const sessionId = useMemo(() => getSessionId(), []);
 
   const hasCustomBackground =
     currentBackground?.enabled &&
     (currentBackground?.image || currentBackground?.wallpaper);
 
+  // Use the current user's display_name for the greeting, falling back to profile name
+  const currentUserName = user?.display_name || profile.name;
+
   const initialPrompt = useMemo(() => {
-    if (initialProfile.onboardingComplete) {
-      const name = initialProfile.name || user?.display_name;
-      return `Welcome back${name ? `, ${name}` : ""}. What's on your mind today?`;
+    if (initialProfile.onboardingComplete || isAuthenticated) {
+      return `Welcome back${currentUserName ? `, ${currentUserName}` : ""}. What's on your mind today?`;
     }
     return ONBOARDING_PROMPTS.name;
-  }, [initialProfile.onboardingComplete, initialProfile.name, user?.display_name]);
+  }, [initialProfile.onboardingComplete, isAuthenticated, currentUserName]);
 
   const seasonalWeatherPayload = useMemo(() => {
     if (!weather) return undefined;
@@ -339,6 +342,20 @@ const ChatPage = () => {
       localStorage.removeItem(PLAYBOOK_STATE_KEY);
     }
   }, [playbookState]);
+
+  // Reset chat when user changes (e.g., logging in as different user)
+  useEffect(() => {
+    const currentUserId = user?.id || null;
+    if (prevUserIdRef.current !== null && prevUserIdRef.current !== currentUserId) {
+      // User changed - reset the chat with new greeting
+      const newGreeting = `Welcome back${user?.display_name ? `, ${user.display_name}` : ""}. What's on your mind today?`;
+      setMessages([createMessage("assistant", newGreeting)]);
+      // Reset playbook state for new user
+      setPlaybookState(null);
+      setSuggestedResources([]);
+    }
+    prevUserIdRef.current = currentUserId;
+  }, [user?.id, user?.display_name]);
 
   useEffect(() => {
     // Always sync profile name with authenticated user's display_name
