@@ -6,6 +6,19 @@ A cinematic, calm web app that combines a best-friend style chat experience with
 
 ---
 
+## 🏆 Hackathon Result
+
+**Secured 2nd place at Inspire Hackathon 2026.**
+
+---
+
+## 📸 Screenshots
+
+![Lantern UI 1](Lantern1.png)
+![Lantern UI 2](Lantern2.png)
+
+---
+
 ## ✨ Features
 
 ### 💬 Chat Companion
